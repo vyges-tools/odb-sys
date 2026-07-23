@@ -45,9 +45,8 @@ fn main() {
             )
         };
 
-    // 1. link libodb.
+    // 1. libodb search path (the archive is linked platform-specifically below).
     println!("cargo:rustc-link-search=native={}", lib_dir.display());
-    println!("cargo:rustc-link-lib=static=odb");
 
     // 2. compile the cxx bridge + shim against odb/utl + dep headers.
     includes.extend(dep.includes.iter().cloned());
@@ -58,20 +57,39 @@ fn main() {
     }
     b.compile("vyges_odb_shim");
 
-    // 3. external link flags.
+    // 3. link libodb + external deps.
+    //   Linux: STATIC (apt ships .a) => a self-contained binary. Wrapped in a group so
+    //          abseil's many interdependent archives resolve. z + stdc++ stay dynamic (system).
+    //   macOS: DYNAMIC (Homebrew is dylib-only for abseil); the Homebrew formula declares
+    //          abseil/spdlog/fmt as runtime deps so `brew install` provides them.
     for dir in &dep.lib_dirs {
         println!("cargo:rustc-link-search=native={}", dir.display());
     }
-    for lib in ["spdlog", "fmt", "z"] {
-        println!("cargo:rustc-link-lib=dylib={lib}");
-    }
-    for absl in dep.abseil_libs() {
-        println!("cargo:rustc-link-lib=dylib={absl}");
-    }
-    if cfg!(target_os = "macos") {
-        println!("cargo:rustc-link-lib=dylib=c++");
-    } else {
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    if target_os == "linux" {
+        let mut archives = vec![lib_dir.join("libodb.a")];
+        for n in ["libspdlog.a", "libfmt.a"] {
+            if let Some(p) = dep.find_lib(n) {
+                archives.push(p);
+            }
+        }
+        archives.extend(dep.abseil_static());
+        println!("cargo:rustc-link-arg=-Wl,--start-group");
+        for a in &archives {
+            println!("cargo:rustc-link-arg={}", a.display());
+        }
+        println!("cargo:rustc-link-arg=-Wl,--end-group");
+        println!("cargo:rustc-link-lib=dylib=z");
         println!("cargo:rustc-link-lib=dylib=stdc++");
+    } else {
+        println!("cargo:rustc-link-lib=static=odb");
+        for lib in ["spdlog", "fmt", "z"] {
+            println!("cargo:rustc-link-lib=dylib={lib}");
+        }
+        for absl in dep.abseil_libs() {
+            println!("cargo:rustc-link-lib=dylib={absl}");
+        }
+        println!("cargo:rustc-link-lib=dylib=c++");
     }
 
     println!("cargo:rerun-if-env-changed=VYGES_ODB_PREBUILT_DIR");
@@ -165,6 +183,29 @@ impl DepPaths {
                 dylib_ext: ".so",
             }
         }
+    }
+
+    /// First existing `<lib_dir>/<name>` across the search dirs (for Linux static archives).
+    fn find_lib(&self, name: &str) -> Option<PathBuf> {
+        self.lib_dirs.iter().map(|d| d.join(name)).find(|p| p.exists())
+    }
+
+    /// Full paths to the unversioned `libabsl_*.a` static archives (Linux self-contained link).
+    fn abseil_static(&self) -> Vec<PathBuf> {
+        let mut out = Vec::new();
+        for dir in self.lib_dirs.iter().chain(std::iter::once(&self.abseil_lib_dir)) {
+            if let Ok(rd) = std::fs::read_dir(dir) {
+                for e in rd.flatten() {
+                    let n = e.file_name().to_string_lossy().into_owned();
+                    if n.starts_with("libabsl_") && n.ends_with(".a") {
+                        out.push(e.path());
+                    }
+                }
+            }
+        }
+        out.sort();
+        out.dedup();
+        out
     }
 
     fn abseil_libs(&self) -> Vec<String> {
