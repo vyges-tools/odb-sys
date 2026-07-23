@@ -1,5 +1,6 @@
 /vendor/
 /build/
+/prebuilt/
 /target/
 Cargo.lock
 *.o

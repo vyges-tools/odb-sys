@@ -49,11 +49,18 @@ jobs:
           ./build/odb_smoke test/fixtures/counter.odb /tmp/rt.odb
           echo "libodb.a: $(du -h build/libodb.a | cut -f1)"
 
-      - name: Upload libodb artifact (+ OpenROAD BSD-3 license for binary compliance)
+      - name: Assemble prebuilt bundle (VYGES_ODB_PREBUILT_DIR layout)
+        run: |
+          mkdir -p prebuilt/lib prebuilt/include
+          cp build/libodb.a prebuilt/lib/
+          cp -R vendor/OpenROAD/src/odb/include/odb prebuilt/include/
+          cp -R vendor/OpenROAD/src/utl/include/utl prebuilt/include/
+          cp vendor/OpenROAD/LICENSE prebuilt/OPENROAD-LICENSE-BSD3.txt   # BSD-3 binary compliance
+
+      - name: Upload prebuilt libodb bundle
         uses: actions/upload-artifact@v4
         with:
+          # Download + point VYGES_ODB_PREBUILT_DIR at the extracted dir to link without a build.
           name: libodb-${{ matrix.label }}
-          path: |
-            build/libodb.a
-            vendor/OpenROAD/LICENSE
+          path: prebuilt
           if-no-files-found: error

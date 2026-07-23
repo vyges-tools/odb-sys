@@ -24,6 +24,15 @@ routed `.odb`, walks the model, and writes it back — linking none of the engin
 - **`.github/workflows/build-libodb.yml`** builds + smoke-tests + publishes `libodb.a`
   per-arch, on demand (`workflow_dispatch`).
 
+## Two ways to get libodb
+
+- **Prebuilt (fast, no toolchain-heavy build):** download the per-arch bundle the
+  `build-libodb` workflow publishes (`lib/libodb.a` + `include/{odb,utl}` + the OpenROAD
+  license), extract it, and set `VYGES_ODB_PREBUILT_DIR=<dir>`. `build.rs` links the archive
+  directly — no cmake, no OpenROAD fetch, no `libodb` compile. This is the path for consumers
+  (e.g. `vyges-cli`) and CI.
+- **From source (default):** `scripts/fetch-odb-src.sh` + CMake, below.
+
 ## Build locally
 
 ```sh

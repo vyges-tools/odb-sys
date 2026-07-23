@@ -1,56 +1,74 @@
 // SPDX-License-Identifier: Apache-2.0
-// Builds the standalone libodb (CMake, from the pinned sparse OpenROAD subtree),
-// compiles the cxx bridge + C++ shim against it, and emits the link flags.
+// Gets libodb one of two ways, then compiles the cxx bridge + shim against it:
+//
+//   1. PREBUILT (light): set VYGES_ODB_PREBUILT_DIR=<dir> containing `lib/libodb.a` and
+//      `include/{odb,utl}/...` (the layout the build-libodb workflow publishes). No cmake,
+//      no OpenROAD fetch, no C++ compile of libodb — just links the published archive.
+//   2. FROM SOURCE (default): builds a standalone libodb via CMake from the pinned sparse
+//      OpenROAD subtree (run scripts/fetch-odb-src.sh first).
 use std::path::{Path, PathBuf};
 
 fn main() {
-    let vendor = PathBuf::from("vendor/OpenROAD");
-    if !vendor.join("src/odb/include/odb/db.h").exists() {
-        panic!("vendor/OpenROAD missing — run scripts/fetch-odb-src.sh first");
-    }
-
-    // 1. standalone libodb.a via CMake.
-    let dst = cmake::Config::new(".")
-        .define("VYGES_ODB_SMOKE", "OFF")
-        .build_target("odb")
-        .build();
-    let odb_build = dst.join("build");
-    println!("cargo:rustc-link-search=native={}", odb_build.display());
-    println!("cargo:rustc-link-lib=static=odb");
-
-    // 2. external dependency prefixes (cross-platform).
     let dep = DepPaths::detect();
 
-    // 3. compile the cxx bridge + shim against odb + utl + dep headers.
+    // Where libodb.a lives + the include dirs the shim compiles against.
+    let (lib_dir, mut includes): (PathBuf, Vec<PathBuf>) =
+        if let Ok(prebuilt) = std::env::var("VYGES_ODB_PREBUILT_DIR") {
+            let p = PathBuf::from(&prebuilt);
+            let lib = p.join("lib");
+            if !lib.join("libodb.a").exists() {
+                panic!("VYGES_ODB_PREBUILT_DIR set but {}/libodb.a not found", lib.display());
+            }
+            println!("cargo:warning=vyges-odb-sys: linking prebuilt libodb from {prebuilt}");
+            (lib, vec![p.join("include")])
+        } else {
+            let vendor = PathBuf::from("vendor/OpenROAD");
+            if !vendor.join("src/odb/include/odb/db.h").exists() {
+                panic!("no libodb: set VYGES_ODB_PREBUILT_DIR, or run scripts/fetch-odb-src.sh to build from source");
+            }
+            let dst = cmake::Config::new(".")
+                .define("VYGES_ODB_SMOKE", "OFF")
+                .build_target("odb")
+                .build();
+            (
+                dst.join("build"),
+                vec![
+                    vendor.join("src/odb/include"),
+                    vendor.join("src/utl/include"),
+                ],
+            )
+        };
+
+    // 1. link libodb.
+    println!("cargo:rustc-link-search=native={}", lib_dir.display());
+    println!("cargo:rustc-link-lib=static=odb");
+
+    // 2. compile the cxx bridge + shim against odb/utl + dep headers.
+    includes.extend(dep.includes.iter().cloned());
     let mut b = cxx_build::bridge("src/lib.rs");
-    b.file("src/shim.cc")
-        .std("c++20")
-        .include("src")
-        .include(vendor.join("src/odb/include"))
-        .include(vendor.join("src/utl/include"));
-    for inc in &dep.includes {
+    b.file("src/shim.cc").std("c++20").include("src");
+    for inc in &includes {
         b.include(inc);
     }
     b.compile("vyges_odb_shim");
 
-    // 4. external link flags.
+    // 3. external link flags.
     for dir in &dep.lib_dirs {
         println!("cargo:rustc-link-search=native={}", dir.display());
     }
     for lib in ["spdlog", "fmt", "z"] {
         println!("cargo:rustc-link-lib=dylib={lib}");
     }
-    // abseil: link the unversioned libs the db + logger pull in.
     for absl in dep.abseil_libs() {
         println!("cargo:rustc-link-lib=dylib={absl}");
     }
-    // C++ runtime.
     if cfg!(target_os = "macos") {
         println!("cargo:rustc-link-lib=dylib=c++");
     } else {
         println!("cargo:rustc-link-lib=dylib=stdc++");
     }
 
+    println!("cargo:rerun-if-env-changed=VYGES_ODB_PREBUILT_DIR");
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/shim.cc");
     println!("cargo:rerun-if-changed=src/shim.h");
@@ -67,7 +85,6 @@ struct DepPaths {
 impl DepPaths {
     fn detect() -> Self {
         if cfg!(target_os = "macos") {
-            // Homebrew (Apple Silicon default /opt/homebrew, Intel /usr/local).
             let brew = if Path::new("/opt/homebrew").exists() {
                 PathBuf::from("/opt/homebrew")
             } else {
@@ -80,7 +97,6 @@ impl DepPaths {
                 dylib_ext: ".dylib",
             }
         } else {
-            // Linux: system paths (apt lib*-dev). Cover both multiarch dirs.
             let mut lib_dirs = vec![PathBuf::from("/usr/lib")];
             for d in ["/usr/lib/x86_64-linux-gnu", "/usr/lib/aarch64-linux-gnu"] {
                 if Path::new(d).exists() {
@@ -89,7 +105,7 @@ impl DepPaths {
             }
             let abseil_lib_dir = lib_dirs
                 .iter()
-                .find(|d| d.join("libabsl_base.so").exists() || arch_glob(d))
+                .find(|d| arch_glob(d))
                 .cloned()
                 .unwrap_or_else(|| PathBuf::from("/usr/lib"));
             DepPaths {
@@ -101,7 +117,6 @@ impl DepPaths {
         }
     }
 
-    // Enumerate unversioned libabsl_*.{dylib,so} -> "absl_<name>" link names.
     fn abseil_libs(&self) -> Vec<String> {
         let mut out = Vec::new();
         if let Ok(rd) = std::fs::read_dir(&self.abseil_lib_dir) {
@@ -109,7 +124,6 @@ impl DepPaths {
                 let n = e.file_name().to_string_lossy().into_owned();
                 if let Some(rest) = n.strip_prefix("libabsl_") {
                     if let Some(stem) = rest.strip_suffix(self.dylib_ext) {
-                        // skip versioned (libabsl_base.2601.0.0.dylib)
                         if !stem.chars().any(|c| c.is_ascii_digit()) {
                             out.push(format!("absl_{stem}"));
                         }
