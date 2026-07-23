@@ -1,47 +1,92 @@
 # SPDX-License-Identifier: Apache-2.0
-# On-demand, per-arch build of the standalone libodb from the pinned OpenROAD subtree.
-# Not on push — manual (workflow_dispatch). Proves + publishes libodb.a for each target.
+# Per-arch build of the standalone libodb from the pinned OpenROAD subtree.
+# Not on push — manual (workflow_dispatch) + a weekly canary for upstream drift.
+#
+# Two jobs:
+#   test    — cargo test on NATIVE runners (x86_64 / arm64 Linux / Apple Silicon). The real
+#             per-arch correctness proof of the cxx bridge -> shim -> libodb (incl. arm64).
+#   bundle  — the shippable artifact. Linux legs build inside an OLD-glibc container
+#             (ubuntu:22.04) so the binary runs on more distros; fmt/spdlog/abseil are built
+#             FROM SOURCE at the pinned versions (never the system's), the glibc floor is
+#             MEASURED, and a provenance manifest.json is emitted next to the .a bundle.
 name: build-libodb
 
 on:
   workflow_dispatch:
-  # weekly canary so we notice upstream drift; artifacts still deliberate/manual.
   schedule:
-    - cron: "0 6 * * 1"
+    - cron: "0 6 * * 1"   # weekly canary; artifacts still deliberate/manual
 
 jobs:
-  build:
-    name: ${{ matrix.label }}
+  # ---- functional correctness, native per-arch (this is where arm64 gets tested) ----------
+  test:
+    name: test-${{ matrix.label }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-latest,    label: linux-x86_64,      arch: x86_64 }
-          - { os: ubuntu-24.04-arm, label: linux-arm64,       arch: arm64  }
-          - { os: macos-14,         label: macos-arm64,       arch: arm64  }
+          - { os: ubuntu-latest,   label: linux-x86_64 }
+          - { os: ubuntu-24.04-arm, label: linux-arm64  }
+          - { os: macos-14,        label: macos-arm64   }
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install deps (Linux)
+      - name: Toolchain (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ git \
-            libboost-dev zlib1g-dev libabsl-dev libspdlog-dev libfmt-dev
-
-      - name: Install deps (macOS / Apple Silicon)
+          # Boost (headers) + zlib only. fmt/spdlog/abseil are built from source by CMake —
+          # installing the system copies here would shadow the pinned versions and break the link.
+          sudo apt-get install -y cmake g++ git libboost-dev zlib1g-dev
+      - name: Toolchain (macOS)
         if: runner.os == 'macOS'
-        run: brew install cmake boost abseil spdlog fmt
+        run: brew install cmake boost   # NOT fmt/spdlog/abseil — built from source
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo test (build-from-source, end-to-end bridge)
+        run: cargo test --release --verbose
+
+  # ---- shippable bundle: old glibc base, deps from source, measured floor, manifest -------
+  bundle:
+    name: bundle-${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,    label: linux-x86_64, container: "ubuntu:22.04", base: "ubuntu:22.04" }
+          - { os: ubuntu-24.04-arm, label: linux-arm64,  container: "ubuntu:22.04", base: "ubuntu:22.04" }
+          - { os: macos-14,         label: macos-arm64,  container: "",             base: "macos>=11.0"  }
+    steps:
+      - name: Bootstrap git (bare container needs it before checkout)
+        if: matrix.container != ''
+        run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
+
+      - uses: actions/checkout@v4
+
+      - name: Toolchain (Linux, old base)
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          # g++-12 for a complete C++20 (odb uses operator<=> / <numbers>); binutils for objdump
+          # (glibc-floor measurement); curl/ca-certs/git for the sparse fetch + FetchContent clones.
+          apt-get install -y --no-install-recommends \
+            cmake g++-12 git curl ca-certificates binutils libboost-dev zlib1g-dev
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 100
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100
+          git config --global --add safe.directory '*'   # checked-out repo is owned by another uid
+
+      - name: Toolchain (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cmake boost
 
       - name: Fetch pinned odb subtree (sparse)
         run: scripts/fetch-odb-src.sh
 
-      - name: Configure + build
+      - name: Configure + build (libodb + fmt/spdlog/abseil from source, static)
         run: |
-          PREFIX=""
-          [ "${{ runner.os }}" = "macOS" ] && PREFIX="-DCMAKE_PREFIX_PATH=$(brew --prefix)"
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVYGES_ODB_SMOKE=ON $PREFIX
+          OSX=""
+          [ "${{ runner.os }}" = "macOS" ] && OSX="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_PREFIX_PATH=$(brew --prefix)"
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVYGES_ODB_SMOKE=ON $OSX
           cmake --build build -j
 
       - name: Smoke test (round-trip a real .odb)
@@ -49,18 +94,57 @@ jobs:
           ./build/odb_smoke test/fixtures/counter.odb /tmp/rt.odb
           echo "libodb.a: $(du -h build/libodb.a | cut -f1)"
 
-      - name: Assemble prebuilt bundle (VYGES_ODB_PREBUILT_DIR layout)
+      - name: Measure runtime floor
+        id: floor
         run: |
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            FLOOR=$(objdump -T build/odb_smoke | grep -oE 'GLIBC_[0-9]+\.[0-9]+' | sort -V | uniq | tail -1)
+            echo "glibc_floor=${FLOOR#GLIBC_}" >> "$GITHUB_OUTPUT"
+          else
+            echo "glibc_floor=n/a (macos>=11.0)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Assemble bundle (VYGES_ODB_PREBUILT_DIR layout) + provenance manifest
+        run: |
+          set -eu
+          NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          OR_SHA=$(grep -E '^\s+commit:' openroad-pin.yaml | head -1 | sed 's/.*commit:[[:space:]]*//; s/[[:space:]]*#.*//')
+          FMT=$(grep -E '^\s+fmt:'    openroad-pin.yaml | sed 's/.*"\(.*\)".*/\1/')
+          ABSL=$(grep -E '^\s+abseil:' openroad-pin.yaml | sed 's/.*"\(.*\)".*/\1/')
+          SPD=$(grep -E '^\s+spdlog:' openroad-pin.yaml | sed 's/.*"\(.*\)".*/\1/')
+
           mkdir -p prebuilt/lib prebuilt/include
+          # every static archive: libodb + the fetched fmt/spdlog/abseil pins
           cp build/libodb.a prebuilt/lib/
+          find build/_deps -name '*.a' -exec cp {} prebuilt/lib/ \;
+          # headers the consumer's shim compiles against
           cp -R vendor/OpenROAD/src/odb/include/odb prebuilt/include/
           cp -R vendor/OpenROAD/src/utl/include/utl prebuilt/include/
+          cp -R build/_deps/fmt-src/include/fmt       prebuilt/include/
+          cp -R build/_deps/spdlog-src/include/spdlog prebuilt/include/
+          cp -R build/_deps/absl-src/absl             prebuilt/include/
           cp vendor/OpenROAD/LICENSE prebuilt/OPENROAD-LICENSE-BSD3.txt   # BSD-3 binary compliance
+
+          cat > prebuilt/manifest.json <<EOF
+          {
+            "component": "libodb",
+            "target": "${{ matrix.label }}",
+            "built_utc": "$NOW",
+            "build_base": "${{ matrix.base }}",
+            "glibc_floor": "${{ steps.floor.outputs.glibc_floor }}",
+            "cxx_standard": "20",
+            "openroad_commit": "$OR_SHA",
+            "deps_from_source": { "fmt": "$FMT", "abseil": "$ABSL", "spdlog": "$SPD" },
+            "static": ["libodb", "fmt", "spdlog", "abseil"],
+            "dynamic": ["glibc", "libstdc++", "zlib"]
+          }
+          EOF
+          echo "--- manifest.json ---"; cat prebuilt/manifest.json
 
       - name: Upload prebuilt libodb bundle
         uses: actions/upload-artifact@v4
         with:
-          # Download + point VYGES_ODB_PREBUILT_DIR at the extracted dir to link without a build.
+          # Extract + point VYGES_ODB_PREBUILT_DIR at it to link without a from-source build.
           name: libodb-${{ matrix.label }}
           path: prebuilt
           if-no-files-found: error
