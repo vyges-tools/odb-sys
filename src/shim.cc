@@ -82,18 +82,28 @@ rust::String find_master(const OdbDb& h, rust::Str substr) {
     }
   return rust::String();
 }
+// Inspect functions are total (never throw): return "" on a missing block/inst/pin.
 rust::String input_pin(const OdbDb& h, rust::Str inst) {
-  for (dbITerm* t : require_inst(h, inst)->getITerms())
+  dbBlock* b = block_of(h);
+  dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;
+  if (!i) return rust::String();
+  for (dbITerm* t : i->getITerms())
     if (t->isInputSignal()) return rust::String(t->getMTerm()->getName());
   return rust::String();
 }
 rust::String output_pin(const OdbDb& h, rust::Str inst) {
-  for (dbITerm* t : require_inst(h, inst)->getITerms())
+  dbBlock* b = block_of(h);
+  dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;
+  if (!i) return rust::String();
+  for (dbITerm* t : i->getITerms())
     if (t->isOutputSignal()) return rust::String(t->getMTerm()->getName());
   return rust::String();
 }
 rust::String net_of(const OdbDb& h, rust::Str inst, rust::Str pin) {
-  dbNet* n = require_iterm(h, inst, pin)->getNet();
+  dbBlock* b = block_of(h);
+  dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;
+  dbITerm* t = i ? i->findITerm(s(pin).c_str()) : nullptr;
+  dbNet* n = t ? t->getNet() : nullptr;
   return rust::String(n ? n->getName() : std::string());
 }
 
