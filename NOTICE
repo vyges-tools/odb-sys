@@ -1,11 +1,20 @@
 vyges-odb-sys
 Copyright 2026 Vyges
 
-This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+Licensed under the Apache License, Version 2.0 (see LICENSE). This applies to the
+Vyges-authored files in this repository: the CMake build, scripts, GitHub workflow,
+the cxx bridge (src/shim.*, src/lib.rs), build.rs, and documentation.
 
-This repository builds a standalone `libodb` from OpenROAD's OpenDB source:
+This project builds a standalone `libodb` from OpenROAD's OpenDB source:
   OpenROAD — https://github.com/The-OpenROAD-Project/OpenROAD
-  Licensed under BSD-3-Clause. Copyright (c) The OpenROAD Authors.
-OpenROAD source is fetched at build time (sparse-checkout of the pinned commit in
-openroad-pin.yaml); it is not vendored in this repository. Its license headers are
-retained in the fetched sources.
+  Copyright (c) 2018-2025, The OpenROAD Authors. Licensed under BSD-3-Clause.
+
+OpenROAD source is NOT vendored in this repository; it is fetched at build time
+(sparse-checkout of the pinned commit in openroad-pin.yaml). The per-file
+BSD-3-Clause headers are retained in the fetched sources.
+
+Binary artifacts produced by this project (e.g. `libodb.a`) are compiled from
+OpenROAD source and are therefore governed by OpenROAD's BSD-3-Clause license.
+Distributions of those binaries reproduce OpenROAD's copyright notice and the
+BSD-3-Clause license text (fetched to vendor/OpenROAD/LICENSE and published
+alongside release artifacts by the build workflow).

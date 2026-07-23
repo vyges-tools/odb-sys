@@ -49,9 +49,11 @@ jobs:
           ./build/odb_smoke test/fixtures/counter.odb /tmp/rt.odb
           echo "libodb.a: $(du -h build/libodb.a | cut -f1)"
 
-      - name: Upload libodb artifact
+      - name: Upload libodb artifact (+ OpenROAD BSD-3 license for binary compliance)
         uses: actions/upload-artifact@v4
         with:
           name: libodb-${{ matrix.label }}
-          path: build/libodb.a
+          path: |
+            build/libodb.a
+            vendor/OpenROAD/LICENSE
           if-no-files-found: error
