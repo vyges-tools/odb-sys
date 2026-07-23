@@ -3,12 +3,13 @@
 # Not on push — manual (workflow_dispatch) + a weekly canary for upstream drift.
 #
 # Two jobs:
-#   test    — cargo test on NATIVE runners (x86_64 / arm64 Linux / Apple Silicon). The real
-#             per-arch correctness proof of the cxx bridge -> shim -> libodb (incl. arm64).
-#   bundle  — the shippable artifact. Linux legs build inside an OLD-glibc container
-#             (ubuntu:22.04) so the binary runs on more distros; fmt/spdlog/abseil are built
-#             FROM SOURCE at the pinned versions (never the system's), the glibc floor is
-#             MEASURED, and a provenance manifest.json is emitted next to the .a bundle.
+#   test    — cargo test on x86_64 / arm64 Linux / Apple Silicon. The real per-arch
+#             correctness proof of the cxx bridge -> shim -> libodb (incl. arm64).
+#   bundle  — the shippable artifact. fmt/spdlog/abseil are built FROM SOURCE at the pinned
+#             versions (never the system's — those lag and would shadow the pins), the glibc
+#             floor is MEASURED from the smoke binary, and a provenance manifest.json is
+#             emitted next to the .a + headers bundle. Built on ubuntu-24.04 (glibc floor ~2.38,
+#             which covers current mainstream distros); the manifest records the exact floor.
 name: build-libodb
 
 on:
@@ -25,9 +26,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-latest,   label: linux-x86_64 }
+          - { os: ubuntu-latest,    label: linux-x86_64 }
           - { os: ubuntu-24.04-arm, label: linux-arm64  }
-          - { os: macos-14,        label: macos-arm64   }
+          - { os: macos-14,         label: macos-arm64  }
     steps:
       - uses: actions/checkout@v4
       - name: Toolchain (Linux)
@@ -44,36 +45,26 @@ jobs:
       - name: cargo test (build-from-source, end-to-end bridge)
         run: cargo test --release --verbose
 
-  # ---- shippable bundle: old glibc base, deps from source, measured floor, manifest -------
+  # ---- shippable bundle: deps from source, measured glibc floor, provenance manifest ------
   bundle:
     name: bundle-${{ matrix.label }}
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-latest,    label: linux-x86_64, container: "ubuntu:22.04", base: "ubuntu:22.04" }
-          - { os: ubuntu-24.04-arm, label: linux-arm64,  container: "ubuntu:22.04", base: "ubuntu:22.04" }
-          - { os: macos-14,         label: macos-arm64,  container: "",             base: "macos>=11.0"  }
+          - { os: ubuntu-latest,    label: linux-x86_64, base: "ubuntu-24.04" }
+          - { os: ubuntu-24.04-arm, label: linux-arm64,  base: "ubuntu-24.04" }
+          - { os: macos-14,         label: macos-arm64,  base: "macos>=11.0"  }
     steps:
-      - name: Bootstrap git (bare container needs it before checkout)
-        if: matrix.container != ''
-        run: apt-get update && apt-get install -y --no-install-recommends git ca-certificates
-
       - uses: actions/checkout@v4
 
-      - name: Toolchain (Linux, old base)
+      - name: Toolchain (Linux)
         if: runner.os == 'Linux'
         run: |
-          apt-get update
-          # g++-12 for a complete C++20 (odb uses operator<=> / <numbers>); binutils for objdump
-          # (glibc-floor measurement); curl/ca-certs/git for the sparse fetch + FetchContent clones.
-          apt-get install -y --no-install-recommends \
-            cmake g++-12 git curl ca-certificates binutils libboost-dev zlib1g-dev
-          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 100
-          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100
-          git config --global --add safe.directory '*'   # checked-out repo is owned by another uid
+          sudo apt-get update
+          # binutils for objdump (glibc-floor measurement); no system fmt/spdlog/abseil.
+          sudo apt-get install -y cmake g++ git binutils libboost-dev zlib1g-dev
 
       - name: Toolchain (macOS)
         if: runner.os == 'macOS'
