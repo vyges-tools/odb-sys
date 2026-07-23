@@ -22,19 +22,19 @@ fn main() {
             println!("cargo:warning=vyges-odb-sys: linking prebuilt libodb from {prebuilt}");
             (lib, vec![p.join("include")])
         } else {
-            let vendor = PathBuf::from("vendor/OpenROAD");
-            if !vendor.join("src/odb/include/odb/db.h").exists() {
-                panic!("no libodb: set VYGES_ODB_PREBUILT_DIR, or run scripts/fetch-odb-src.sh to build from source");
-            }
+            // Build from source. Use the local sparse checkout if present (dev), else auto-fetch
+            // the pinned subtree into OUT_DIR (self-contained dist build-from-source).
+            let src = source_tree();
             let dst = cmake::Config::new(".")
                 .define("VYGES_ODB_SMOKE", "OFF")
+                .define("OPENROAD_SRC", &src)
                 .build_target("odb")
                 .build();
             (
                 dst.join("build"),
                 vec![
-                    vendor.join("src/odb/include"),
-                    vendor.join("src/utl/include"),
+                    src.join("src/odb/include"),
+                    src.join("src/utl/include"),
                 ],
             )
         };
@@ -73,6 +73,49 @@ fn main() {
     println!("cargo:rerun-if-changed=src/shim.cc");
     println!("cargo:rerun-if-changed=src/shim.h");
     println!("cargo:rerun-if-changed=CMakeLists.txt");
+}
+
+/// Local `vendor/OpenROAD` if present (dev); otherwise auto-fetch the pinned sparse subtree
+/// into `OUT_DIR/OpenROAD` (self-contained dist build-from-source).
+fn source_tree() -> PathBuf {
+    let vendor = PathBuf::from("vendor/OpenROAD");
+    if vendor.join("src/odb/include/odb/db.h").exists() {
+        return vendor;
+    }
+    let out = PathBuf::from(std::env::var("OUT_DIR").unwrap());
+    let dest = out.join("OpenROAD");
+    if !dest.join("src/odb/include/odb/db.h").exists() {
+        fetch_openroad(&dest);
+    }
+    dest
+}
+
+/// Blobless, cone-sparse checkout of only src/odb + src/utl + cmake at the pinned commit.
+fn fetch_openroad(dest: &Path) {
+    let pin = std::fs::read_to_string("openroad-pin.yaml").expect("read openroad-pin.yaml");
+    let sha = pin
+        .lines()
+        .find_map(|l| l.trim().strip_prefix("commit:").map(|s| s.split('#').next().unwrap().trim().to_string()))
+        .expect("commit: in openroad-pin.yaml");
+    let src = "https://github.com/The-OpenROAD-Project/OpenROAD.git";
+    println!("cargo:warning=vyges-odb-sys: fetching pinned OpenROAD subtree @ {sha}");
+    let run = |args: &[&str], cwd: Option<&Path>| {
+        let mut c = std::process::Command::new("git");
+        c.args(args);
+        if let Some(d) = cwd {
+            c.current_dir(d);
+        }
+        let st = c.status().expect("git not found");
+        if !st.success() {
+            panic!("git {args:?} failed");
+        }
+    };
+    if !dest.join(".git").exists() {
+        std::fs::create_dir_all(dest).unwrap();
+        run(&["clone", "--quiet", "--filter=blob:none", "--no-checkout", src, dest.to_str().unwrap()], None);
+    }
+    run(&["sparse-checkout", "set", "--cone", "src/odb", "src/utl", "cmake"], Some(dest));
+    run(&["checkout", "--quiet", &sha], Some(dest));
 }
 
 struct DepPaths {
