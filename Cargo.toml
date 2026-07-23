@@ -1,0 +1,14 @@
+[package]
+name = "vyges-odb-sys"
+version = "0.0.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Standalone build + low-level FFI for OpenROAD's OpenDB (libodb) — no tcl/swig/engines."
+repository = "https://github.com/vyges-tools/odb-sys"
+links = "odb"
+build = "build.rs"
+# The cxx bridge lands here next; v0 ships the standalone libodb build recipe.
+
+[build-dependencies]
+cmake = "0.1"
+# cxx-build = "1"   # enabled with the bridge

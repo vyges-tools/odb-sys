@@ -1,0 +1,11 @@
+vyges-odb-sys
+Copyright 2026 Vyges
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This repository builds a standalone `libodb` from OpenROAD's OpenDB source:
+  OpenROAD — https://github.com/The-OpenROAD-Project/OpenROAD
+  Licensed under BSD-3-Clause. Copyright (c) The OpenROAD Authors.
+OpenROAD source is fetched at build time (sparse-checkout of the pinned commit in
+openroad-pin.yaml); it is not vendored in this repository. Its license headers are
+retained in the fetched sources.

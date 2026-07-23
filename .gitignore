@@ -1,0 +1,7 @@
+/vendor/
+/build/
+/target/
+Cargo.lock
+*.o
+*.a
+!test/fixtures/*.odb

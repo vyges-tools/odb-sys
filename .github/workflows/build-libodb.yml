@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: Apache-2.0
+# On-demand, per-arch build of the standalone libodb from the pinned OpenROAD subtree.
+# Not on push — manual (workflow_dispatch). Proves + publishes libodb.a for each target.
+name: build-libodb
+
+on:
+  workflow_dispatch:
+  # weekly canary so we notice upstream drift; artifacts still deliberate/manual.
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  build:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,    label: linux-x86_64,      arch: x86_64 }
+          - { os: ubuntu-24.04-arm, label: linux-arm64,       arch: arm64  }
+          - { os: macos-14,         label: macos-arm64,       arch: arm64  }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ git \
+            libboost-dev zlib1g-dev libabsl-dev libspdlog-dev libfmt-dev
+
+      - name: Install deps (macOS / Apple Silicon)
+        if: runner.os == 'macOS'
+        run: brew install cmake boost abseil spdlog fmt
+
+      - name: Fetch pinned odb subtree (sparse)
+        run: scripts/fetch-odb-src.sh
+
+      - name: Configure + build
+        run: |
+          PREFIX=""
+          [ "${{ runner.os }}" = "macOS" ] && PREFIX="-DCMAKE_PREFIX_PATH=$(brew --prefix)"
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVYGES_ODB_SMOKE=ON $PREFIX
+          cmake --build build -j
+
+      - name: Smoke test (round-trip a real .odb)
+        run: |
+          ./build/odb_smoke test/fixtures/counter.odb /tmp/rt.odb
+          echo "libodb.a: $(du -h build/libodb.a | cut -f1)"
+
+      - name: Upload libodb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libodb-${{ matrix.label }}
+          path: build/libodb.a
+          if-no-files-found: error

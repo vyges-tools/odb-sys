@@ -1,0 +1,15 @@
+# vyges-odb-sys — pinned OpenROAD source for the standalone libodb build.
+# Matches the vyges-openroad distribution pin so libodb tracks the shipped tool.
+# Bump deliberately (manual), then re-run the build workflow.
+upstream:
+  source: https://github.com/The-OpenROAD-Project/OpenROAD
+  commit: b5624809f29048e1f9ce9e83eb562620c652e084   # == vyges-openroad 2026.07.2
+  subtree:                                            # only these are sparse-checked-out
+    - src/odb
+    - src/utl
+    - cmake
+license:
+  spdx: BSD-3-Clause                                  # OpenROAD source
+notes: >
+  Standalone libodb links WITHOUT tcl, swig, or-tools, or any OpenROAD engine.
+  Deps: Boost (headers), zlib, spdlog, fmt, abseil. Requires C++20.
