@@ -60,11 +60,14 @@ list(FILTER UTL_SRC EXCLUDE REGEX "/(MakeLogger|decode)\\.cpp$")
 add_library(odb STATIC ${DB_SRC} ${UTL_SRC})
 target_include_directories(odb PUBLIC
   "${OPENROAD_SRC}/src/odb/include"
-  "${OPENROAD_SRC}/src/utl/include"
-  ${Boost_INCLUDE_DIRS})
+  "${OPENROAD_SRC}/src/utl/include")
+# Link fmt/spdlog/abseil (our pinned, source-built) BEFORE Boost so their headers win: a
+# system Boost dir (e.g. Homebrew's /opt/homebrew/include) also bundles a *different* fmt/abseil,
+# and if it came first the odb objects would reference those symbols and fail to link our pins.
 target_link_libraries(odb PUBLIC
-  ZLIB::ZLIB spdlog::spdlog fmt::fmt
-  absl::synchronization absl::strings absl::hash absl::flat_hash_map absl::base)
+  fmt::fmt spdlog::spdlog
+  absl::synchronization absl::strings absl::hash absl::flat_hash_map absl::base
+  Boost::headers ZLIB::ZLIB)
 # Deliberately NOT linked: Tcl (proven droppable), SWIG bindings, or-tools, engines.
 
 # ---- smoke test: round-trip a real .odb --------------------------------------
