@@ -7,6 +7,9 @@
 //! blocks for the ECO applier (`InsertECOBuffers`). The safe, ergonomic wrappers live in
 //! the sibling crate `vyges-odb`.
 
+// Unix-only: libodb is not built on non-unix targets (see build.rs). On Windows this crate
+// compiles to an empty stub so a `--features odb` build still succeeds across the dist matrix.
+#[cfg(unix)]
 #[cxx::bridge]
 mod ffi {
     unsafe extern "C++" {
@@ -42,6 +45,7 @@ mod ffi {
     }
 }
 
+#[cfg(unix)]
 pub use ffi::{
     block_name, connect, create_inst, create_net, disconnect, find_master, first_master_name,
     input_pin, inst_x, inst_y, net_of, nth_inst_name, num_bterms, num_insts, num_nets, open_db,

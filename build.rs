@@ -9,6 +9,12 @@
 use std::path::{Path, PathBuf};
 
 fn main() {
+    // libodb is unix-only. On other targets (e.g. Windows) build nothing — the crate compiles
+    // to an empty stub so a cross-platform `--features odb` build still succeeds.
+    if std::env::var_os("CARGO_CFG_UNIX").is_none() {
+        println!("cargo:warning=vyges-odb-sys: non-unix target, building empty stub (libodb unavailable)");
+        return;
+    }
     let dep = DepPaths::detect();
 
     // Where libodb.a lives + the include dirs the shim compiles against.
@@ -78,12 +84,13 @@ fn main() {
 /// Local `vendor/OpenROAD` if present (dev); otherwise auto-fetch the pinned sparse subtree
 /// into `OUT_DIR/OpenROAD` (self-contained dist build-from-source).
 fn source_tree() -> PathBuf {
+    // Absolute paths only — cmake runs in OUT_DIR, so a relative OPENROAD_SRC would not resolve.
     let vendor = PathBuf::from("vendor/OpenROAD");
     if vendor.join("src/odb/include/odb/db.h").exists() {
-        return vendor;
+        return std::fs::canonicalize(&vendor).expect("canonicalize vendor/OpenROAD");
     }
     let out = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let dest = out.join("OpenROAD");
+    let dest = out.join("OpenROAD"); // OUT_DIR is absolute
     if !dest.join("src/odb/include/odb/db.h").exists() {
         fetch_openroad(&dest);
     }
