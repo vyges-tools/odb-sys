@@ -30,6 +30,8 @@ mod ffi {
         fn input_pin(db: &OdbDb, inst: &str) -> String;
         fn output_pin(db: &OdbDb, inst: &str) -> String;
         fn net_of(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn inst_x(db: &OdbDb, inst: &str) -> i32;
+        fn inst_y(db: &OdbDb, inst: &str) -> i32;
 
         // write / ECO primitives
         fn create_net(db: &OdbDb, name: &str) -> Result<()>;
@@ -42,6 +44,6 @@ mod ffi {
 
 pub use ffi::{
     block_name, connect, create_inst, create_net, disconnect, find_master, first_master_name,
-    input_pin, net_of, nth_inst_name, num_bterms, num_insts, num_nets, open_db, output_pin,
-    set_inst_location, write_db, OdbDb,
+    input_pin, inst_x, inst_y, net_of, nth_inst_name, num_bterms, num_insts, num_nets, open_db,
+    output_pin, set_inst_location, write_db, OdbDb,
 };

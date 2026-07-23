@@ -106,6 +106,22 @@ rust::String net_of(const OdbDb& h, rust::Str inst, rust::Str pin) {
   dbNet* n = t ? t->getNet() : nullptr;
   return rust::String(n ? n->getName() : std::string());
 }
+int32_t inst_x(const OdbDb& h, rust::Str inst) {
+  dbBlock* b = block_of(h);
+  dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;
+  if (!i) return 0;
+  int x = 0, y = 0;
+  i->getLocation(x, y);
+  return x;
+}
+int32_t inst_y(const OdbDb& h, rust::Str inst) {
+  dbBlock* b = block_of(h);
+  dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;
+  if (!i) return 0;
+  int x = 0, y = 0;
+  i->getLocation(x, y);
+  return y;
+}
 
 // ---- write / ECO primitives --------------------------------------------------
 void create_net(const OdbDb& h, rust::Str name) {

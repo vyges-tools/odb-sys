@@ -33,6 +33,8 @@ rust::String find_master(const OdbDb& db, rust::Str substr);     // first master
 rust::String input_pin(const OdbDb& db, rust::Str inst);         // first input-signal pin name
 rust::String output_pin(const OdbDb& db, rust::Str inst);        // first output-signal pin name
 rust::String net_of(const OdbDb& db, rust::Str inst, rust::Str pin);  // net on a pin, "" if none
+int32_t inst_x(const OdbDb& db, rust::Str inst);   // instance origin x in DBU (0 if not found)
+int32_t inst_y(const OdbDb& db, rust::Str inst);   // instance origin y in DBU (0 if not found)
 
 // ---- write / ECO primitives (the InsertECOBuffers building blocks) -----------
 void create_net(const OdbDb& db, rust::Str name);                       // throws on dup/failure
