@@ -22,12 +22,28 @@ if(NOT EXISTS "${OPENROAD_SRC}/src/odb/include/odb/db.h")
     "Run: scripts/fetch-odb-src.sh   (sparse-checkout of the pinned SHA)")
 endif()
 
-# ---- external deps (all cross-platform: linux x86_64/arm64 + Apple Silicon) --
-find_package(Boost  REQUIRED)   # header-only for the db core
-find_package(ZLIB   REQUIRED)
-find_package(absl   REQUIRED)   # abseil
-find_package(spdlog REQUIRED)
-find_package(fmt    REQUIRED)
+# ---- external deps -----------------------------------------------------------
+# Boost (headers) + zlib come from the system: stable, ABI-safe, always present.
+# fmt / spdlog / abseil are built FROM SOURCE at PINNED versions and static-linked, so the
+# binary does not depend on the host's (often older, incompatible) system versions. This is
+# what makes libodb portable — the version floor is glibc, not the distro's C++ libs.
+# (Versions mirrored in openroad-pin.yaml for the provenance manifest.)
+find_package(Boost REQUIRED)   # header-only for the db core
+find_package(ZLIB  REQUIRED)
+
+include(FetchContent)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)      # build the fetched deps static
+set(ABSL_PROPAGATE_CXX_STD ON  CACHE BOOL "" FORCE)
+set(ABSL_ENABLE_INSTALL    OFF CACHE BOOL "" FORCE)
+set(FMT_INSTALL            OFF CACHE BOOL "" FORCE)
+set(SPDLOG_INSTALL         OFF CACHE BOOL "" FORCE)
+set(SPDLOG_FMT_EXTERNAL    ON  CACHE BOOL "" FORCE)  # use our pinned fmt, not spdlog's bundled copy
+
+FetchContent_Declare(fmt    GIT_REPOSITORY https://github.com/fmtlib/fmt.git        GIT_TAG 11.0.2     GIT_SHALLOW TRUE)
+FetchContent_Declare(absl   GIT_REPOSITORY https://github.com/abseil/abseil-cpp.git GIT_TAG 20250127.0 GIT_SHALLOW TRUE)
+FetchContent_Declare(spdlog GIT_REPOSITORY https://github.com/gabime/spdlog.git     GIT_TAG v1.15.3    GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(fmt absl)   # fmt before spdlog (SPDLOG_FMT_EXTERNAL)
+FetchContent_MakeAvailable(spdlog)
 
 # ---- sources (pinned layout) -------------------------------------------------
 # v0 scope: the db core (in-memory model + .odb read/write) + utl (logger).
@@ -37,6 +53,9 @@ file(GLOB DB_SRC  CONFIGURE_DEPENDS "${OPENROAD_SRC}/src/odb/src/db/*.cpp")
 file(GLOB UTL_SRC CONFIGURE_DEPENDS
      "${OPENROAD_SRC}/src/utl/src/*.cpp"
      "${OPENROAD_SRC}/src/utl/src/prometheus/*.cpp")  # Logger.cpp references it unconditionally
+# Drop the Tcl-glue files (need tcl.h; unused in a tcl-free libodb). They only compiled on
+# macOS by accident (system tcl.h present) and were dropped as dead code at link time.
+list(FILTER UTL_SRC EXCLUDE REGEX "/(MakeLogger|decode)\\.cpp$")
 
 add_library(odb STATIC ${DB_SRC} ${UTL_SRC})
 target_include_directories(odb PUBLIC

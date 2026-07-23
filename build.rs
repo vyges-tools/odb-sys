@@ -1,55 +1,61 @@
 // SPDX-License-Identifier: Apache-2.0
-// Gets libodb one of two ways, then compiles the cxx bridge + shim against it:
+// Builds a self-contained libodb and links it into the cxx bridge.
 //
-//   1. PREBUILT (light): set VYGES_ODB_PREBUILT_DIR=<dir> containing `lib/libodb.a` and
-//      `include/{odb,utl}/...` (the layout the build-libodb workflow publishes). No cmake,
-//      no OpenROAD fetch, no C++ compile of libodb — just links the published archive.
-//   2. FROM SOURCE (default): builds a standalone libodb via CMake from the pinned sparse
-//      OpenROAD subtree (run scripts/fetch-odb-src.sh first).
+//   PREBUILT (light): VYGES_ODB_PREBUILT_DIR=<dir> with lib/*.a (libodb + fmt/spdlog/abseil,
+//     static) and include/ — links the published bundle; no cmake/fetch/compile.
+//   FROM SOURCE (default): CMake builds libodb from the pinned sparse OpenROAD subtree AND
+//     fmt/spdlog/abseil from source at pinned versions (static, self-contained). Deps are
+//     never taken from the (often older) system, so the binary is portable — the floor is
+//     glibc, not the distro's C++ libs.
+//
+// libodb is unix-only; on non-unix targets the crate is an empty stub (see lib.rs).
 use std::path::{Path, PathBuf};
 
 fn main() {
-    // libodb is unix-only. On other targets (e.g. Windows) build nothing — the crate compiles
-    // to an empty stub so a cross-platform `--features odb` build still succeeds.
     if std::env::var_os("CARGO_CFG_UNIX").is_none() {
         println!("cargo:warning=vyges-odb-sys: non-unix target, building empty stub (libodb unavailable)");
         return;
     }
-    let dep = DepPaths::detect();
 
-    // Where libodb.a lives + the include dirs the shim compiles against.
-    let (lib_dir, mut includes): (PathBuf, Vec<PathBuf>) =
+    // (static archives to link, include dirs the shim compiles against)
+    let (archives, mut includes): (Vec<PathBuf>, Vec<PathBuf>) =
         if let Ok(prebuilt) = std::env::var("VYGES_ODB_PREBUILT_DIR") {
             let p = PathBuf::from(&prebuilt);
-            let lib = p.join("lib");
-            if !lib.join("libodb.a").exists() {
-                panic!("VYGES_ODB_PREBUILT_DIR set but {}/libodb.a not found", lib.display());
+            if !p.join("lib/libodb.a").exists() {
+                panic!("VYGES_ODB_PREBUILT_DIR set but {}/lib/libodb.a not found", p.display());
             }
             println!("cargo:warning=vyges-odb-sys: linking prebuilt libodb from {prebuilt}");
-            (lib, vec![p.join("include")])
+            (ordered_archives(collect_archives(&p.join("lib"))), vec![p.join("include")])
         } else {
-            // Build from source. Use the local sparse checkout if present (dev), else auto-fetch
-            // the pinned subtree into OUT_DIR (self-contained dist build-from-source).
             let src = source_tree();
             let dst = cmake::Config::new(".")
                 .define("VYGES_ODB_SMOKE", "OFF")
                 .define("OPENROAD_SRC", &src)
                 .build_target("odb")
                 .build();
+            let build = dst.join("build");
+            let mut libs = collect_archives(&build.join("_deps")); // fmt/spdlog/abseil (static)
+            libs.insert(0, build.join("libodb.a"));
+            let deps = build.join("_deps");
             (
-                dst.join("build"),
+                ordered_archives(libs),
                 vec![
                     src.join("src/odb/include"),
                     src.join("src/utl/include"),
+                    deps.join("fmt-src/include"),
+                    deps.join("spdlog-src/include"),
+                    deps.join("absl-src"),
                 ],
             )
         };
 
-    // 1. libodb search path (the archive is linked platform-specifically below).
-    println!("cargo:rustc-link-search=native={}", lib_dir.display());
+    // Boost headers are header-only + system (mac: brew prefix; linux: default /usr/include).
+    if cfg!(target_os = "macos") {
+        let brew = if Path::new("/opt/homebrew").exists() { "/opt/homebrew" } else { "/usr/local" };
+        includes.push(PathBuf::from(format!("{brew}/include")));
+    }
 
-    // 2. compile the cxx bridge + shim against odb/utl + dep headers.
-    includes.extend(dep.includes.iter().cloned());
+    // Compile the cxx bridge + shim against odb/utl + the pinned deps' headers.
     let mut b = cxx_build::bridge("src/lib.rs");
     b.file("src/shim.cc").std("c++20").include("src");
     for inc in &includes {
@@ -57,39 +63,32 @@ fn main() {
     }
     b.compile("vyges_odb_shim");
 
-    // 3. link libodb + external deps.
-    //   Linux: STATIC (apt ships .a) => a self-contained binary. Wrapped in a group so
-    //          abseil's many interdependent archives resolve. z + stdc++ stay dynamic (system).
-    //   macOS: DYNAMIC (Homebrew is dylib-only for abseil); the Homebrew formula declares
-    //          abseil/spdlog/fmt as runtime deps so `brew install` provides them.
-    for dir in &dep.lib_dirs {
+    // Link libodb + the static deps. Use rustc-link-lib (NOT rustc-link-arg): a dependency
+    // build script's link-args do not propagate to the final binary, but link-lib/link-search
+    // do. abseil's archives are mutually circular, so `+whole-archive` includes them fully —
+    // this avoids a linker `--start-group` (which would need the non-propagating link-arg).
+    // libstdc++ compatibility comes from building on an old glibc base, not `-static-libstdc++`
+    // (also a non-propagating link-arg).
+    for a in &archives {
+        let dir = a.parent().unwrap();
         println!("cargo:rustc-link-search=native={}", dir.display());
+        let name = a
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .and_then(|s| s.strip_prefix("lib"))
+            .unwrap_or("");
+        if name == "odb" {
+            println!("cargo:rustc-link-lib=static=odb");
+        } else {
+            // fmt / spdlog / absl_* — whole-archive so forward + circular refs all resolve.
+            println!("cargo:rustc-link-lib=static:+whole-archive={name}");
+        }
     }
-    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
-    if target_os == "linux" {
-        let mut archives = vec![lib_dir.join("libodb.a")];
-        for n in ["libspdlog.a", "libfmt.a"] {
-            if let Some(p) = dep.find_lib(n) {
-                archives.push(p);
-            }
-        }
-        archives.extend(dep.abseil_static());
-        println!("cargo:rustc-link-arg=-Wl,--start-group");
-        for a in &archives {
-            println!("cargo:rustc-link-arg={}", a.display());
-        }
-        println!("cargo:rustc-link-arg=-Wl,--end-group");
-        println!("cargo:rustc-link-lib=dylib=z");
-        println!("cargo:rustc-link-lib=dylib=stdc++");
-    } else {
-        println!("cargo:rustc-link-lib=static=odb");
-        for lib in ["spdlog", "fmt", "z"] {
-            println!("cargo:rustc-link-lib=dylib={lib}");
-        }
-        for absl in dep.abseil_libs() {
-            println!("cargo:rustc-link-lib=dylib={absl}");
-        }
+    println!("cargo:rustc-link-lib=dylib=z");
+    if cfg!(target_os = "macos") {
         println!("cargo:rustc-link-lib=dylib=c++");
+    } else {
+        println!("cargo:rustc-link-lib=dylib=stdc++");
     }
 
     println!("cargo:rerun-if-env-changed=VYGES_ODB_PREBUILT_DIR");
@@ -99,16 +98,43 @@ fn main() {
     println!("cargo:rerun-if-changed=CMakeLists.txt");
 }
 
+/// Recursively collect `*.a` under `dir`.
+fn collect_archives(dir: &Path) -> Vec<PathBuf> {
+    fn walk(d: &Path, out: &mut Vec<PathBuf>) {
+        if let Ok(rd) = std::fs::read_dir(d) {
+            for e in rd.flatten() {
+                let p = e.path();
+                if p.is_dir() {
+                    walk(&p, out);
+                } else if p.extension().is_some_and(|x| x == "a") {
+                    out.push(p);
+                }
+            }
+        }
+    }
+    let mut out = Vec::new();
+    walk(dir, &mut out);
+    out
+}
+
+/// libodb first (it references the deps), then the rest sorted — a stable order for the group.
+fn ordered_archives(mut a: Vec<PathBuf>) -> Vec<PathBuf> {
+    a.sort_by_key(|p| {
+        let is_odb = p.file_name().map_or(false, |n| n == "libodb.a");
+        (!is_odb, p.clone())
+    });
+    a
+}
+
 /// Local `vendor/OpenROAD` if present (dev); otherwise auto-fetch the pinned sparse subtree
 /// into `OUT_DIR/OpenROAD` (self-contained dist build-from-source).
 fn source_tree() -> PathBuf {
-    // Absolute paths only — cmake runs in OUT_DIR, so a relative OPENROAD_SRC would not resolve.
     let vendor = PathBuf::from("vendor/OpenROAD");
     if vendor.join("src/odb/include/odb/db.h").exists() {
         return std::fs::canonicalize(&vendor).expect("canonicalize vendor/OpenROAD");
     }
     let out = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let dest = out.join("OpenROAD"); // OUT_DIR is absolute
+    let dest = out.join("OpenROAD");
     if !dest.join("src/odb/include/odb/db.h").exists() {
         fetch_openroad(&dest);
     }
@@ -130,8 +156,7 @@ fn fetch_openroad(dest: &Path) {
         if let Some(d) = cwd {
             c.current_dir(d);
         }
-        let st = c.status().expect("git not found");
-        if !st.success() {
+        if !c.status().expect("git not found").success() {
             panic!("git {args:?} failed");
         }
     };
@@ -141,98 +166,4 @@ fn fetch_openroad(dest: &Path) {
     }
     run(&["sparse-checkout", "set", "--cone", "src/odb", "src/utl", "cmake"], Some(dest));
     run(&["checkout", "--quiet", &sha], Some(dest));
-}
-
-struct DepPaths {
-    includes: Vec<PathBuf>,
-    lib_dirs: Vec<PathBuf>,
-    abseil_lib_dir: PathBuf,
-    dylib_ext: &'static str,
-}
-
-impl DepPaths {
-    fn detect() -> Self {
-        if cfg!(target_os = "macos") {
-            let brew = if Path::new("/opt/homebrew").exists() {
-                PathBuf::from("/opt/homebrew")
-            } else {
-                PathBuf::from("/usr/local")
-            };
-            DepPaths {
-                includes: vec![brew.join("include")],
-                lib_dirs: vec![brew.join("lib")],
-                abseil_lib_dir: brew.join("opt/abseil/lib"),
-                dylib_ext: ".dylib",
-            }
-        } else {
-            let mut lib_dirs = vec![PathBuf::from("/usr/lib")];
-            for d in ["/usr/lib/x86_64-linux-gnu", "/usr/lib/aarch64-linux-gnu"] {
-                if Path::new(d).exists() {
-                    lib_dirs.push(PathBuf::from(d));
-                }
-            }
-            let abseil_lib_dir = lib_dirs
-                .iter()
-                .find(|d| arch_glob(d))
-                .cloned()
-                .unwrap_or_else(|| PathBuf::from("/usr/lib"));
-            DepPaths {
-                includes: vec![PathBuf::from("/usr/include")],
-                lib_dirs,
-                abseil_lib_dir,
-                dylib_ext: ".so",
-            }
-        }
-    }
-
-    /// First existing `<lib_dir>/<name>` across the search dirs (for Linux static archives).
-    fn find_lib(&self, name: &str) -> Option<PathBuf> {
-        self.lib_dirs.iter().map(|d| d.join(name)).find(|p| p.exists())
-    }
-
-    /// Full paths to the unversioned `libabsl_*.a` static archives (Linux self-contained link).
-    fn abseil_static(&self) -> Vec<PathBuf> {
-        let mut out = Vec::new();
-        for dir in self.lib_dirs.iter().chain(std::iter::once(&self.abseil_lib_dir)) {
-            if let Ok(rd) = std::fs::read_dir(dir) {
-                for e in rd.flatten() {
-                    let n = e.file_name().to_string_lossy().into_owned();
-                    if n.starts_with("libabsl_") && n.ends_with(".a") {
-                        out.push(e.path());
-                    }
-                }
-            }
-        }
-        out.sort();
-        out.dedup();
-        out
-    }
-
-    fn abseil_libs(&self) -> Vec<String> {
-        let mut out = Vec::new();
-        if let Ok(rd) = std::fs::read_dir(&self.abseil_lib_dir) {
-            for e in rd.flatten() {
-                let n = e.file_name().to_string_lossy().into_owned();
-                if let Some(rest) = n.strip_prefix("libabsl_") {
-                    if let Some(stem) = rest.strip_suffix(self.dylib_ext) {
-                        if !stem.chars().any(|c| c.is_ascii_digit()) {
-                            out.push(format!("absl_{stem}"));
-                        }
-                    }
-                }
-            }
-        }
-        out.sort();
-        out.dedup();
-        out
-    }
-}
-
-fn arch_glob(dir: &Path) -> bool {
-    std::fs::read_dir(dir)
-        .map(|rd| {
-            rd.flatten()
-                .any(|e| e.file_name().to_string_lossy().starts_with("libabsl_"))
-        })
-        .unwrap_or(false)
 }

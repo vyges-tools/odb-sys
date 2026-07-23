@@ -8,8 +8,16 @@ upstream:
     - src/odb
     - src/utl
     - cmake
+# C++ deps built FROM SOURCE at these pinned versions + static-linked (not the system's, which
+# lag and break the compile). These + the build base go into the release provenance manifest.
+deps:
+  fmt:    "11.0.2"        # fmtlib/fmt
+  abseil: "20250127.0"    # abseil/abseil-cpp
+  spdlog: "v1.15.3"       # gabime/spdlog (built with SPDLOG_FMT_EXTERNAL against the pinned fmt)
+  # boost: headers only (system); zlib: system (dynamic)
 license:
   spdx: BSD-3-Clause                                  # OpenROAD source
 notes: >
-  Standalone libodb links WITHOUT tcl, swig, or-tools, or any OpenROAD engine.
-  Deps: Boost (headers), zlib, spdlog, fmt, abseil. Requires C++20.
+  Standalone libodb links WITHOUT tcl, swig, or-tools, or any OpenROAD engine. fmt/spdlog/abseil
+  are built from source (static); only glibc + zlib are dynamic, so the binary is portable across
+  Linux distros with glibc >= the build base. Requires C++20.
