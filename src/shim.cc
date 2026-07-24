@@ -3,9 +3,12 @@
 
 #include "odb/defin.h"   // LEF/DEF I/O (libodb v1)
 #include "odb/defout.h"
+#include "spdlog/sinks/callback_sink.h"   // forward libodb's utl::Logger -> Rust -> vyges-events
+#include "vyges-opendb-lib/src/lib.rs.h"  // odb_forward_log (extern "Rust")
 
 #include <cstdint>
 #include <fstream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -44,9 +47,22 @@ static dbITerm* require_iterm(const OdbDb& h, rust::Str inst, rust::Str pin) {
   return t;
 }
 
+// Route every libodb log message (already formatted by utl::Logger as "[INFO ODB-0127] …") to the
+// Rust forwarder, which hands it to the installed events sink. Added alongside utl's default stdout
+// sink (so nothing that already worked breaks); the forwarder is a no-op until the engine installs
+// a sink, so this is free when unused.
+static void install_log_forwarding(utl::Logger& logger) {
+  logger.addSink(std::make_shared<spdlog::sinks::callback_sink_mt>(
+      [](const spdlog::details::log_msg& m) {
+        odb_forward_log(static_cast<int32_t>(m.level),
+                        rust::Str(m.payload.data(), m.payload.size()));
+      }));
+}
+
 // ---- open / write ------------------------------------------------------------
 std::unique_ptr<OdbDb> open_db(rust::Str path) {
   auto h = std::make_unique<OdbDb>();
+  install_log_forwarding(h->logger);
   std::string p = s(path);
   std::ifstream in(p, std::ios::binary);
   if (!in) throw std::runtime_error("vyges-opendb: cannot open " + p);

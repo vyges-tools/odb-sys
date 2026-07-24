@@ -66,6 +66,34 @@ mod ffi {
         fn connect(db: &OdbDb, inst: &str, pin: &str, net: &str) -> Result<()>;
         fn disconnect(db: &OdbDb, inst: &str, pin: &str) -> Result<()>;
     }
+
+    // The C++ side (libodb's utl::Logger via a spdlog callback sink) calls this on every log
+    // message, so odb's native diagnostics can be centralized through the same events path as
+    // the Rust surface. See `set_log_sink` — the actual emitter is installed by the opendb crate
+    // (which owns vyges-events), keeping this low-level crate free of that dependency.
+    extern "Rust" {
+        fn odb_forward_log(level: i32, message: &str);
+    }
+}
+
+/// The installed forwarder for libodb log messages (level, formatted "[INFO ODB-0127] …" text).
+/// `None` until the engine calls [`set_log_sink`]; unset = libodb logs go only to its own stdout.
+#[cfg(unix)]
+static LOG_SINK: std::sync::OnceLock<fn(i32, &str)> = std::sync::OnceLock::new();
+
+/// Install the sink that receives libodb's native log messages (the opendb crate points this at a
+/// `vyges-events` emitter). Idempotent — only the first call wins.
+#[cfg(unix)]
+pub fn set_log_sink(f: fn(i32, &str)) {
+    let _ = LOG_SINK.set(f);
+}
+
+/// Called from C++ per libodb log message; forwards to the installed sink (no-op if unset).
+#[cfg(unix)]
+fn odb_forward_log(level: i32, message: &str) {
+    if let Some(f) = LOG_SINK.get() {
+        f(level, message);
+    }
 }
 
 // Second cxx bridge: machine-generated read accessors (scripts/generate-bindings.py). Kept in a
