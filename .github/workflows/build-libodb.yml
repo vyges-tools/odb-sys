@@ -28,7 +28,7 @@ jobs:
         include:
           - { os: ubuntu-latest,    label: linux-x86_64 }
           - { os: ubuntu-24.04-arm, label: linux-arm64  }
-          - { os: macos-latest,     label: macos-arm64  }   # newest hosted macOS (Apple Silicon); modern Xcode
+          - { os: macos-15,         label: macos-arm64  }   # Apple Silicon, Xcode 16 (new enough for cxx, stable for fmt 11.0.2; macos-latest/Xcode 26.5 breaks fmt consteval)
     steps:
       - uses: actions/checkout@v4
       - name: Toolchain (Linux)
@@ -55,7 +55,7 @@ jobs:
         include:
           - { os: ubuntu-latest,    label: linux-x86_64, base: "ubuntu-24.04" }
           - { os: ubuntu-24.04-arm, label: linux-arm64,  base: "ubuntu-24.04" }
-          - { os: macos-latest,     label: macos-arm64,  base: "macos>=11.0"  }   # newest hosted macOS (Apple Silicon)
+          - { os: macos-15,         label: macos-arm64,  base: "macos>=11.0"  }   # Apple Silicon, Xcode 16 (macos-latest/Xcode 26.5 breaks fmt 11.0.2 consteval)
     steps:
       - uses: actions/checkout@v4
 
