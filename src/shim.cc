@@ -19,17 +19,17 @@ static dbBlock* block_of(const OdbDb& h) {
 }
 static dbBlock* require_block(const OdbDb& h) {
   dbBlock* b = block_of(h);
-  if (!b) throw std::runtime_error("vyges-odb: no top block");
+  if (!b) throw std::runtime_error("vyges-opendb: no top block");
   return b;
 }
 static dbInst* require_inst(const OdbDb& h, rust::Str inst) {
   dbInst* i = require_block(h)->findInst(s(inst).c_str());
-  if (!i) throw std::runtime_error("vyges-odb: inst not found: " + s(inst));
+  if (!i) throw std::runtime_error("vyges-opendb: inst not found: " + s(inst));
   return i;
 }
 static dbITerm* require_iterm(const OdbDb& h, rust::Str inst, rust::Str pin) {
   dbITerm* t = require_inst(h, inst)->findITerm(s(pin).c_str());
-  if (!t) throw std::runtime_error("vyges-odb: pin not found: " + s(inst) + "/" + s(pin));
+  if (!t) throw std::runtime_error("vyges-opendb: pin not found: " + s(inst) + "/" + s(pin));
   return t;
 }
 
@@ -38,14 +38,14 @@ std::unique_ptr<OdbDb> open_db(rust::Str path) {
   auto h = std::make_unique<OdbDb>();
   std::string p = s(path);
   std::ifstream in(p, std::ios::binary);
-  if (!in) throw std::runtime_error("vyges-odb: cannot open " + p);
+  if (!in) throw std::runtime_error("vyges-opendb: cannot open " + p);
   h->db->read(in);
   return h;
 }
 void write_db(const OdbDb& h, rust::Str path) {
   std::string p = s(path);
   std::ofstream out(p, std::ios::binary);
-  if (!out) throw std::runtime_error("vyges-odb: cannot write " + p);
+  if (!out) throw std::runtime_error("vyges-opendb: cannot write " + p);
   h.db->write(out);
 }
 
@@ -126,14 +126,14 @@ int32_t inst_y(const OdbDb& h, rust::Str inst) {
 // ---- write / ECO primitives --------------------------------------------------
 void create_net(const OdbDb& h, rust::Str name) {
   dbBlock* b = require_block(h);
-  if (b->findNet(s(name).c_str())) throw std::runtime_error("vyges-odb: net exists: " + s(name));
-  if (!dbNet::create(b, s(name).c_str())) throw std::runtime_error("vyges-odb: create_net failed: " + s(name));
+  if (b->findNet(s(name).c_str())) throw std::runtime_error("vyges-opendb: net exists: " + s(name));
+  if (!dbNet::create(b, s(name).c_str())) throw std::runtime_error("vyges-opendb: create_net failed: " + s(name));
 }
 void create_inst(const OdbDb& h, rust::Str master, rust::Str name) {
   dbBlock* b = require_block(h);
   dbMaster* m = h.db->findMaster(s(master).c_str());
-  if (!m) throw std::runtime_error("vyges-odb: master not found: " + s(master));
-  if (!dbInst::create(b, m, s(name).c_str())) throw std::runtime_error("vyges-odb: create_inst failed: " + s(name));
+  if (!m) throw std::runtime_error("vyges-opendb: master not found: " + s(master));
+  if (!dbInst::create(b, m, s(name).c_str())) throw std::runtime_error("vyges-opendb: create_inst failed: " + s(name));
 }
 void set_inst_location(const OdbDb& h, rust::Str inst, int32_t x, int32_t y) {
   dbInst* i = require_inst(h, inst);
@@ -142,7 +142,7 @@ void set_inst_location(const OdbDb& h, rust::Str inst, int32_t x, int32_t y) {
 }
 void connect(const OdbDb& h, rust::Str inst, rust::Str pin, rust::Str net) {
   dbNet* n = require_block(h)->findNet(s(net).c_str());
-  if (!n) throw std::runtime_error("vyges-odb: net not found: " + s(net));
+  if (!n) throw std::runtime_error("vyges-opendb: net not found: " + s(net));
   require_iterm(h, inst, pin)->connect(n);
 }
 void disconnect(const OdbDb& h, rust::Str inst, rust::Str pin) {

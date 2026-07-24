@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
-//! `vyges-odb-sys` — low-level FFI to OpenROAD's OpenDB (`libodb`).
+//! `vyges-opendb-lib` — low-level FFI to OpenROAD's OpenDB (`libodb`).
 //!
 //! Read + write-path surface over a standalone libodb (no tcl/swig/engines), proven on
 //! linux/x86_64, linux/arm64, and macOS/Apple Silicon. Objects are addressed by name so
 //! no raw odb pointers cross the FFI boundary. The write primitives are the building
 //! blocks for the ECO applier (`InsertECOBuffers`). The safe, ergonomic wrappers live in
-//! the sibling crate `vyges-odb`.
+//! the sibling crate `vyges-opendb`.
 
 // Unix-only: libodb is not built on non-unix targets (see build.rs). On Windows this crate
 // compiles to an empty stub so a `--features odb` build still succeeds across the dist matrix.

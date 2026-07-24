@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 
 fn main() {
     if std::env::var_os("CARGO_CFG_UNIX").is_none() {
-        println!("cargo:warning=vyges-odb-sys: non-unix target, building empty stub (libodb unavailable)");
+        println!("cargo:warning=vyges-opendb-lib: non-unix target, building empty stub (libodb unavailable)");
         return;
     }
 
@@ -24,7 +24,7 @@ fn main() {
             if !p.join("lib/libodb.a").exists() {
                 panic!("VYGES_ODB_PREBUILT_DIR set but {}/lib/libodb.a not found", p.display());
             }
-            println!("cargo:warning=vyges-odb-sys: linking prebuilt libodb from {prebuilt}");
+            println!("cargo:warning=vyges-opendb-lib: linking prebuilt libodb from {prebuilt}");
             (ordered_archives(collect_archives(&p.join("lib"))), vec![p.join("include")])
         } else {
             let src = source_tree();
@@ -61,7 +61,7 @@ fn main() {
     for inc in &includes {
         b.include(inc);
     }
-    b.compile("vyges_odb_shim");
+    b.compile("vyges_opendb_shim");
 
     // Link libodb + the static deps. Use rustc-link-lib (NOT rustc-link-arg): a dependency
     // build script's link-args do not propagate to the final binary, but link-lib/link-search
@@ -149,7 +149,7 @@ fn fetch_openroad(dest: &Path) {
         .find_map(|l| l.trim().strip_prefix("commit:").map(|s| s.split('#').next().unwrap().trim().to_string()))
         .expect("commit: in openroad-pin.yaml");
     let src = "https://github.com/The-OpenROAD-Project/OpenROAD.git";
-    println!("cargo:warning=vyges-odb-sys: fetching pinned OpenROAD subtree @ {sha}");
+    println!("cargo:warning=vyges-opendb-lib: fetching pinned OpenROAD subtree @ {sha}");
     let run = |args: &[&str], cwd: Option<&Path>| {
         let mut c = std::process::Command::new("git");
         c.args(args);

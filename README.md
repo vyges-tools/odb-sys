@@ -1,8 +1,8 @@
-# vyges-odb-sys
+# vyges-opendb-lib
 
 Low-level build + (future) FFI bindings for **OpenROAD's OpenDB (`libodb`)** — built
 **standalone** from a pinned, sparse OpenROAD subtree, with **no Tcl, no SWIG, and no
-OpenROAD engines**. The safe Rust API lives in the sibling crate `vyges-odb`.
+OpenROAD engines**. The safe Rust API lives in the sibling crate `vyges-opendb`.
 
 > Part of Vyges Loom. `libodb` is the in-memory design database every OpenROAD engine reads
 > and writes; binding it lets Loom do ECO/audit/extraction natively over `.odb` — and it
@@ -16,7 +16,7 @@ routed `.odb`, walks the model, and writes it back — linking none of the engin
 
 ## How it works — pinned + sparse, no full mirror
 
-- **`openroad-pin.yaml`** pins the OpenROAD commit (matches the `vyges-openroad` distribution).
+- **`openroad-pin.yaml`** pins the OpenROAD commit (matches the `vyges-opendb` distribution).
 - **`scripts/fetch-odb-src.sh`** does a blobless, cone-sparse checkout of only `src/odb` +
   `src/utl` + `cmake` at that SHA — **~24 MB**, not the ~1.8 GB full tree.
 - **`CMakeLists.txt`** compiles the db core + utl into `libodb.a` (C++20), linking Boost
@@ -50,7 +50,7 @@ Deps: a C++20 compiler + `cmake boost zlib abseil spdlog fmt` (apt `lib*-dev`, o
 - **v0 (now):** the db core — the in-memory model + `.odb` read/write (dbDatabase, the ECO
   journal, wire codec, RC, connectivity). Enough for the odb applier + audit steps.
 - **v1 (next):** add the LEF/DEF/GDS/CDL I/O sub-libs (`defin/lefin/gdsin/...`).
-- **bindings (next):** the `cxx` bridge (this crate's `src/`) + the safe `vyges-odb` API.
+- **bindings (next):** the `cxx` bridge (this crate's `src/`) + the safe `vyges-opendb` API.
 
 ## Notes
 

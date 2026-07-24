@@ -1,10 +1,10 @@
 [package]
-name = "vyges-odb-sys"
+name = "vyges-opendb-lib"
 version = "0.0.1"
 edition = "2021"
 license = "Apache-2.0"
 description = "Standalone build + low-level FFI for OpenROAD's OpenDB (libodb) — no tcl/swig/engines."
-repository = "https://github.com/vyges-tools/odb-sys"
+repository = "https://github.com/vyges-tools/opendb-lib"
 links = "odb"
 build = "build.rs"
 

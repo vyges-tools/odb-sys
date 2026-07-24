@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Write path: create a buffer inst + net, wire it, persist, and verify it survives a
 // round-trip. These are the primitives InsertECOBuffers composes.
-use vyges_odb_sys as odb;
+use vyges_opendb_lib as odb;
 
 #[test]
 fn create_wire_and_persist() {
@@ -25,7 +25,7 @@ fn create_wire_and_persist() {
     assert_eq!(odb::num_nets(&db), m0 + 1);
 
     // persist -> reread -> the edit survived serialization
-    let out = std::env::temp_dir().join("vyges_odb_wp.odb");
+    let out = std::env::temp_dir().join("vyges_opendb_wp.odb");
     odb::write_db(&db, out.to_str().unwrap()).unwrap();
     let db2 = odb::open_db(out.to_str().unwrap()).unwrap();
     assert_eq!(odb::num_insts(&db2), n0 + 1);
