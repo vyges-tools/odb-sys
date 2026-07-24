@@ -68,13 +68,17 @@ def upstream_schema_classes(odb: Path) -> set[str]:
 
 
 def bridged_methods(odb_lib: Path) -> set[str]:
-    """odb method names our cxx shim already calls (best-effort, for a coverage cross-ref)."""
-    shim = odb_lib / "src" / "shim.cc"
+    """odb method names our cxx layer already calls (best-effort, for a coverage cross-ref).
+
+    Scans the hand-written shim AND the machine-generated bindings (generate-bindings.py), so
+    the `bridged` flag reflects the full exposed surface, not just the hand-written part."""
     called = set()
-    if shim.is_file():
-        # match `->methodName(` and `.methodName(` on odb objects
-        for m in re.finditer(r"[.>]([a-z][A-Za-z0-9]*)\s*\(", shim.read_text()):
-            called.add(m.group(1))
+    for rel in ("src/shim.cc", "src/generated.cc"):
+        f = odb_lib / rel
+        if f.is_file():
+            # match `->methodName(` and `.methodName(` on odb objects
+            for m in re.finditer(r"[.>]([a-z][A-Za-z0-9]*)\s*\(", f.read_text()):
+                called.add(m.group(1))
     return called
 
 

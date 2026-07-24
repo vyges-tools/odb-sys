@@ -68,6 +68,13 @@ mod ffi {
     }
 }
 
+// Second cxx bridge: machine-generated read accessors (scripts/generate-bindings.py). Kept in a
+// separate module + bridge so the generator wholly owns it and never edits this hand-written file.
+#[cfg(unix)]
+mod generated_bridge;
+#[cfg(unix)]
+pub use generated_bridge::*;
+
 #[cfg(unix)]
 pub use ffi::{
     add_obstruction, block_name, bterm_direction, bterm_net, bterm_x, bterm_y, clear_obstructions,

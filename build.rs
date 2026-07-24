@@ -56,8 +56,8 @@ fn main() {
     }
 
     // Compile the cxx bridge + shim against odb/utl + the pinned deps' headers.
-    let mut b = cxx_build::bridge("src/lib.rs");
-    b.file("src/shim.cc").std("c++20").include("src");
+    let mut b = cxx_build::bridges(["src/lib.rs", "src/generated_bridge.rs"]);
+    b.file("src/shim.cc").file("src/generated.cc").std("c++20").include("src");
     for inc in &includes {
         b.include(inc);
     }
@@ -110,6 +110,9 @@ fn main() {
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/shim.cc");
     println!("cargo:rerun-if-changed=src/shim.h");
+    println!("cargo:rerun-if-changed=src/generated_bridge.rs");
+    println!("cargo:rerun-if-changed=src/generated.cc");
+    println!("cargo:rerun-if-changed=src/generated.h");
     println!("cargo:rerun-if-changed=CMakeLists.txt");
 }
 

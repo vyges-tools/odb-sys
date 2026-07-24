@@ -5,7 +5,7 @@
   "scope": "hand-written core only",
   "class_count": 44,
   "method_count": 1137,
-  "bridged_count": 95,
+  "bridged_count": 233,
   "classes": [
     {
       "name": "dbBPin",
@@ -17,7 +17,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setPlacementStatus",
@@ -145,7 +145,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "rename",
@@ -229,7 +229,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setMark",
@@ -250,7 +250,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setExtId",
@@ -271,7 +271,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isSpecial",
@@ -304,7 +304,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbModNet"
         },
         {
@@ -398,7 +398,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -446,7 +446,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getGroundPin",
@@ -454,7 +454,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbBTerm"
         },
         {
@@ -476,7 +476,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbBTerm"
         },
         {
@@ -498,7 +498,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "staSetVertexId",
@@ -561,7 +561,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbBTerm"
         },
         {
@@ -570,7 +570,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isMirrored",
@@ -578,7 +578,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         }
       ],
       "hand_written": true
@@ -601,7 +601,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getBBox",
@@ -645,7 +645,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbBlock"
         },
         {
@@ -654,7 +654,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbInst"
         },
         {
@@ -672,7 +672,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbBlock"
         },
         {
@@ -829,7 +829,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbModNet"
         },
         {
@@ -1288,7 +1288,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbVia"
         },
         {
@@ -1306,7 +1306,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setDefUnits",
@@ -1327,7 +1327,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "dbuToMicrons",
@@ -1519,7 +1519,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getCornersPerBlock",
@@ -1527,7 +1527,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getExtDbCount",
@@ -1535,7 +1535,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getExtCornerName",
@@ -1582,7 +1582,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setCornerCount",
@@ -1655,7 +1655,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbRow"
         },
         {
@@ -1838,7 +1838,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setMinRoutingLayer",
@@ -1859,7 +1859,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setMaxRoutingLayer",
@@ -1880,7 +1880,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setMinLayerForClock",
@@ -1901,7 +1901,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setMaxLayerForClock",
@@ -1922,7 +1922,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getExtCornerNames",
@@ -2102,7 +2102,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbRegion"
         },
         {
@@ -2139,7 +2139,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbTechNonDefaultRule"
         },
         {
@@ -2853,7 +2853,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setMark",
@@ -3265,7 +3265,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setSelect",
@@ -3458,7 +3458,7 @@
           ],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -3723,7 +3723,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbModNet"
         },
         {
@@ -3826,7 +3826,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setExtId",
@@ -3847,7 +3847,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isSpecial",
@@ -3913,7 +3913,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isConnected",
@@ -4087,7 +4087,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "staSetVertexId",
@@ -4123,7 +4123,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isNamed",
@@ -4182,7 +4182,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setOrient",
@@ -4301,7 +4301,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isFixed",
@@ -4309,7 +4309,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isPlaced",
@@ -4317,7 +4317,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setPlacementStatus",
@@ -4338,7 +4338,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getEcoDestroy",
@@ -4346,7 +4346,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getEcoModify",
@@ -4354,7 +4354,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setEcoCreate",
@@ -4401,7 +4401,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setUserFlag1",
@@ -4425,7 +4425,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setUserFlag2",
@@ -4449,7 +4449,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setUserFlag3",
@@ -4486,7 +4486,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getBlock",
@@ -4530,7 +4530,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -4539,7 +4539,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -4548,7 +4548,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbRegion"
         },
         {
@@ -4585,7 +4585,7 @@
           ],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -4632,7 +4632,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbBlock"
         },
         {
@@ -4641,7 +4641,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbInst"
         },
         {
@@ -4650,7 +4650,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbInst"
         },
         {
@@ -4659,7 +4659,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isPhysicalOnly",
@@ -4667,7 +4667,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getHalo",
@@ -4721,7 +4721,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setWeight",
@@ -4742,7 +4742,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setSourceType",
@@ -4768,7 +4768,7 @@
           ],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -4790,7 +4790,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isCore",
@@ -4798,7 +4798,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isPad",
@@ -4806,7 +4806,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isEndCap",
@@ -4814,7 +4814,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getScanInst",
@@ -4844,7 +4844,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getChipBump",
@@ -4904,7 +4904,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getDbUnitsPerMicron",
@@ -4912,7 +4912,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getTech",
@@ -5130,7 +5130,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getName",
@@ -5226,7 +5226,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getMaster",
@@ -5463,7 +5463,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getOrigin",
@@ -5562,7 +5562,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isCore",
@@ -5570,7 +5570,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isPad",
@@ -5578,7 +5578,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isEndCap",
@@ -5586,7 +5586,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isCover",
@@ -5894,7 +5894,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isSpecialPower",
@@ -6010,7 +6010,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "printNetName",
@@ -6069,7 +6069,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setRCDisconnected",
@@ -6090,7 +6090,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setWeight",
@@ -6111,7 +6111,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setSourceType",
@@ -6132,7 +6132,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setXTalkClass",
@@ -6166,7 +6166,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -6175,7 +6175,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setFixedBump",
@@ -6196,7 +6196,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setWireType",
@@ -6251,7 +6251,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isMark_1ed",
@@ -6293,7 +6293,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setSelect",
@@ -6314,7 +6314,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setWireOrdered",
@@ -6335,7 +6335,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setDisconnected",
@@ -6369,7 +6369,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setRCgraph",
@@ -6390,7 +6390,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setExtracted",
@@ -6411,7 +6411,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setSpef",
@@ -6432,7 +6432,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setDoNotTouch",
@@ -6453,7 +6453,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getBlock",
@@ -6479,7 +6479,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -6511,7 +6511,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbInst"
         },
         {
@@ -6520,7 +6520,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbITerm"
         },
         {
@@ -6538,7 +6538,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbBTerm"
         },
         {
@@ -6633,7 +6633,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setIOflag",
@@ -6649,7 +6649,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isWildConnected",
@@ -6657,7 +6657,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setWildConnected",
@@ -6681,7 +6681,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setGndcCalibFactor",
@@ -6739,7 +6739,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setCcCalibFactor",
@@ -6820,7 +6820,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setCcAdjustFactor",
@@ -6841,7 +6841,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setCcAdjustOrder",
@@ -6888,7 +6888,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setDbCc",
@@ -6909,7 +6909,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setRefCc",
@@ -6930,7 +6930,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setCcMatchRatio",
@@ -7055,7 +7055,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "findRSeg",
@@ -7094,7 +7094,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setTermExtIds",
@@ -7115,7 +7115,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getRSegs",
@@ -7145,7 +7145,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getCapNodeCount",
@@ -7153,7 +7153,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getCcCount",
@@ -7161,7 +7161,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "destroyRSegs",
@@ -7283,7 +7283,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechNonDefaultRule"
         },
         {
@@ -7343,7 +7343,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getITermCount",
@@ -7351,7 +7351,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getBTermCount",
@@ -7359,7 +7359,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getTermBBox",
@@ -7461,7 +7461,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setJumpers",
@@ -7508,7 +7508,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbModNet"
         },
         {
@@ -8489,7 +8489,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getSite",
@@ -8514,7 +8514,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getDirection",
@@ -8689,7 +8689,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setWireType",
@@ -8743,7 +8743,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getWidth",
@@ -8972,7 +8972,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getLayers",
@@ -9049,7 +9049,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbTechVia"
         },
         {
@@ -9312,7 +9312,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbTechNonDefaultRule"
         },
         {
@@ -9950,7 +9950,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechNonDefaultRule"
         },
         {
@@ -10709,7 +10709,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isBlockRule",
@@ -10757,7 +10757,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "findSameNetRule",
@@ -10985,7 +10985,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isDefault",
@@ -11163,7 +11163,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechNonDefaultRule"
         }
       ],
@@ -11721,7 +11721,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getPattern",
@@ -11854,7 +11854,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getTechVia",
