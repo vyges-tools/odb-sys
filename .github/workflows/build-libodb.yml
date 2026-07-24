@@ -14,8 +14,16 @@
 # duplicate heavy build doubled minutes and was the leg that kept OOM/hang-failing on Linux.
 name: build-libodb
 
+# workflow_dispatch → build + upload the per-platform bundle as a 90-day CI artifact.
+# push a tag `v*`   → additionally PUBLISH the bundle (.a's + headers + manifest.json) to a
+#                     durable GitHub Release, so the prebuilt libodb + provenance never expire.
 on:
   workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write   # create the Release + attach bundles on a tag
 
 jobs:
   build:
@@ -125,3 +133,22 @@ jobs:
           name: libodb-${{ matrix.label }}
           path: prebuilt
           if-no-files-found: error
+
+      - name: Package bundle + manifest (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          # libodb-<platform>.tar.gz IS the VYGES_ODB_PREBUILT_DIR layout (lib/ + include/ +
+          # manifest.json). Also surface manifest.json standalone so it's viewable on the Release.
+          tar -C prebuilt -czf "libodb-${{ matrix.label }}.tar.gz" .
+          ( sha256sum "libodb-${{ matrix.label }}.tar.gz" 2>/dev/null \
+            || shasum -a 256 "libodb-${{ matrix.label }}.tar.gz" ) > "libodb-${{ matrix.label }}.tar.gz.sha256"
+          cp prebuilt/manifest.json "manifest-${{ matrix.label }}.json"
+
+      - name: Attach bundle + manifest to the Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            libodb-${{ matrix.label }}.tar.gz
+            libodb-${{ matrix.label }}.tar.gz.sha256
+            manifest-${{ matrix.label }}.json
