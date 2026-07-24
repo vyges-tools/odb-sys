@@ -6,3 +6,7 @@ Cargo.lock
 *.o
 *.a
 !test/fixtures/*.odb
+
+# Python bytecode from generate-bindings importing derive-schema
+__pycache__/
+*.pyc
