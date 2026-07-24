@@ -32,6 +32,9 @@ mod ffi {
         fn find_master(db: &OdbDb, substr: &str) -> String;
         fn input_pin(db: &OdbDb, inst: &str) -> String;
         fn output_pin(db: &OdbDb, inst: &str) -> String;
+        fn inst_master(db: &OdbDb, inst: &str) -> String;
+        fn num_iterms(db: &OdbDb, inst: &str) -> usize;
+        fn nth_iterm_name(db: &OdbDb, inst: &str, i: usize) -> String;
         fn net_of(db: &OdbDb, inst: &str, pin: &str) -> String;
         fn inst_x(db: &OdbDb, inst: &str) -> i32;
         fn inst_y(db: &OdbDb, inst: &str) -> i32;
@@ -53,7 +56,7 @@ mod ffi {
 #[cfg(unix)]
 pub use ffi::{
     block_name, bterm_net, bterm_x, bterm_y, connect, create_inst, create_net, disconnect,
-    find_master, first_master_name, input_pin, inst_x, inst_y, net_of, nth_bterm_name,
-    nth_inst_name, num_bterms, num_insts, num_nets, open_db, output_pin, set_inst_location,
-    set_inst_orient, write_db, OdbDb,
+    find_master, first_master_name, input_pin, inst_master, inst_x, inst_y, net_of, nth_bterm_name,
+    nth_inst_name, nth_iterm_name, num_bterms, num_insts, num_iterms, num_nets, open_db, output_pin,
+    set_inst_location, set_inst_orient, write_db, OdbDb,
 };

@@ -100,6 +100,26 @@ rust::String output_pin(const OdbDb& h, rust::Str inst) {
     if (t->isOutputSignal()) return rust::String(t->getMTerm()->getName());
   return rust::String();
 }
+rust::String inst_master(const OdbDb& h, rust::Str inst) {
+  dbBlock* b = block_of(h);
+  dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;
+  dbMaster* m = i ? i->getMaster() : nullptr;
+  return rust::String(m ? m->getName() : std::string());
+}
+std::size_t num_iterms(const OdbDb& h, rust::Str inst) {
+  dbBlock* b = block_of(h);
+  dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;
+  return i ? i->getITerms().size() : 0;
+}
+rust::String nth_iterm_name(const OdbDb& h, rust::Str inst, std::size_t idx) {
+  dbBlock* b = block_of(h);
+  dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;
+  if (!i) return rust::String();
+  std::size_t k = 0;
+  for (dbITerm* t : i->getITerms())
+    if (k++ == idx) return rust::String(t->getMTerm()->getName());
+  return rust::String();
+}
 rust::String net_of(const OdbDb& h, rust::Str inst, rust::Str pin) {
   dbBlock* b = block_of(h);
   dbInst* i = b ? b->findInst(s(inst).c_str()) : nullptr;

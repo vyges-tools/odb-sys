@@ -32,6 +32,9 @@ rust::String first_master_name(const OdbDb& db);                 // any master, 
 rust::String find_master(const OdbDb& db, rust::Str substr);     // first master whose name contains substr
 rust::String input_pin(const OdbDb& db, rust::Str inst);         // first input-signal pin name
 rust::String output_pin(const OdbDb& db, rust::Str inst);        // first output-signal pin name
+rust::String inst_master(const OdbDb& db, rust::Str inst);       // instance's master cell name ("" if none)
+std::size_t num_iterms(const OdbDb& db, rust::Str inst);         // number of instance pins (iterms)
+rust::String nth_iterm_name(const OdbDb& db, rust::Str inst, std::size_t i);  // i-th pin name ("" out of range)
 rust::String net_of(const OdbDb& db, rust::Str inst, rust::Str pin);  // net on a pin, "" if none
 int32_t inst_x(const OdbDb& db, rust::Str inst);   // instance origin x in DBU (0 if not found)
 int32_t inst_y(const OdbDb& db, rust::Str inst);   // instance origin y in DBU (0 if not found)
