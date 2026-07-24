@@ -99,3 +99,24 @@ if(VYGES_ODB_SMOKE)
   add_executable(odb_smoke test/probe.cpp)
   target_link_libraries(odb_smoke PRIVATE odb)
 endif()
+
+# ---- conformance gate: OpenROAD's OWN odb C++ GTests, run against OUR libodb --
+# Proves our standalone/no-Tcl build is behaviorally OpenROAD, and catches drift on a pin bump.
+# Only the tests needing nothing beyond libodb build here: OpenROAD's tst/ framework pulls STA +
+# Tcl + Bazel-runfiles, so the tst/helper-based, gdsin, 3dblox, and STA tests are out of scope.
+# Coverage note (2026-07-24): only TestGeom builds standalone. The other 25 odb gtests pull
+# OpenROAD's `tst::Fixture` framework (tst/fixture.h, {sky130,nangate45}_fixture.h,
+# IntegratedFixture.h), which #includes db_sta/dbSta + sta/Liberty + tcl.h + Bazel runfiles — none
+# of which exist in a Tcl/SWIG/engine-free libodb. Expanding this gate toward parity = writing a
+# minimal standalone `tst` shim (db + Logger + LEF load via our lefin, no STA/Tcl); see
+# docs (opendb-conformance-gate.md) in vyges-tools-internal.
+option(VYGES_ODB_GTEST "Build OpenROAD's standalone odb C++ GTests against our libodb" OFF)
+if(VYGES_ODB_GTEST)
+  FetchContent_Declare(googletest GIT_REPOSITORY https://github.com/google/googletest.git
+                       GIT_TAG v1.15.2 GIT_SHALLOW TRUE)
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
+  set(ODB_TEST "${OPENROAD_SRC}/src/odb/test/cpp")
+  add_executable(odb_gtest "${ODB_TEST}/TestGeom.cpp")   # Point/Rect/Oct/Polygon geometry
+  target_link_libraries(odb_gtest PRIVATE odb GTest::gtest GTest::gtest_main GTest::gmock)
+endif()

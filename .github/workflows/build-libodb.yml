@@ -77,6 +77,16 @@ jobs:
           ./build/odb_smoke test/fixtures/counter.odb /tmp/rt.odb
           echo "libodb.a: $(du -h build/libodb.a | cut -f1)"
 
+      - name: Conformance gate (OpenROAD's odb GTests vs our libodb)
+        # Runs OpenROAD's OWN gtests against our standalone libodb — behavioral conformance +
+        # drift tripwire. Only TestGeom builds standalone today (the rest need OpenROAD's tst/STA
+        # framework); see docs/openroad/opendb-conformance-gate.md for the parity roadmap.
+        run: |
+          [ "${{ runner.os }}" = "macOS" ] && export PATH="$(brew --prefix bison)/bin:$PATH"
+          cmake -S . -B build -DVYGES_ODB_GTEST=ON >/dev/null
+          cmake --build build --target odb_gtest --parallel "$(nproc 2>/dev/null || sysctl -n hw.ncpu)"
+          ./build/odb_gtest
+
       - name: Measure runtime floor
         id: floor
         run: |
