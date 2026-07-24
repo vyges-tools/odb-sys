@@ -53,6 +53,7 @@ mod ffi {
         fn clear_obstructions(db: &OdbDb) -> usize;
         fn bterm_direction(db: &OdbDb, bterm: &str) -> String;
         fn total_wire_length(db: &OdbDb) -> u64;
+        fn place_bterm(db: &OdbDb, bterm: &str, layer: &str, x1: i32, y1: i32, x2: i32, y2: i32) -> Result<()>;
         fn connect(db: &OdbDb, inst: &str, pin: &str, net: &str) -> Result<()>;
         fn disconnect(db: &OdbDb, inst: &str, pin: &str) -> Result<()>;
     }
@@ -63,6 +64,6 @@ pub use ffi::{
     add_obstruction, block_name, bterm_direction, bterm_net, bterm_x, bterm_y, clear_obstructions,
     connect, create_inst, create_net, disconnect, find_master, first_master_name, input_pin,
     inst_master, inst_x, inst_y, net_of, nth_bterm_name, nth_inst_name, nth_iterm_name, num_bterms,
-    num_insts, num_iterms, num_nets, num_obstructions, open_db, output_pin, set_inst_location,
-    set_inst_orient, total_wire_length, write_db, OdbDb,
+    num_insts, num_iterms, num_nets, num_obstructions, open_db, output_pin, place_bterm,
+    set_inst_location, set_inst_orient, total_wire_length, write_db, OdbDb,
 };

@@ -8,6 +8,8 @@
 #include <vector>
 
 using odb::dbBlock;
+using odb::dbBox;
+using odb::dbBPin;
 using odb::dbBTerm;
 using odb::dbInst;
 using odb::dbITerm;
@@ -233,6 +235,18 @@ std::uint64_t total_wire_length(const OdbDb& h) {
     if (w) total += w->getLength();
   }
   return total;
+}
+void place_bterm(const OdbDb& h, rust::Str bterm, rust::Str layer, int32_t x1, int32_t y1,
+                 int32_t x2, int32_t y2) {
+  dbBlock* b = require_block(h);
+  dbBTerm* bt = b->findBTerm(s(bterm).c_str());
+  if (!bt) throw std::runtime_error("vyges-opendb: bterm not found: " + s(bterm));
+  dbTech* tech = b->getTech();
+  dbTechLayer* l = tech ? tech->findLayer(s(layer).c_str()) : nullptr;
+  if (!l) throw std::runtime_error("vyges-opendb: tech layer not found: " + s(layer));
+  dbBPin* bpin = dbBPin::create(bt);
+  dbBox::create(bpin, l, x1, y1, x2, y2);
+  bpin->setPlacementStatus(odb::dbPlacementStatus::PLACED);
 }
 void connect(const OdbDb& h, rust::Str inst, rust::Str pin, rust::Str net) {
   dbNet* n = require_block(h)->findNet(s(net).c_str());
