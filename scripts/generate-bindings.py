@@ -101,6 +101,12 @@ SCALAR_IN = {
     "int64_t": ("int64_t", "i64"), "uint64_t": ("uint64_t", "u64"),
     "bool": ("bool", "bool"), "float": ("float", "f32"), "double": ("double", "f64"),
 }
+# scalar reference out-param type -> (cxx type, rust type). For `void get*(int& x, int& y)`.
+OUTREF = {
+    "int": ("int32_t", "i32"), "int32_t": ("int32_t", "i32"),
+    "uint": ("uint32_t", "u32"), "uint32_t": ("uint32_t", "u32"), "unsigned": ("uint32_t", "u32"),
+    "bool": ("bool", "bool"), "double": ("double", "f64"), "float": ("float", "f32"),
+}
 RUST_KW = {"type", "match", "move", "ref", "box", "fn", "let", "mut", "self", "use", "mod", "impl",
            "as", "in", "loop", "if", "else", "for", "while", "const", "static", "trait", "where",
            "enum", "struct", "crate", "pub", "return", "break", "continue", "dyn", "async", "await",
@@ -291,6 +297,56 @@ class Emit:
         self.wreg.append((cls, field, value_types, keys_desc, arm))
         return True
 
+    def add_outparam_getter(self, cls, spec, m, reserved_fn, reserved_db, seen):
+        """A `void get*(int& a, int& b, ...)` reader (all params are scalar out-refs) -> one scalar
+        sub-field per out-param. Classifies as a 'setter' (void return) so it's otherwise skipped."""
+        name = m["name"]
+        params = m["params"]
+        if not name.startswith("get") or not params:
+            return False
+        outs = []
+        for i, p in enumerate(params):
+            om = re.match(r"^(int|int32_t|uint|uint32_t|unsigned|bool|double|float)\s*&$", p["type"].strip())
+            if not om:
+                return False  # any non-scalar-out-ref param -> not an out-param getter
+            cty, rty = OUTREF[om.group(1)]
+            pn = p.get("name")
+            pn = snake(pn) if pn and re.fullmatch(r"[A-Za-z_]\w*", pn) else f"a{i}"
+            outs.append((pn, om.group(1), cty, rty))
+
+        argspecs = normalize_args(spec["args"])
+        c_ids = "".join(f", {_cty(k)} {n}" for n, k in argspecs)
+        r_ids = "".join(f", {n}: {_rty(k)}" for n, k in argspecs)
+        fwd = "".join(f", {n}" for n, k in argspecs)
+        key_call, keys_desc = key_exprs(argspecs)
+        field = snake(name)
+        base = f"{spec['key']}_{field}"
+        decls = "; ".join(f"{ct} v{i} = 0" for i, (_, ct, _, _) in enumerate(outs))
+        callargs = ", ".join(f"v{i}" for i in range(len(outs)))
+        emitted = 0
+        for i, (pn, ct, cty, rty) in enumerate(outs):
+            sub = f"{base}_{pn}"
+            if sub in seen or sub in reserved_fn or sub in reserved_db:
+                continue
+            # declare every out-param, call the getter once, return the i-th.
+            self.h.append(f"{cty} {sub}(const OdbDb& db{c_ids});")
+            self.cc.append(
+                f"{cty} {sub}(const OdbDb& h{c_ids}) {{ {decls}; auto* p = {spec['resolve']}; "
+                f"if (p) p->{name}({callargs}); return v{i}; }}")
+            self.bridge.append(f"        fn {sub}(db: &OdbDb{r_ids}) -> {rty};")
+            self.api.append(
+                f"    pub fn {sub}(&self{r_ids}) -> {rty} {{ sys::{sub}(self.r(){fwd}) }}")
+            self.reexport.append(sub)
+            seen.add(sub)
+            subarm = (f'        ("{cls}", "{field}_{pn}") => '
+                      f"Ok(serde_json::json!(db.{sub}({key_call}))),")
+            self.reg.append((cls, f"{field}_{pn}", rty, keys_desc, subarm))
+            emitted += 1
+        if emitted:
+            self.per_class[cls] = self.per_class.get(cls, 0) + 1
+            return True
+        return False
+
     def add(self, cls, spec, m, nameable, reserved_fn, reserved_db, seen):
         key, resolve = spec["key"], spec["resolve"]
         argspecs = normalize_args(spec["args"])
@@ -313,6 +369,40 @@ class Emit:
         key_call, keys_desc = key_exprs(argspecs)
         arm = f'        ("{cls}", "{field}") => Ok(serde_json::json!(db.{fn}({key_call}))),'
         reg_kind = None
+
+        # std::vector<dbFoo*> getters marshal exactly like a dbSet iterator (count + nth-name).
+        vec_m = re.match(r"^(?:const\s+)?std::vector<\s*(db[A-Za-z0-9_]+)\s*\*\s*>\s*&?$", ret.strip())
+        if kind == "getter" and vec_m:
+            velem = vec_m.group(1)
+            if velem not in nameable:
+                self.skipped += 1
+                return False
+            nexpr = nameable[velem].format("e")
+            num, nth = f"num_{fn}", f"nth_{fn}"
+            if num in seen or nth in seen:
+                return False
+            self.h.append(f"std::size_t {num}(const OdbDb& db{c_params});")
+            self.h.append(f"rust::String {nth}(const OdbDb& db{c_params}, std::size_t i);")
+            self.cc.append(
+                f"std::size_t {num}(const OdbDb& h{c_params}) {{ auto* p = {resolve}; "
+                f"return p ? p->{name}().size() : 0; }}")
+            self.cc.append(
+                f"rust::String {nth}(const OdbDb& h{c_params}, std::size_t i) {{ auto* p = {resolve}; "
+                f"if (!p) return rust::String(); auto v = p->{name}(); if (i >= v.size()) return rust::String(); "
+                f"auto* e = v[i]; return rust::String({nexpr}); }}")
+            self.bridge.append(f"        fn {num}(db: &OdbDb{r_params}) -> usize;")
+            self.bridge.append(f"        fn {nth}(db: &OdbDb{r_params}, i: usize) -> String;")
+            self.reexport.append(num)
+            self.reexport.append(nth)
+            self.api.append(
+                f"    pub fn {fn}(&self{rust_args_sig}) -> Vec<String> {{ "
+                f"(0..sys::{num}(self.r(){rust_fwd})).map(|i| sys::{nth}(self.r(){rust_fwd}, i)).collect() }}")
+            seen.add(num)
+            seen.add(nth)
+            seen.add(fn)
+            self.per_class[cls] = self.per_class.get(cls, 0) + 1
+            self.reg.append((cls, field, "list", keys_desc, arm))
+            return True
 
         # ---- decide marshalling ------------------------------------------------
         if kind in ("getter", "predicate"):
@@ -471,6 +561,10 @@ def main() -> int:
         for m in by_name[cls]["methods"]:
             if m["kind"] in ("getter", "predicate", "relation", "iterator") and not m["params"]:
                 e.add(cls, spec, m, nameable, reserved_fn, reserved_db, seen)
+        # out-param getters `void get*(scalar&...)` classify as setters (void) — pick them up as reads.
+        for m in by_name[cls]["methods"]:
+            if m["kind"] == "setter" and m["name"].startswith("get"):
+                e.add_outparam_getter(cls, spec, m, reserved_fn, reserved_db, seen)
         seen_w: set[str] = set()
         for m in by_name[cls]["methods"]:
             if m["kind"] == "setter":

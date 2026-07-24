@@ -45,6 +45,8 @@ mod ffi_gen {
         fn nth_block_get_level_shifters(db: &OdbDb, i: usize) -> String;
         fn num_block_get_groups(db: &OdbDb) -> usize;
         fn nth_block_get_groups(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_component_mask_shift(db: &OdbDb) -> usize;
+        fn nth_block_get_component_mask_shift(db: &OdbDb, i: usize) -> String;
         fn num_block_get_nets(db: &OdbDb) -> usize;
         fn nth_block_get_nets(db: &OdbDb, i: usize) -> String;
         fn num_block_get_vias(db: &OdbDb) -> usize;
@@ -184,6 +186,12 @@ mod ffi_gen {
         fn net_find_main_parent_module(db: &OdbDb, net: &str) -> String;
         fn net_has_jumpers(db: &OdbDb, net: &str) -> bool;
         fn net_find_mod_net_in_highest_hier(db: &OdbDb, net: &str) -> String;
+        fn net_get_wire_count_wire_cnt(db: &OdbDb, net: &str) -> u32;
+        fn net_get_wire_count_via_cnt(db: &OdbDb, net: &str) -> u32;
+        fn net_get_signal_wire_count_wire_cnt(db: &OdbDb, net: &str) -> u32;
+        fn net_get_signal_wire_count_via_cnt(db: &OdbDb, net: &str) -> u32;
+        fn net_get_power_wire_count_wire_cnt(db: &OdbDb, net: &str) -> u32;
+        fn net_get_power_wire_count_via_cnt(db: &OdbDb, net: &str) -> u32;
         fn bterm_get_name(db: &OdbDb, bterm: &str) -> String;
         fn bterm_get_const_name(db: &OdbDb, bterm: &str) -> String;
         fn bterm_get_b_box_x_min(db: &OdbDb, bterm: &str) -> i32;
@@ -330,6 +338,10 @@ mod ffi_gen {
         fn layer_get_upper_layer(db: &OdbDb, layer: &str) -> String;
         fn layer_get_tech(db: &OdbDb, layer: &str) -> String;
         fn layer_has_orth_spacing_table(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_max_wide_d_r_c_range_owidth(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_max_wide_d_r_c_range_olength(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_min_wide_d_r_c_range_owidth(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_min_wide_d_r_c_range_olength(db: &OdbDb, layer: &str) -> i32;
         fn row_get_name(db: &OdbDb, row: &str) -> String;
         fn row_get_const_name(db: &OdbDb, row: &str) -> String;
         fn row_get_site(db: &OdbDb, row: &str) -> String;
@@ -445,6 +457,8 @@ mod ffi_gen {
         fn nth_module_get_mod_b_terms(db: &OdbDb, module: &str, i: usize) -> String;
         fn num_module_get_insts(db: &OdbDb, module: &str) -> usize;
         fn nth_module_get_insts(db: &OdbDb, module: &str, i: usize) -> String;
+        fn num_module_get_leaf_insts(db: &OdbDb, module: &str) -> usize;
+        fn nth_module_get_leaf_insts(db: &OdbDb, module: &str, i: usize) -> String;
         fn module_get_mod_inst_count(db: &OdbDb, module: &str) -> i32;
         fn module_get_db_inst_count(db: &OdbDb, module: &str) -> i32;
         fn module_is_top(db: &OdbDb, module: &str) -> bool;
@@ -640,10 +654,14 @@ pub use ffi_gen::{
     layer_get_layer_adjustment,
     layer_get_lef58_type_string,
     layer_get_lower_layer,
+    layer_get_max_wide_d_r_c_range_olength,
+    layer_get_max_wide_d_r_c_range_owidth,
     layer_get_max_width,
     layer_get_min_step,
     layer_get_min_step_max_edges,
     layer_get_min_step_max_length,
+    layer_get_min_wide_d_r_c_range_olength,
+    layer_get_min_wide_d_r_c_range_owidth,
     layer_get_min_width,
     layer_get_name,
     layer_get_num_masks,
@@ -764,9 +782,13 @@ pub use ffi_gen::{
     net_get_i_term_count,
     net_get_name,
     net_get_non_default_rule,
+    net_get_power_wire_count_via_cnt,
+    net_get_power_wire_count_wire_cnt,
     net_get_r_seg_count,
     net_get_ref_cc,
     net_get_sig_type,
+    net_get_signal_wire_count_via_cnt,
+    net_get_signal_wire_count_wire_cnt,
     net_get_source_type,
     net_get_term_b_box_dx,
     net_get_term_b_box_dy,
@@ -776,6 +798,8 @@ pub use ffi_gen::{
     net_get_term_b_box_y_min,
     net_get_term_count,
     net_get_weight,
+    net_get_wire_count_via_cnt,
+    net_get_wire_count_wire_cnt,
     net_get_wire_type,
     net_get_x_talk_class,
     net_has_fixed_bump,
@@ -797,6 +821,7 @@ pub use ffi_gen::{
     net_max_internal_cap_num,
     nth_block_get_b_terms,
     nth_block_get_children,
+    nth_block_get_component_mask_shift,
     nth_block_get_groups,
     nth_block_get_i_terms,
     nth_block_get_insts,
@@ -827,6 +852,7 @@ pub use ffi_gen::{
     nth_master_get_m_terms,
     nth_module_get_children,
     nth_module_get_insts,
+    nth_module_get_leaf_insts,
     nth_module_get_mod_b_terms,
     nth_module_get_mod_insts,
     nth_module_get_mod_nets,
@@ -837,6 +863,7 @@ pub use ffi_gen::{
     nth_region_get_region_insts,
     num_block_get_b_terms,
     num_block_get_children,
+    num_block_get_component_mask_shift,
     num_block_get_groups,
     num_block_get_i_terms,
     num_block_get_insts,
@@ -867,6 +894,7 @@ pub use ffi_gen::{
     num_master_get_m_terms,
     num_module_get_children,
     num_module_get_insts,
+    num_module_get_leaf_insts,
     num_module_get_mod_b_terms,
     num_module_get_mod_insts,
     num_module_get_mod_nets,
