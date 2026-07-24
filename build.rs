@@ -91,6 +91,10 @@ fn main() {
     if cfg!(target_os = "macos") {
         let brew = if Path::new("/opt/homebrew").exists() { "/opt/homebrew" } else { "/usr/local" };
         println!("cargo:rustc-link-search=native={brew}/lib");
+    } else if let Ok(arch) = std::env::var("CARGO_CFG_TARGET_ARCH") {
+        // Debian/Ubuntu multiarch dir where libboost_iostreams.a lives — not a default rustc
+        // *static* search path (e.g. /usr/lib/x86_64-linux-gnu, /usr/lib/aarch64-linux-gnu).
+        println!("cargo:rustc-link-search=native=/usr/lib/{arch}-linux-gnu");
     }
     println!("cargo:rustc-link-lib=static=boost_iostreams");
     if cfg!(target_os = "macos") {
