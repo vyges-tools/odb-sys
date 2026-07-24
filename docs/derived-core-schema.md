@@ -68,8 +68,10 @@ It writes four generated files (all marked `@generated … DO NOT EDIT`):
 Scope guards, by design:
 
 - **Marshallable types only.** Scalars (`int`/`uint`/`bool`/`float`), strings, the six
-  `getString()` enums, nameable relations/iterators. Geometry structs (`Point`/`Rect`/
-  `Polygon`), vectors, and `optional`s are skipped — those get purpose-built hand bindings.
+  `getString()` enums, nameable relations/iterators, and the geometry structs `Point`/`Rect`
+  returned by value — **expanded into scalar sub-fields** (`Rect getBBox()` → `get_b_box_{x_min,
+  y_min,x_max,y_max,dx,dy}`, `Point getOrigin()` → `get_origin_{x,y}`). `Polygon`, vectors, and
+  `optional`s are still skipped — those get purpose-built hand bindings.
 - **No collisions.** Any generated name that clashes with a hand-written export/`Db` method
   is skipped, so the hand-written surface always wins.
 

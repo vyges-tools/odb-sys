@@ -80,6 +80,14 @@ SCALAR = {
 # constructor — so they marshal both ways (getter → string, setter param ← string).
 ENUMS = {"dbSigType", "dbIoType", "dbPlacementStatus", "dbOrientType", "dbSourceType", "dbWireType"}
 
+# geometry structs returned by value — expanded into scalar (int) sub-fields (suffix, accessor),
+# so `Rect getBBox()` becomes get_b_box_{x_min,y_min,x_max,y_max,dx,dy}. Reuses the scalar path.
+STRUCT_FIELDS = {
+    "Point": [("x", "getX"), ("y", "getY")],
+    "Rect": [("x_min", "xMin"), ("y_min", "yMin"), ("x_max", "xMax"), ("y_max", "yMax"),
+             ("dx", "dx"), ("dy", "dy")],
+}
+
 # setter param scalar -> (cxx type, rust type)
 SCALAR_IN = {
     "int": ("int32_t", "i32"), "int32_t": ("int32_t", "i32"),
@@ -330,6 +338,34 @@ class Emit:
                 reg_kind = "string"
                 self._string(fn, name, resolve, c_params, r_params, rust_args_sig, rust_fwd,
                              f"rust::String(p->{name}().getString())")
+            elif ret.replace("odb::", "").strip() in STRUCT_FIELDS \
+                    and not any(c in ret for c in "<&*"):
+                # a geometry struct (Point/Rect) returned by value -> N scalar (int) sub-fields.
+                base = ret.replace("odb::", "").strip()
+                emitted = 0
+                for suffix, accessor in STRUCT_FIELDS[base]:
+                    sub = f"{fn}_{suffix}"
+                    if sub in seen or sub in reserved_fn or sub in reserved_db:
+                        continue
+                    self.h.append(f"int32_t {sub}(const OdbDb& db{c_params});")
+                    self.cc.append(
+                        f"int32_t {sub}(const OdbDb& h{c_params}) {{ auto* p = {resolve}; "
+                        f"return p ? p->{name}().{accessor}() : 0; }}")
+                    self.bridge.append(f"        fn {sub}(db: &OdbDb{r_params}) -> i32;")
+                    self.api.append(
+                        f"    pub fn {sub}(&self{rust_args_sig}) -> i32 "
+                        f"{{ sys::{sub}(self.r(){rust_fwd}) }}")
+                    self.reexport.append(sub)
+                    seen.add(sub)
+                    subarm = (f'        ("{cls}", "{field}_{suffix}") => '
+                              f"Ok(serde_json::json!(db.{sub}({key_call}))),")
+                    self.reg.append((cls, f"{field}_{suffix}", "i32", keys_desc, subarm))
+                    emitted += 1
+                if emitted:
+                    self.per_class[cls] = self.per_class.get(cls, 0) + 1
+                    return True
+                self.skipped += 1
+                return False
             else:
                 self.skipped += 1
                 return False

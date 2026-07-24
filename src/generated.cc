@@ -32,6 +32,18 @@ int32_t block_get_ext_db_count(const OdbDb& h) { auto* p = gen_block(h); return 
 rust::String block_get_corner_name_list(const OdbDb& h) { auto* p = gen_block(h); if (!p) return rust::String(); const char* v = p->getCornerNameList(); return rust::String(v ? v : ""); }
 std::size_t num_block_get_rows(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getRows().size() : 0; }
 rust::String nth_block_get_rows(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getRows()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+int32_t block_get_die_area_x_min(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getDieArea().xMin() : 0; }
+int32_t block_get_die_area_y_min(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getDieArea().yMin() : 0; }
+int32_t block_get_die_area_x_max(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getDieArea().xMax() : 0; }
+int32_t block_get_die_area_y_max(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getDieArea().yMax() : 0; }
+int32_t block_get_die_area_dx(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getDieArea().dx() : 0; }
+int32_t block_get_die_area_dy(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getDieArea().dy() : 0; }
+int32_t block_get_core_area_x_min(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getCoreArea().xMin() : 0; }
+int32_t block_get_core_area_y_min(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getCoreArea().yMin() : 0; }
+int32_t block_get_core_area_x_max(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getCoreArea().xMax() : 0; }
+int32_t block_get_core_area_y_max(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getCoreArea().yMax() : 0; }
+int32_t block_get_core_area_dx(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getCoreArea().dx() : 0; }
+int32_t block_get_core_area_dy(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getCoreArea().dy() : 0; }
 int32_t block_get_min_routing_layer(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getMinRoutingLayer() : 0; }
 int32_t block_get_max_routing_layer(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getMaxRoutingLayer() : 0; }
 int32_t block_get_min_layer_for_clock(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getMinLayerForClock() : 0; }
@@ -43,7 +55,11 @@ std::size_t num_block_get_non_default_rules(const OdbDb& h) { auto* p = gen_bloc
 rust::String nth_block_get_non_default_rules(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getNonDefaultRules()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
 rust::String inst_get_name(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? rust::String(p->getName()) : rust::String(); }
 rust::String inst_get_const_name(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+int32_t inst_get_origin_x(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getOrigin().getX() : 0; }
+int32_t inst_get_origin_y(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getOrigin().getY() : 0; }
 rust::String inst_get_orient(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? rust::String(p->getOrient().getString()) : rust::String(); }
+int32_t inst_get_location_x(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getLocation().getX() : 0; }
+int32_t inst_get_location_y(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getLocation().getY() : 0; }
 rust::String inst_get_placement_status(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? rust::String(p->getPlacementStatus().getString()) : rust::String(); }
 bool inst_is_fixed(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->isFixed() : false; }
 bool inst_is_placed(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->isPlaced() : false; }
@@ -67,6 +83,12 @@ std::size_t num_inst_get_children(const OdbDb& h, rust::Str inst) { auto* p = ge
 rust::String nth_inst_get_children(const OdbDb& h, rust::Str inst, std::size_t i) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getChildren()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
 bool inst_is_hierarchical(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->isHierarchical() : false; }
 bool inst_is_physical_only(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->isPhysicalOnly() : false; }
+int32_t inst_get_transformed_halo_x_min(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getTransformedHalo().xMin() : 0; }
+int32_t inst_get_transformed_halo_y_min(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getTransformedHalo().yMin() : 0; }
+int32_t inst_get_transformed_halo_x_max(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getTransformedHalo().xMax() : 0; }
+int32_t inst_get_transformed_halo_y_max(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getTransformedHalo().yMax() : 0; }
+int32_t inst_get_transformed_halo_dx(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getTransformedHalo().dx() : 0; }
+int32_t inst_get_transformed_halo_dy(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getTransformedHalo().dy() : 0; }
 int32_t inst_get_weight(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getWeight() : 0; }
 rust::String inst_get_source_type(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? rust::String(p->getSourceType().getString()) : rust::String(); }
 bool inst_is_block(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->isBlock() : false; }
@@ -123,10 +145,22 @@ rust::String net_get_non_default_rule(const OdbDb& h, rust::Str net) { auto* p =
 uint32_t net_get_term_count(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermCount() : 0; }
 uint32_t net_get_i_term_count(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getITermCount() : 0; }
 uint32_t net_get_b_term_count(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getBTermCount() : 0; }
+int32_t net_get_term_b_box_x_min(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().xMin() : 0; }
+int32_t net_get_term_b_box_y_min(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().yMin() : 0; }
+int32_t net_get_term_b_box_x_max(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().xMax() : 0; }
+int32_t net_get_term_b_box_y_max(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().yMax() : 0; }
+int32_t net_get_term_b_box_dx(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().dx() : 0; }
+int32_t net_get_term_b_box_dy(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().dy() : 0; }
 bool net_has_jumpers(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->hasJumpers() : false; }
 rust::String net_find_mod_net_in_highest_hier(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); if (!p) return rust::String(); auto* t = p->findModNetInHighestHier(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String bterm_get_name(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? rust::String(p->getName()) : rust::String(); }
 rust::String bterm_get_const_name(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+int32_t bterm_get_b_box_x_min(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->getBBox().xMin() : 0; }
+int32_t bterm_get_b_box_y_min(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->getBBox().yMin() : 0; }
+int32_t bterm_get_b_box_x_max(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->getBBox().xMax() : 0; }
+int32_t bterm_get_b_box_y_max(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->getBBox().yMax() : 0; }
+int32_t bterm_get_b_box_dx(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->getBBox().dx() : 0; }
+int32_t bterm_get_b_box_dy(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->getBBox().dy() : 0; }
 rust::String bterm_get_sig_type(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? rust::String(p->getSigType().getString()) : rust::String(); }
 rust::String bterm_get_io_type(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? rust::String(p->getIoType().getString()) : rust::String(); }
 bool bterm_is_set_spef_mark(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->isSetSpefMark() : false; }
@@ -146,6 +180,8 @@ bool bterm_has_mirrored_b_term(const OdbDb& h, rust::Str bterm) { auto* p = gen_
 bool bterm_is_mirrored(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->isMirrored() : false; }
 rust::String master_get_name(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? rust::String(p->getName()) : rust::String(); }
 rust::String master_get_const_name(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+int32_t master_get_origin_x(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getOrigin().getX() : 0; }
+int32_t master_get_origin_y(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getOrigin().getY() : 0; }
 uint32_t master_get_width(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getWidth() : 0; }
 uint32_t master_get_height(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getHeight() : 0; }
 bool master_is_filler(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isFiller() : false; }
@@ -175,6 +211,12 @@ rust::String iterm_get_inst(const OdbDb& h, rust::Str inst, rust::Str pin) { aut
 rust::String iterm_get_net(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getNet(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String iterm_get_mod_net(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getModNet(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String iterm_get_m_term(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getMTerm(); return t ? rust::String(t->getConstName()) : rust::String(); }
+int32_t iterm_get_b_box_x_min(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->getBBox().xMin() : 0; }
+int32_t iterm_get_b_box_y_min(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->getBBox().yMin() : 0; }
+int32_t iterm_get_b_box_x_max(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->getBBox().xMax() : 0; }
+int32_t iterm_get_b_box_y_max(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->getBBox().yMax() : 0; }
+int32_t iterm_get_b_box_dx(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->getBBox().dx() : 0; }
+int32_t iterm_get_b_box_dy(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->getBBox().dy() : 0; }
 rust::String iterm_get_block(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String iterm_get_sig_type(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? rust::String(p->getSigType().getString()) : rust::String(); }
 rust::String iterm_get_io_type(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? rust::String(p->getIoType().getString()) : rust::String(); }
@@ -192,6 +234,12 @@ rust::String mterm_get_sig_type(const OdbDb& h, rust::Str master, rust::Str term
 rust::String mterm_get_io_type(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? rust::String(p->getIoType().getString()) : rust::String(); }
 bool mterm_is_set_mark(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->isSetMark() : false; }
 rust::String mterm_get_master(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); if (!p) return rust::String(); auto* t = p->getMaster(); return t ? rust::String(t->getConstName()) : rust::String(); }
+int32_t mterm_get_b_box_x_min(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->getBBox().xMin() : 0; }
+int32_t mterm_get_b_box_y_min(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->getBBox().yMin() : 0; }
+int32_t mterm_get_b_box_x_max(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->getBBox().xMax() : 0; }
+int32_t mterm_get_b_box_y_max(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->getBBox().yMax() : 0; }
+int32_t mterm_get_b_box_dx(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->getBBox().dx() : 0; }
+int32_t mterm_get_b_box_dy(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->getBBox().dy() : 0; }
 bool mterm_has_default_antenna_model(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->hasDefaultAntennaModel() : false; }
 bool mterm_has_oxide2_antenna_model(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->hasOxide2AntennaModel() : false; }
 int32_t mterm_get_index(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->getIndex() : 0; }
@@ -252,9 +300,17 @@ bool layer_has_orth_spacing_table(const OdbDb& h, rust::Str layer) { auto* p = g
 rust::String row_get_name(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? rust::String(p->getName()) : rust::String(); }
 rust::String row_get_const_name(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
 rust::String row_get_site(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); if (!p) return rust::String(); auto* t = p->getSite(); return t ? rust::String(t->getConstName()) : rust::String(); }
+int32_t row_get_origin_x(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getOrigin().getX() : 0; }
+int32_t row_get_origin_y(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getOrigin().getY() : 0; }
 rust::String row_get_orient(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? rust::String(p->getOrient().getString()) : rust::String(); }
 int32_t row_get_site_count(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getSiteCount() : 0; }
 int32_t row_get_spacing(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getSpacing() : 0; }
+int32_t row_get_b_box_x_min(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getBBox().xMin() : 0; }
+int32_t row_get_b_box_y_min(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getBBox().yMin() : 0; }
+int32_t row_get_b_box_x_max(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getBBox().xMax() : 0; }
+int32_t row_get_b_box_y_max(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getBBox().yMax() : 0; }
+int32_t row_get_b_box_dx(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getBBox().dx() : 0; }
+int32_t row_get_b_box_dy(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getBBox().dy() : 0; }
 rust::String row_get_block(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String via_get_name(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); return p ? rust::String(p->getName()) : rust::String(); }
 rust::String via_get_const_name(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
@@ -325,6 +381,14 @@ int32_t box_y_max(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); 
 bool box_is_via(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->isVia() : false; }
 rust::String box_get_tech_via(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); if (!p) return rust::String(); auto* t = p->getTechVia(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String box_get_block_via(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); if (!p) return rust::String(); auto* t = p->getBlockVia(); return t ? rust::String(t->getConstName()) : rust::String(); }
+int32_t box_get_via_x_y_x(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getViaXY().getX() : 0; }
+int32_t box_get_via_x_y_y(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getViaXY().getY() : 0; }
+int32_t box_get_box_x_min(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getBox().xMin() : 0; }
+int32_t box_get_box_y_min(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getBox().yMin() : 0; }
+int32_t box_get_box_x_max(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getBox().xMax() : 0; }
+int32_t box_get_box_y_max(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getBox().yMax() : 0; }
+int32_t box_get_box_dx(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getBox().dx() : 0; }
+int32_t box_get_box_dy(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getBox().dy() : 0; }
 uint32_t box_get_d_x(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getDX() : 0; }
 int32_t box_get_design_rule_width(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getDesignRuleWidth() : 0; }
 uint32_t box_get_d_y(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getDY() : 0; }

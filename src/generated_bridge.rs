@@ -35,6 +35,18 @@ mod ffi_gen {
         fn block_get_corner_name_list(db: &OdbDb) -> String;
         fn num_block_get_rows(db: &OdbDb) -> usize;
         fn nth_block_get_rows(db: &OdbDb, i: usize) -> String;
+        fn block_get_die_area_x_min(db: &OdbDb) -> i32;
+        fn block_get_die_area_y_min(db: &OdbDb) -> i32;
+        fn block_get_die_area_x_max(db: &OdbDb) -> i32;
+        fn block_get_die_area_y_max(db: &OdbDb) -> i32;
+        fn block_get_die_area_dx(db: &OdbDb) -> i32;
+        fn block_get_die_area_dy(db: &OdbDb) -> i32;
+        fn block_get_core_area_x_min(db: &OdbDb) -> i32;
+        fn block_get_core_area_y_min(db: &OdbDb) -> i32;
+        fn block_get_core_area_x_max(db: &OdbDb) -> i32;
+        fn block_get_core_area_y_max(db: &OdbDb) -> i32;
+        fn block_get_core_area_dx(db: &OdbDb) -> i32;
+        fn block_get_core_area_dy(db: &OdbDb) -> i32;
         fn block_get_min_routing_layer(db: &OdbDb) -> i32;
         fn block_get_max_routing_layer(db: &OdbDb) -> i32;
         fn block_get_min_layer_for_clock(db: &OdbDb) -> i32;
@@ -46,7 +58,11 @@ mod ffi_gen {
         fn nth_block_get_non_default_rules(db: &OdbDb, i: usize) -> String;
         fn inst_get_name(db: &OdbDb, inst: &str) -> String;
         fn inst_get_const_name(db: &OdbDb, inst: &str) -> String;
+        fn inst_get_origin_x(db: &OdbDb, inst: &str) -> i32;
+        fn inst_get_origin_y(db: &OdbDb, inst: &str) -> i32;
         fn inst_get_orient(db: &OdbDb, inst: &str) -> String;
+        fn inst_get_location_x(db: &OdbDb, inst: &str) -> i32;
+        fn inst_get_location_y(db: &OdbDb, inst: &str) -> i32;
         fn inst_get_placement_status(db: &OdbDb, inst: &str) -> String;
         fn inst_is_fixed(db: &OdbDb, inst: &str) -> bool;
         fn inst_is_placed(db: &OdbDb, inst: &str) -> bool;
@@ -70,6 +86,12 @@ mod ffi_gen {
         fn nth_inst_get_children(db: &OdbDb, inst: &str, i: usize) -> String;
         fn inst_is_hierarchical(db: &OdbDb, inst: &str) -> bool;
         fn inst_is_physical_only(db: &OdbDb, inst: &str) -> bool;
+        fn inst_get_transformed_halo_x_min(db: &OdbDb, inst: &str) -> i32;
+        fn inst_get_transformed_halo_y_min(db: &OdbDb, inst: &str) -> i32;
+        fn inst_get_transformed_halo_x_max(db: &OdbDb, inst: &str) -> i32;
+        fn inst_get_transformed_halo_y_max(db: &OdbDb, inst: &str) -> i32;
+        fn inst_get_transformed_halo_dx(db: &OdbDb, inst: &str) -> i32;
+        fn inst_get_transformed_halo_dy(db: &OdbDb, inst: &str) -> i32;
         fn inst_get_weight(db: &OdbDb, inst: &str) -> i32;
         fn inst_get_source_type(db: &OdbDb, inst: &str) -> String;
         fn inst_is_block(db: &OdbDb, inst: &str) -> bool;
@@ -126,10 +148,22 @@ mod ffi_gen {
         fn net_get_term_count(db: &OdbDb, net: &str) -> u32;
         fn net_get_i_term_count(db: &OdbDb, net: &str) -> u32;
         fn net_get_b_term_count(db: &OdbDb, net: &str) -> u32;
+        fn net_get_term_b_box_x_min(db: &OdbDb, net: &str) -> i32;
+        fn net_get_term_b_box_y_min(db: &OdbDb, net: &str) -> i32;
+        fn net_get_term_b_box_x_max(db: &OdbDb, net: &str) -> i32;
+        fn net_get_term_b_box_y_max(db: &OdbDb, net: &str) -> i32;
+        fn net_get_term_b_box_dx(db: &OdbDb, net: &str) -> i32;
+        fn net_get_term_b_box_dy(db: &OdbDb, net: &str) -> i32;
         fn net_has_jumpers(db: &OdbDb, net: &str) -> bool;
         fn net_find_mod_net_in_highest_hier(db: &OdbDb, net: &str) -> String;
         fn bterm_get_name(db: &OdbDb, bterm: &str) -> String;
         fn bterm_get_const_name(db: &OdbDb, bterm: &str) -> String;
+        fn bterm_get_b_box_x_min(db: &OdbDb, bterm: &str) -> i32;
+        fn bterm_get_b_box_y_min(db: &OdbDb, bterm: &str) -> i32;
+        fn bterm_get_b_box_x_max(db: &OdbDb, bterm: &str) -> i32;
+        fn bterm_get_b_box_y_max(db: &OdbDb, bterm: &str) -> i32;
+        fn bterm_get_b_box_dx(db: &OdbDb, bterm: &str) -> i32;
+        fn bterm_get_b_box_dy(db: &OdbDb, bterm: &str) -> i32;
         fn bterm_get_sig_type(db: &OdbDb, bterm: &str) -> String;
         fn bterm_get_io_type(db: &OdbDb, bterm: &str) -> String;
         fn bterm_is_set_spef_mark(db: &OdbDb, bterm: &str) -> bool;
@@ -149,6 +183,8 @@ mod ffi_gen {
         fn bterm_is_mirrored(db: &OdbDb, bterm: &str) -> bool;
         fn master_get_name(db: &OdbDb, master: &str) -> String;
         fn master_get_const_name(db: &OdbDb, master: &str) -> String;
+        fn master_get_origin_x(db: &OdbDb, master: &str) -> i32;
+        fn master_get_origin_y(db: &OdbDb, master: &str) -> i32;
         fn master_get_width(db: &OdbDb, master: &str) -> u32;
         fn master_get_height(db: &OdbDb, master: &str) -> u32;
         fn master_is_filler(db: &OdbDb, master: &str) -> bool;
@@ -178,6 +214,12 @@ mod ffi_gen {
         fn iterm_get_net(db: &OdbDb, inst: &str, pin: &str) -> String;
         fn iterm_get_mod_net(db: &OdbDb, inst: &str, pin: &str) -> String;
         fn iterm_get_m_term(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_get_b_box_x_min(db: &OdbDb, inst: &str, pin: &str) -> i32;
+        fn iterm_get_b_box_y_min(db: &OdbDb, inst: &str, pin: &str) -> i32;
+        fn iterm_get_b_box_x_max(db: &OdbDb, inst: &str, pin: &str) -> i32;
+        fn iterm_get_b_box_y_max(db: &OdbDb, inst: &str, pin: &str) -> i32;
+        fn iterm_get_b_box_dx(db: &OdbDb, inst: &str, pin: &str) -> i32;
+        fn iterm_get_b_box_dy(db: &OdbDb, inst: &str, pin: &str) -> i32;
         fn iterm_get_block(db: &OdbDb, inst: &str, pin: &str) -> String;
         fn iterm_get_sig_type(db: &OdbDb, inst: &str, pin: &str) -> String;
         fn iterm_get_io_type(db: &OdbDb, inst: &str, pin: &str) -> String;
@@ -195,6 +237,12 @@ mod ffi_gen {
         fn mterm_get_io_type(db: &OdbDb, master: &str, term: &str) -> String;
         fn mterm_is_set_mark(db: &OdbDb, master: &str, term: &str) -> bool;
         fn mterm_get_master(db: &OdbDb, master: &str, term: &str) -> String;
+        fn mterm_get_b_box_x_min(db: &OdbDb, master: &str, term: &str) -> i32;
+        fn mterm_get_b_box_y_min(db: &OdbDb, master: &str, term: &str) -> i32;
+        fn mterm_get_b_box_x_max(db: &OdbDb, master: &str, term: &str) -> i32;
+        fn mterm_get_b_box_y_max(db: &OdbDb, master: &str, term: &str) -> i32;
+        fn mterm_get_b_box_dx(db: &OdbDb, master: &str, term: &str) -> i32;
+        fn mterm_get_b_box_dy(db: &OdbDb, master: &str, term: &str) -> i32;
         fn mterm_has_default_antenna_model(db: &OdbDb, master: &str, term: &str) -> bool;
         fn mterm_has_oxide2_antenna_model(db: &OdbDb, master: &str, term: &str) -> bool;
         fn mterm_get_index(db: &OdbDb, master: &str, term: &str) -> i32;
@@ -255,9 +303,17 @@ mod ffi_gen {
         fn row_get_name(db: &OdbDb, row: &str) -> String;
         fn row_get_const_name(db: &OdbDb, row: &str) -> String;
         fn row_get_site(db: &OdbDb, row: &str) -> String;
+        fn row_get_origin_x(db: &OdbDb, row: &str) -> i32;
+        fn row_get_origin_y(db: &OdbDb, row: &str) -> i32;
         fn row_get_orient(db: &OdbDb, row: &str) -> String;
         fn row_get_site_count(db: &OdbDb, row: &str) -> i32;
         fn row_get_spacing(db: &OdbDb, row: &str) -> i32;
+        fn row_get_b_box_x_min(db: &OdbDb, row: &str) -> i32;
+        fn row_get_b_box_y_min(db: &OdbDb, row: &str) -> i32;
+        fn row_get_b_box_x_max(db: &OdbDb, row: &str) -> i32;
+        fn row_get_b_box_y_max(db: &OdbDb, row: &str) -> i32;
+        fn row_get_b_box_dx(db: &OdbDb, row: &str) -> i32;
+        fn row_get_b_box_dy(db: &OdbDb, row: &str) -> i32;
         fn row_get_block(db: &OdbDb, row: &str) -> String;
         fn via_get_name(db: &OdbDb, via: &str) -> String;
         fn via_get_const_name(db: &OdbDb, via: &str) -> String;
@@ -328,6 +384,14 @@ mod ffi_gen {
         fn box_is_via(db: &OdbDb, idx: usize) -> bool;
         fn box_get_tech_via(db: &OdbDb, idx: usize) -> String;
         fn box_get_block_via(db: &OdbDb, idx: usize) -> String;
+        fn box_get_via_x_y_x(db: &OdbDb, idx: usize) -> i32;
+        fn box_get_via_x_y_y(db: &OdbDb, idx: usize) -> i32;
+        fn box_get_box_x_min(db: &OdbDb, idx: usize) -> i32;
+        fn box_get_box_y_min(db: &OdbDb, idx: usize) -> i32;
+        fn box_get_box_x_max(db: &OdbDb, idx: usize) -> i32;
+        fn box_get_box_y_max(db: &OdbDb, idx: usize) -> i32;
+        fn box_get_box_dx(db: &OdbDb, idx: usize) -> i32;
+        fn box_get_box_dy(db: &OdbDb, idx: usize) -> i32;
         fn box_get_d_x(db: &OdbDb, idx: usize) -> u32;
         fn box_get_design_rule_width(db: &OdbDb, idx: usize) -> i32;
         fn box_get_d_y(db: &OdbDb, idx: usize) -> u32;
@@ -339,11 +403,23 @@ mod ffi_gen {
 
 pub use ffi_gen::{
     block_get_const_name,
+    block_get_core_area_dx,
+    block_get_core_area_dy,
+    block_get_core_area_x_max,
+    block_get_core_area_x_min,
+    block_get_core_area_y_max,
+    block_get_core_area_y_min,
     block_get_corner_count,
     block_get_corner_name_list,
     block_get_corners_per_block,
     block_get_db_units_per_micron,
     block_get_def_units,
+    block_get_die_area_dx,
+    block_get_die_area_dy,
+    block_get_die_area_x_max,
+    block_get_die_area_x_min,
+    block_get_die_area_y_max,
+    block_get_die_area_y_min,
     block_get_ext_db_count,
     block_get_g_cell_tile_size,
     block_get_max_layer_for_clock,
@@ -355,18 +431,32 @@ pub use ffi_gen::{
     block_get_parent_inst,
     block_get_tech,
     box_get_block_via,
+    box_get_box_dx,
+    box_get_box_dy,
+    box_get_box_x_max,
+    box_get_box_x_min,
+    box_get_box_y_max,
+    box_get_box_y_min,
     box_get_d_x,
     box_get_d_y,
     box_get_design_rule_width,
     box_get_layer_mask,
     box_get_tech_layer,
     box_get_tech_via,
+    box_get_via_x_y_x,
+    box_get_via_x_y_y,
     box_is_soft,
     box_is_via,
     box_x_max,
     box_x_min,
     box_y_max,
     box_y_min,
+    bterm_get_b_box_dx,
+    bterm_get_b_box_dy,
+    bterm_get_b_box_x_max,
+    bterm_get_b_box_x_min,
+    bterm_get_b_box_y_max,
+    bterm_get_b_box_y_min,
     bterm_get_block,
     bterm_get_const_name,
     bterm_get_ext_id,
@@ -397,14 +487,24 @@ pub use ffi_gen::{
     inst_get_eco_modify,
     inst_get_first_input,
     inst_get_first_output,
+    inst_get_location_x,
+    inst_get_location_y,
     inst_get_master,
     inst_get_name,
     inst_get_orient,
+    inst_get_origin_x,
+    inst_get_origin_y,
     inst_get_parent,
     inst_get_pin_access_idx,
     inst_get_placement_status,
     inst_get_region,
     inst_get_source_type,
+    inst_get_transformed_halo_dx,
+    inst_get_transformed_halo_dy,
+    inst_get_transformed_halo_x_max,
+    inst_get_transformed_halo_x_min,
+    inst_get_transformed_halo_y_max,
+    inst_get_transformed_halo_y_min,
     inst_get_user_flag1,
     inst_get_user_flag2,
     inst_get_user_flag3,
@@ -418,6 +518,12 @@ pub use ffi_gen::{
     inst_is_pad,
     inst_is_physical_only,
     inst_is_placed,
+    iterm_get_b_box_dx,
+    iterm_get_b_box_dy,
+    iterm_get_b_box_x_max,
+    iterm_get_b_box_x_min,
+    iterm_get_b_box_y_max,
+    iterm_get_b_box_y_min,
     iterm_get_b_term,
     iterm_get_block,
     iterm_get_ext_id,
@@ -495,6 +601,8 @@ pub use ffi_gen::{
     master_get_m_term_count,
     master_get_master_id,
     master_get_name,
+    master_get_origin_x,
+    master_get_origin_y,
     master_get_site,
     master_get_symmetry_r90,
     master_get_symmetry_x,
@@ -512,6 +620,12 @@ pub use ffi_gen::{
     master_is_pad,
     master_is_sequential,
     master_is_special_power,
+    mterm_get_b_box_dx,
+    mterm_get_b_box_dy,
+    mterm_get_b_box_x_max,
+    mterm_get_b_box_x_min,
+    mterm_get_b_box_y_max,
+    mterm_get_b_box_y_min,
     mterm_get_const_name,
     mterm_get_index,
     mterm_get_io_type,
@@ -551,6 +665,12 @@ pub use ffi_gen::{
     net_get_ref_cc,
     net_get_sig_type,
     net_get_source_type,
+    net_get_term_b_box_dx,
+    net_get_term_b_box_dy,
+    net_get_term_b_box_x_max,
+    net_get_term_b_box_x_min,
+    net_get_term_b_box_y_max,
+    net_get_term_b_box_y_min,
     net_get_term_count,
     net_get_weight,
     net_get_wire_type,
@@ -613,10 +733,18 @@ pub use ffi_gen::{
     obs_is_pushed_down,
     obs_is_slot_obstruction,
     obs_is_system_reserved,
+    row_get_b_box_dx,
+    row_get_b_box_dy,
+    row_get_b_box_x_max,
+    row_get_b_box_x_min,
+    row_get_b_box_y_max,
+    row_get_b_box_y_min,
     row_get_block,
     row_get_const_name,
     row_get_name,
     row_get_orient,
+    row_get_origin_x,
+    row_get_origin_y,
     row_get_site,
     row_get_site_count,
     row_get_spacing,
