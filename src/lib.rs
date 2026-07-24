@@ -75,6 +75,12 @@ mod generated_bridge;
 #[cfg(unix)]
 pub use generated_bridge::*;
 
+// Third bridge: the generated setter surface, gated behind `gen-write` (L2/write governance).
+#[cfg(all(unix, feature = "gen-write"))]
+mod generated_write_bridge;
+#[cfg(all(unix, feature = "gen-write"))]
+pub use generated_write_bridge::*;
+
 #[cfg(unix)]
 pub use ffi::{
     add_obstruction, block_name, bterm_direction, bterm_net, bterm_x, bterm_y, clear_obstructions,

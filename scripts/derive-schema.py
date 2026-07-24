@@ -73,7 +73,7 @@ def bridged_methods(odb_lib: Path) -> set[str]:
     Scans the hand-written shim AND the machine-generated bindings (generate-bindings.py), so
     the `bridged` flag reflects the full exposed surface, not just the hand-written part."""
     called = set()
-    for rel in ("src/shim.cc", "src/generated.cc"):
+    for rel in ("src/shim.cc", "src/generated.cc", "src/generated_write.cc"):
         f = odb_lib / rel
         if f.is_file():
             # match `->methodName(` and `.methodName(` on odb objects

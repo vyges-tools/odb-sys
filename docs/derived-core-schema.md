@@ -67,13 +67,34 @@ It writes four generated files (all marked `@generated … DO NOT EDIT`):
 
 Scope guards, by design:
 
-- **Read-only.** Only `getter`/`predicate`/`relation`/`iterator` are generated. Edits
-  (setters) stay hand-written and audited — the L2/write governance boundary.
-- **Marshallable returns only.** Scalars (`int`/`uint`/`bool`/`float`), strings, the six
+- **Marshallable types only.** Scalars (`int`/`uint`/`bool`/`float`), strings, the six
   `getString()` enums, nameable relations/iterators. Geometry structs (`Point`/`Rect`/
   `Polygon`), vectors, and `optional`s are skipped — those get purpose-built hand bindings.
 - **No collisions.** Any generated name that clashes with a hand-written export/`Db` method
   is skipped, so the hand-written surface always wins.
+
+## The write (setter) surface — governance-gated
+
+The generator also emits `set*`/`clear*` setters with fully-marshallable params (scalars,
+strings, and the enums via their `dbFoo(const char*)` constructors) → each a `&mut self`
+`Db` method returning `Result<()>` that **throws → `Err`** when the addressed object is
+missing. These write into a **separate third `#[cxx::bridge]`** and are **gated behind the
+`gen-write` Cargo feature — OFF by default**:
+
+```sh
+cargo build                      # read-only surface only (no setters linked)
+cargo build --features gen-write # + the generated setter surface
+```
+
+This is the L2/write governance boundary in code: the broad auto-generated edit surface is
+opt-in, never in the default read-only build. Curated, side-effectful edits
+(`create_inst`, `connect`, `set_inst_location` = `setLocation` **+ PLACED`) stay
+hand-written in the shim; the generator deliberately emits only `set*`/`clear*` (never
+`create`/`destroy`/`add`/`remove`/`connect`), so it can't manufacture structural edits.
+
+Files (all `@generated`): `generated_write.{h,cc}`, `generated_write_bridge.rs`,
+`../vyges-tools-opendb/src/generated_write_api.rs`. Resolvers are shared with the read
+surface via `generated_resolvers.h`.
 
 Regenerating after an OpenROAD SHA bump re-derives the schema and re-emits the bindings, so
 new upstream accessors are picked up automatically (subject to the guards above).

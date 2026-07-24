@@ -8,6 +8,12 @@ repository = "https://github.com/vyges-tools/opendb-lib"
 links = "odb"
 build = "build.rs"
 
+[features]
+# Machine-generated setter surface (scripts/generate-bindings.py). OFF by default: writes are
+# L2/governance-gated, so the broad auto-generated edit surface is opt-in, not linked into the
+# default read-only build.
+gen-write = []
+
 [dependencies]
 cxx = "1"
 

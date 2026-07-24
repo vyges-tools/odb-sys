@@ -76,8 +76,36 @@ SCALAR = {
     "float": ("f32", "float", "0.0f"),
     "double": ("f64", "double", "0.0"),
 }
-# enum types that expose `const char* getString() const` (odb/dbTypes.h)
+# enum types that expose `const char* getString() const` (odb/dbTypes.h) AND a `dbFoo(const char*)`
+# constructor — so they marshal both ways (getter → string, setter param ← string).
 ENUMS = {"dbSigType", "dbIoType", "dbPlacementStatus", "dbOrientType", "dbSourceType", "dbWireType"}
+
+# setter param scalar -> (cxx type, rust type)
+SCALAR_IN = {
+    "int": ("int32_t", "i32"), "int32_t": ("int32_t", "i32"),
+    "uint": ("uint32_t", "u32"), "uint32_t": ("uint32_t", "u32"), "unsigned": ("uint32_t", "u32"),
+    "int64_t": ("int64_t", "i64"), "uint64_t": ("uint64_t", "u64"),
+    "bool": ("bool", "bool"), "float": ("float", "f32"), "double": ("double", "f64"),
+}
+RUST_KW = {"type", "match", "move", "ref", "box", "fn", "let", "mut", "self", "use", "mod", "impl",
+           "as", "in", "loop", "if", "else", "for", "while", "const", "static", "trait", "where",
+           "enum", "struct", "crate", "pub", "return", "break", "continue", "dyn", "async", "await",
+           "gen", "become", "yield", "macro", "super", "true", "false", "unsafe", "extern"}
+
+
+def marshal_param(ptype: str, arg: str):
+    """A setter value param -> (cxx_param_type, rust_param_type, cpp_arg_expr). None if unmarshallable."""
+    n = norm(ptype)
+    if n in SCALAR_IN:
+        cxx, rty = SCALAR_IN[n]
+        return cxx, rty, arg
+    if n == "std::string":
+        return "rust::Str", "&str", f"gs({arg})"
+    if n in ("constchar*", "char*"):
+        return "rust::Str", "&str", f"gs({arg}).c_str()"
+    if ptype in ENUMS:
+        return "rust::Str", "&str", f"odb::{ptype}(gs({arg}).c_str())"
+    return None
 
 
 def norm(t: str) -> str:
@@ -156,6 +184,66 @@ class Emit:
         self.api: list[str] = []
         self.per_class: dict[str, int] = {}
         self.skipped = 0
+        # separate buffers for the governance-gated write (setter) surface
+        self.wh: list[str] = []
+        self.wcc: list[str] = []
+        self.wbridge: list[str] = []
+        self.wreexport: list[str] = []
+        self.wapi: list[str] = []
+        self.wper_class: dict[str, int] = {}
+
+    def add_setter(self, cls, spec, m, reserved_fn, reserved_db, seen):
+        """Emit a `set*`/`clear*` setter with fully-marshallable params -> Result<()> (throws on
+        missing object). Written to the gated write buffers, not the read surface."""
+        key, resolve = spec["key"], spec["resolve"]
+        name = m["name"]
+        if not (name.startswith("set") or name.startswith("clear")):
+            return False
+        fn = f"{key}_{snake(name)}"
+        if fn in seen or fn in reserved_fn or fn in reserved_db:
+            return False
+
+        argspecs = normalize_args(spec["args"])
+        used = {n for n, _ in argspecs}
+        # marshal each value param; bail if any is a pointer/struct/unknown type
+        cxx_vals, rust_vals, cpp_args = [], [], []
+        for i, p in enumerate(m["params"]):
+            mp = marshal_param(p["type"], f"a{i}")
+            if mp is None:
+                return False
+            cxx_t, rust_t, expr = mp
+            pn = p.get("name")
+            if pn and re.fullmatch(r"[A-Za-z_]\w*", pn):
+                pn = snake(pn)  # header names are camelCase; snake for idiomatic Rust params
+            if not pn or pn in RUST_KW or pn in used:
+                pn = f"a{i}"
+            used.add(pn)
+            expr = expr.replace(f"a{i}", pn)
+            cxx_vals.append(f"{cxx_t} {pn}")
+            rust_vals.append(f"{pn}: {rust_t}")
+            cpp_args.append(expr)
+
+        c_ids = "".join(f", {_cty(k)} {n}" for n, k in argspecs)
+        r_ids = "".join(f", {n}: {_rty(k)}" for n, k in argspecs)
+        fwd = "".join(f", {n}" for n, k in argspecs) + "".join(
+            f", {v.split(':')[0].strip()}" for v in rust_vals)
+        c_vals = "".join(f", {v}" for v in cxx_vals)
+        r_vals = "".join(f", {v}" for v in rust_vals)
+        call = ", ".join(cpp_args)
+
+        self.wh.append(f"void {fn}(const OdbDb& db{c_ids}{c_vals});")
+        self.wcc.append(
+            f"void {fn}(const OdbDb& h{c_ids}{c_vals}) {{ auto* p = {resolve}; "
+            f'if (!p) throw std::runtime_error("vyges-opendb: {cls} not found"); '
+            f"p->{name}({call}); }}")
+        self.wbridge.append(f"        fn {fn}(db: &OdbDb{r_ids}{r_vals}) -> Result<()>;")
+        self.wreexport.append(fn)
+        self.wapi.append(
+            f"    pub fn {fn}(&mut self{r_ids}{r_vals}) -> crate::Result<()> "
+            f"{{ Ok(sys::{fn}(self.r(){fwd})?) }}")
+        seen.add(fn)
+        self.wper_class[cls] = self.wper_class.get(cls, 0) + 1
+        return True
 
     def add(self, cls, spec, m, nameable, reserved_fn, reserved_db, seen):
         key, resolve = spec["key"], spec["resolve"]
@@ -297,6 +385,10 @@ def main() -> int:
         for m in by_name[cls]["methods"]:
             if m["kind"] in ("getter", "predicate", "relation", "iterator") and not m["params"]:
                 e.add(cls, spec, m, nameable, reserved_fn, reserved_db, seen)
+        seen_w: set[str] = set()
+        for m in by_name[cls]["methods"]:
+            if m["kind"] == "setter":
+                e.add_setter(cls, spec, m, reserved_fn, reserved_db, seen_w)
 
     # ---- generated.h -----------------------------------------------------------
     (LIB / "src/generated.h").write_text(
@@ -355,9 +447,19 @@ def main() -> int:
         "static odb::dbBox* gen_box(const OdbDb& h, std::size_t i) {\n"
         "  odb::dbObstruction* o = gen_obstruction(h, i); return o ? o->getBBox() : nullptr; }\n"
         "}  // namespace\n")
+
+    # ---- generated_resolvers.h (shared by the read + write .cc) -----------------
+    # inline (not static-in-anon-namespace) so a resolver unused in one TU doesn't warn.
+    resolver_body = (resolvers.replace("namespace {\n", "").replace("}  // namespace\n", "")
+                     .replace("static ", "inline "))
+    (LIB / "src/generated_resolvers.h").write_text(
+        "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +
+        '#pragma once\n#include "shim.h"\n\n' + resolver_body)
+
+    # ---- generated.cc ----------------------------------------------------------
     (LIB / "src/generated.cc").write_text(
         "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +
-        '#include "generated.h"\n\nusing namespace odb;\n\n' + resolvers + "\n" +
+        '#include "generated.h"\n#include "generated_resolvers.h"\n\nusing namespace odb;\n\n' +
         "\n".join(e.cc) + "\n")
 
     # ---- generated_bridge.rs ---------------------------------------------------
@@ -381,12 +483,42 @@ def main() -> int:
         "// so this file uses line comments (an inner //! doc is illegal mid-file).\n\n"
         "impl Db {\n" + "\n".join(e.api) + "\n}\n")
 
+    # ---- write surface (gated behind the `gen-write` feature) -------------------
+    (LIB / "src/generated_write.h").write_text(
+        "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +
+        "#pragma once\n#include \"shim.h\"\n\n" + "\n".join(e.wh) + "\n")
+    (LIB / "src/generated_write.cc").write_text(
+        "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +
+        '#include "generated_write.h"\n#include "generated_resolvers.h"\n\n'
+        "#include <stdexcept>\n\nusing namespace odb;\n\n" + "\n".join(e.wcc) + "\n")
+    wreexport = ",\n    ".join(sorted(e.wreexport))
+    (LIB / "src/generated_write_bridge.rs").write_text(
+        "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +
+        "//! Third cxx bridge: machine-generated SETTERS (the L2/write governance surface).\n"
+        "//! Gated behind the `gen-write` feature — absent from the default read-only build.\n\n"
+        "#[cxx::bridge]\nmod ffi_gen_write {\n"
+        "    unsafe extern \"C++\" {\n"
+        "        include!(\"generated_write.h\");\n"
+        "        type OdbDb = crate::ffi::OdbDb;\n" +
+        "\n".join(e.wbridge) + "\n"
+        "    }\n}\n\n"
+        f"pub use ffi_gen_write::{{\n    {wreexport},\n}};\n")
+    (API / "src/generated_write_api.rs").write_text(
+        "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +
+        "// Machine-generated `Db` SETTERS (L2/write). include!()'d into lib.rs behind `gen-write`.\n"
+        "// &mut self + Result<()>; throws (-> Err) when the addressed object does not exist.\n\n"
+        "impl Db {\n" + "\n".join(e.wapi) + "\n}\n")
+
     total = sum(e.per_class.values())
+    wtotal = sum(e.wper_class.values())
     print(f"generated {total} read accessors across {len(e.per_class)} classes "
           f"({e.skipped} methods skipped: non-marshallable / unnameable / reserved)")
     for c in sorted(e.per_class, key=lambda c: -e.per_class[c]):
-        print(f"  {c:<10} {e.per_class[c]:>3}")
-    print("wrote: src/generated.{h,cc}, src/generated_bridge.rs, ../vyges-tools-opendb/src/generated_api.rs")
+        w = e.wper_class.get(c, 0)
+        print(f"  {c:<10} {e.per_class[c]:>3} read  {w:>3} write")
+    print(f"generated {wtotal} setters (gated behind `gen-write`) across {len(e.wper_class)} classes")
+    print("wrote: src/generated{,_write}.{h,cc}, src/generated{,_write}_bridge.rs, "
+          "src/generated_resolvers.h, ../vyges-tools-opendb/src/generated{,_write}_api.rs")
     return 0
 
 

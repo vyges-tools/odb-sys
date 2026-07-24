@@ -56,8 +56,18 @@ fn main() {
     }
 
     // Compile the cxx bridge + shim against odb/utl + the pinned deps' headers.
-    let mut b = cxx_build::bridges(["src/lib.rs", "src/generated_bridge.rs"]);
+    // The generated SETTER surface is gated behind the `gen-write` feature (L2/write governance):
+    // its bridge + .cc are only compiled when the feature is on.
+    let gen_write = std::env::var_os("CARGO_FEATURE_GEN_WRITE").is_some();
+    let mut bridges = vec!["src/lib.rs", "src/generated_bridge.rs"];
+    if gen_write {
+        bridges.push("src/generated_write_bridge.rs");
+    }
+    let mut b = cxx_build::bridges(&bridges);
     b.file("src/shim.cc").file("src/generated.cc").std("c++20").include("src");
+    if gen_write {
+        b.file("src/generated_write.cc");
+    }
     for inc in &includes {
         b.include(inc);
     }
@@ -113,6 +123,10 @@ fn main() {
     println!("cargo:rerun-if-changed=src/generated_bridge.rs");
     println!("cargo:rerun-if-changed=src/generated.cc");
     println!("cargo:rerun-if-changed=src/generated.h");
+    println!("cargo:rerun-if-changed=src/generated_resolvers.h");
+    println!("cargo:rerun-if-changed=src/generated_write_bridge.rs");
+    println!("cargo:rerun-if-changed=src/generated_write.cc");
+    println!("cargo:rerun-if-changed=src/generated_write.h");
     println!("cargo:rerun-if-changed=CMakeLists.txt");
 }
 
