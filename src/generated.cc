@@ -14,6 +14,16 @@ static odb::dbNet* gen_net(const OdbDb& h, rust::Str n) {
   odb::dbBlock* b = gen_block(h); return b ? b->findNet(gs(n).c_str()) : nullptr; }
 static odb::dbBTerm* gen_bterm(const OdbDb& h, rust::Str n) {
   odb::dbBlock* b = gen_block(h); return b ? b->findBTerm(gs(n).c_str()) : nullptr; }
+static odb::dbMaster* gen_master(const OdbDb& h, rust::Str n) {
+  std::string name = gs(n);
+  for (odb::dbLib* lib : h.db->getLibs()) { if (auto* m = lib->findMaster(name.c_str())) return m; }
+  return nullptr; }
+static odb::dbITerm* gen_iterm(const OdbDb& h, rust::Str inst, rust::Str pin) {
+  odb::dbInst* i = gen_inst(h, inst); return i ? i->findITerm(gs(pin).c_str()) : nullptr; }
+static odb::dbMTerm* gen_mterm(const OdbDb& h, rust::Str master, rust::Str term) {
+  odb::dbMaster* m = gen_master(h, master); return m ? m->findMTerm(gs(term).c_str()) : nullptr; }
+static odb::dbTechLayer* gen_techlayer(const OdbDb& h, rust::Str n) {
+  odb::dbTech* t = h.db->getTech(); return t ? t->findLayer(gs(n).c_str()) : nullptr; }
 }  // namespace
 
 rust::String block_get_name(const OdbDb& h) { auto* p = gen_block(h); return p ? rust::String(p->getName()) : rust::String(); }
@@ -155,3 +165,108 @@ uint32_t bterm_sta_vertex_id(const OdbDb& h, rust::Str bterm) { auto* p = gen_bt
 rust::String bterm_get_mirrored_b_term(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); if (!p) return rust::String(); auto* t = p->getMirroredBTerm(); return t ? rust::String(t->getConstName()) : rust::String(); }
 bool bterm_has_mirrored_b_term(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->hasMirroredBTerm() : false; }
 bool bterm_is_mirrored(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? p->isMirrored() : false; }
+rust::String master_get_name(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String master_get_const_name(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+uint32_t master_get_width(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getWidth() : 0; }
+uint32_t master_get_height(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getHeight() : 0; }
+bool master_is_filler(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isFiller() : false; }
+bool master_is_block(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isBlock() : false; }
+bool master_is_core(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isCore() : false; }
+bool master_is_pad(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isPad() : false; }
+bool master_is_end_cap(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isEndCap() : false; }
+bool master_is_cover(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isCover() : false; }
+bool master_is_core_auto_placeable(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isCoreAutoPlaceable() : false; }
+bool master_is_backside_bridge(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isBacksideBridge() : false; }
+rust::String master_get_l_e_q(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); if (!p) return rust::String(); auto* t = p->getLEQ(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String master_get_e_e_q(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); if (!p) return rust::String(); auto* t = p->getEEQ(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool master_get_symmetry_x(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getSymmetryX() : false; }
+bool master_get_symmetry_y(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getSymmetryY() : false; }
+bool master_get_symmetry_r90(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getSymmetryR90() : false; }
+std::size_t num_master_get_m_terms(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getMTerms().size() : 0; }
+rust::String nth_master_get_m_terms(const OdbDb& h, rust::Str master, std::size_t i) { auto* p = gen_master(h, master); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getMTerms()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+rust::String master_get_lib(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); if (!p) return rust::String(); auto* t = p->getLib(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool master_is_frozen(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isFrozen() : false; }
+bool master_is_sequential(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isSequential() : false; }
+uint32_t master_is_marked(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isMarked() : 0; }
+bool master_is_special_power(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->isSpecialPower() : false; }
+int32_t master_get_m_term_count(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getMTermCount() : 0; }
+rust::String master_get_site(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); if (!p) return rust::String(); auto* t = p->getSite(); return t ? rust::String(t->getConstName()) : rust::String(); }
+int32_t master_get_master_id(const OdbDb& h, rust::Str master) { auto* p = gen_master(h, master); return p ? p->getMasterId() : 0; }
+rust::String iterm_get_inst(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getInst(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String iterm_get_net(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getNet(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String iterm_get_mod_net(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getModNet(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String iterm_get_m_term(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getMTerm(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String iterm_get_block(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String iterm_get_sig_type(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? rust::String(p->getSigType().getString()) : rust::String(); }
+rust::String iterm_get_io_type(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? rust::String(p->getIoType().getString()) : rust::String(); }
+bool iterm_is_spef(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->isSpef() : false; }
+uint32_t iterm_get_ext_id(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->getExtId() : 0; }
+bool iterm_is_special(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->isSpecial() : false; }
+bool iterm_is_clocked(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->isClocked() : false; }
+bool iterm_is_set_mark(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->isSetMark() : false; }
+bool iterm_is_connected(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->isConnected() : false; }
+rust::String iterm_get_b_term(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); if (!p) return rust::String(); auto* t = p->getBTerm(); return t ? rust::String(t->getConstName()) : rust::String(); }
+uint32_t iterm_sta_vertex_id(const OdbDb& h, rust::Str inst, rust::Str pin) { auto* p = gen_iterm(h, inst, pin); return p ? p->staVertexId() : 0; }
+rust::String mterm_get_name(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String mterm_get_const_name(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+rust::String mterm_get_sig_type(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? rust::String(p->getSigType().getString()) : rust::String(); }
+rust::String mterm_get_io_type(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? rust::String(p->getIoType().getString()) : rust::String(); }
+bool mterm_is_set_mark(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->isSetMark() : false; }
+rust::String mterm_get_master(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); if (!p) return rust::String(); auto* t = p->getMaster(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool mterm_has_default_antenna_model(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->hasDefaultAntennaModel() : false; }
+bool mterm_has_oxide2_antenna_model(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->hasOxide2AntennaModel() : false; }
+int32_t mterm_get_index(const OdbDb& h, rust::Str master, rust::Str term) { auto* p = gen_mterm(h, master, term); return p ? p->getIndex() : 0; }
+uint32_t layer_get_wrong_way_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getWrongWayWidth() : 0; }
+uint32_t layer_get_wrong_way_min_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getWrongWayMinWidth() : 0; }
+float layer_get_layer_adjustment(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getLayerAdjustment() : 0.0f; }
+bool layer_is_rect_only(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->isRectOnly() : false; }
+bool layer_is_right_way_on_grid_only(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->isRightWayOnGridOnly() : false; }
+bool layer_is_right_way_on_grid_only_check_mask(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->isRightWayOnGridOnlyCheckMask() : false; }
+bool layer_is_rect_only_except_non_core_pins(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->isRectOnlyExceptNonCorePins() : false; }
+rust::String layer_get_lef58_type_string(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? rust::String(p->getLef58TypeString()) : rust::String(); }
+bool layer_is_backside(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->isBackside() : false; }
+rust::String layer_get_name(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String layer_get_const_name(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+bool layer_has_alias(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasAlias() : false; }
+rust::String layer_get_alias(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? rust::String(p->getAlias()) : rust::String(); }
+uint32_t layer_get_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getWidth() : 0; }
+int32_t layer_get_spacing(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getSpacing() : 0; }
+uint32_t layer_get_num_masks(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getNumMasks() : 0; }
+bool layer_has_v55_spacing_rules(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasV55SpacingRules() : false; }
+bool layer_has_two_widths_spacing_rules(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasTwoWidthsSpacingRules() : false; }
+uint32_t layer_get_two_widths_spacing_table_num_widths(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getTwoWidthsSpacingTableNumWidths() : 0; }
+bool layer_has_default_antenna_rule(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasDefaultAntennaRule() : false; }
+bool layer_has_oxide2_antenna_rule(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasOxide2AntennaRule() : false; }
+int32_t layer_get_pitch(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getPitch() : 0; }
+int32_t layer_get_pitch_x(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getPitchX() : 0; }
+int32_t layer_get_pitch_y(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getPitchY() : 0; }
+int32_t layer_get_first_last_pitch(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getFirstLastPitch() : 0; }
+bool layer_has_x_y_pitch(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasXYPitch() : false; }
+int32_t layer_get_offset(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getOffset() : 0; }
+int32_t layer_get_offset_x(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getOffsetX() : 0; }
+int32_t layer_get_offset_y(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getOffsetY() : 0; }
+bool layer_has_x_y_offset(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasXYOffset() : false; }
+bool layer_has_area(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasArea() : false; }
+bool layer_has_max_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasMaxWidth() : false; }
+uint32_t layer_get_max_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getMaxWidth() : 0; }
+uint32_t layer_get_min_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getMinWidth() : 0; }
+bool layer_has_min_step(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasMinStep() : false; }
+uint32_t layer_get_min_step(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getMinStep() : 0; }
+bool layer_has_min_step_max_length(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasMinStepMaxLength() : false; }
+uint32_t layer_get_min_step_max_length(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getMinStepMaxLength() : 0; }
+bool layer_has_min_step_max_edges(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasMinStepMaxEdges() : false; }
+uint32_t layer_get_min_step_max_edges(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getMinStepMaxEdges() : 0; }
+bool layer_has_protrusion(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasProtrusion() : false; }
+uint32_t layer_get_protrusion_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getProtrusionWidth() : 0; }
+uint32_t layer_get_protrusion_length(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getProtrusionLength() : 0; }
+uint32_t layer_get_protrusion_from_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getProtrusionFromWidth() : 0; }
+double layer_get_resistance(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getResistance() : 0.0; }
+double layer_get_capacitance(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getCapacitance() : 0.0; }
+double layer_get_edge_capacitance(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getEdgeCapacitance() : 0.0; }
+uint32_t layer_get_wire_extension(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getWireExtension() : 0; }
+int32_t layer_get_number(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getNumber() : 0; }
+int32_t layer_get_routing_level(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getRoutingLevel() : 0; }
+rust::String layer_get_lower_layer(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); if (!p) return rust::String(); auto* t = p->getLowerLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String layer_get_upper_layer(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); if (!p) return rust::String(); auto* t = p->getUpperLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String layer_get_tech(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); if (!p) return rust::String(); auto* t = p->getTech(); return t ? rust::String(t->getName()) : rust::String(); }
+bool layer_has_orth_spacing_table(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasOrthSpacingTable() : false; }

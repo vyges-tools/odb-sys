@@ -23,8 +23,8 @@ It also doubles as a **coverage map**: each method is tagged `bridged` if our cx
 `scripts/generate-bindings.py` consumes this schema and emits the **read** surface —
 getters, predicates, relations (`dbFoo*` → the target's name), and iterators
 (`dbSet<dbFoo>` → count + nth-name) — for the name-addressable core classes (`dbBlock`,
-`dbInst`, `dbNet`, `dbBTerm`), so the long tail of accessors is bound *mechanically*
-instead of by hand:
+`dbInst`, `dbNet`, `dbBTerm`, `dbMaster`, `dbITerm`, `dbMTerm`, `dbTechLayer`), so the long
+tail of accessors is bound *mechanically* instead of by hand:
 
 ```sh
 scripts/generate-bindings.py     # then: cargo build

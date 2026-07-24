@@ -147,6 +147,111 @@ mod ffi_gen {
         fn bterm_get_mirrored_b_term(db: &OdbDb, bterm: &str) -> String;
         fn bterm_has_mirrored_b_term(db: &OdbDb, bterm: &str) -> bool;
         fn bterm_is_mirrored(db: &OdbDb, bterm: &str) -> bool;
+        fn master_get_name(db: &OdbDb, master: &str) -> String;
+        fn master_get_const_name(db: &OdbDb, master: &str) -> String;
+        fn master_get_width(db: &OdbDb, master: &str) -> u32;
+        fn master_get_height(db: &OdbDb, master: &str) -> u32;
+        fn master_is_filler(db: &OdbDb, master: &str) -> bool;
+        fn master_is_block(db: &OdbDb, master: &str) -> bool;
+        fn master_is_core(db: &OdbDb, master: &str) -> bool;
+        fn master_is_pad(db: &OdbDb, master: &str) -> bool;
+        fn master_is_end_cap(db: &OdbDb, master: &str) -> bool;
+        fn master_is_cover(db: &OdbDb, master: &str) -> bool;
+        fn master_is_core_auto_placeable(db: &OdbDb, master: &str) -> bool;
+        fn master_is_backside_bridge(db: &OdbDb, master: &str) -> bool;
+        fn master_get_l_e_q(db: &OdbDb, master: &str) -> String;
+        fn master_get_e_e_q(db: &OdbDb, master: &str) -> String;
+        fn master_get_symmetry_x(db: &OdbDb, master: &str) -> bool;
+        fn master_get_symmetry_y(db: &OdbDb, master: &str) -> bool;
+        fn master_get_symmetry_r90(db: &OdbDb, master: &str) -> bool;
+        fn num_master_get_m_terms(db: &OdbDb, master: &str) -> usize;
+        fn nth_master_get_m_terms(db: &OdbDb, master: &str, i: usize) -> String;
+        fn master_get_lib(db: &OdbDb, master: &str) -> String;
+        fn master_is_frozen(db: &OdbDb, master: &str) -> bool;
+        fn master_is_sequential(db: &OdbDb, master: &str) -> bool;
+        fn master_is_marked(db: &OdbDb, master: &str) -> u32;
+        fn master_is_special_power(db: &OdbDb, master: &str) -> bool;
+        fn master_get_m_term_count(db: &OdbDb, master: &str) -> i32;
+        fn master_get_site(db: &OdbDb, master: &str) -> String;
+        fn master_get_master_id(db: &OdbDb, master: &str) -> i32;
+        fn iterm_get_inst(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_get_net(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_get_mod_net(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_get_m_term(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_get_block(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_get_sig_type(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_get_io_type(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_is_spef(db: &OdbDb, inst: &str, pin: &str) -> bool;
+        fn iterm_get_ext_id(db: &OdbDb, inst: &str, pin: &str) -> u32;
+        fn iterm_is_special(db: &OdbDb, inst: &str, pin: &str) -> bool;
+        fn iterm_is_clocked(db: &OdbDb, inst: &str, pin: &str) -> bool;
+        fn iterm_is_set_mark(db: &OdbDb, inst: &str, pin: &str) -> bool;
+        fn iterm_is_connected(db: &OdbDb, inst: &str, pin: &str) -> bool;
+        fn iterm_get_b_term(db: &OdbDb, inst: &str, pin: &str) -> String;
+        fn iterm_sta_vertex_id(db: &OdbDb, inst: &str, pin: &str) -> u32;
+        fn mterm_get_name(db: &OdbDb, master: &str, term: &str) -> String;
+        fn mterm_get_const_name(db: &OdbDb, master: &str, term: &str) -> String;
+        fn mterm_get_sig_type(db: &OdbDb, master: &str, term: &str) -> String;
+        fn mterm_get_io_type(db: &OdbDb, master: &str, term: &str) -> String;
+        fn mterm_is_set_mark(db: &OdbDb, master: &str, term: &str) -> bool;
+        fn mterm_get_master(db: &OdbDb, master: &str, term: &str) -> String;
+        fn mterm_has_default_antenna_model(db: &OdbDb, master: &str, term: &str) -> bool;
+        fn mterm_has_oxide2_antenna_model(db: &OdbDb, master: &str, term: &str) -> bool;
+        fn mterm_get_index(db: &OdbDb, master: &str, term: &str) -> i32;
+        fn layer_get_wrong_way_width(db: &OdbDb, layer: &str) -> u32;
+        fn layer_get_wrong_way_min_width(db: &OdbDb, layer: &str) -> u32;
+        fn layer_get_layer_adjustment(db: &OdbDb, layer: &str) -> f32;
+        fn layer_is_rect_only(db: &OdbDb, layer: &str) -> bool;
+        fn layer_is_right_way_on_grid_only(db: &OdbDb, layer: &str) -> bool;
+        fn layer_is_right_way_on_grid_only_check_mask(db: &OdbDb, layer: &str) -> bool;
+        fn layer_is_rect_only_except_non_core_pins(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_lef58_type_string(db: &OdbDb, layer: &str) -> String;
+        fn layer_is_backside(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_name(db: &OdbDb, layer: &str) -> String;
+        fn layer_get_const_name(db: &OdbDb, layer: &str) -> String;
+        fn layer_has_alias(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_alias(db: &OdbDb, layer: &str) -> String;
+        fn layer_get_width(db: &OdbDb, layer: &str) -> u32;
+        fn layer_get_spacing(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_num_masks(db: &OdbDb, layer: &str) -> u32;
+        fn layer_has_v55_spacing_rules(db: &OdbDb, layer: &str) -> bool;
+        fn layer_has_two_widths_spacing_rules(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_two_widths_spacing_table_num_widths(db: &OdbDb, layer: &str) -> u32;
+        fn layer_has_default_antenna_rule(db: &OdbDb, layer: &str) -> bool;
+        fn layer_has_oxide2_antenna_rule(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_pitch(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_pitch_x(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_pitch_y(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_first_last_pitch(db: &OdbDb, layer: &str) -> i32;
+        fn layer_has_x_y_pitch(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_offset(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_offset_x(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_offset_y(db: &OdbDb, layer: &str) -> i32;
+        fn layer_has_x_y_offset(db: &OdbDb, layer: &str) -> bool;
+        fn layer_has_area(db: &OdbDb, layer: &str) -> bool;
+        fn layer_has_max_width(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_max_width(db: &OdbDb, layer: &str) -> u32;
+        fn layer_get_min_width(db: &OdbDb, layer: &str) -> u32;
+        fn layer_has_min_step(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_min_step(db: &OdbDb, layer: &str) -> u32;
+        fn layer_has_min_step_max_length(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_min_step_max_length(db: &OdbDb, layer: &str) -> u32;
+        fn layer_has_min_step_max_edges(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_min_step_max_edges(db: &OdbDb, layer: &str) -> u32;
+        fn layer_has_protrusion(db: &OdbDb, layer: &str) -> bool;
+        fn layer_get_protrusion_width(db: &OdbDb, layer: &str) -> u32;
+        fn layer_get_protrusion_length(db: &OdbDb, layer: &str) -> u32;
+        fn layer_get_protrusion_from_width(db: &OdbDb, layer: &str) -> u32;
+        fn layer_get_resistance(db: &OdbDb, layer: &str) -> f64;
+        fn layer_get_capacitance(db: &OdbDb, layer: &str) -> f64;
+        fn layer_get_edge_capacitance(db: &OdbDb, layer: &str) -> f64;
+        fn layer_get_wire_extension(db: &OdbDb, layer: &str) -> u32;
+        fn layer_get_number(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_routing_level(db: &OdbDb, layer: &str) -> i32;
+        fn layer_get_lower_layer(db: &OdbDb, layer: &str) -> String;
+        fn layer_get_upper_layer(db: &OdbDb, layer: &str) -> String;
+        fn layer_get_tech(db: &OdbDb, layer: &str) -> String;
+        fn layer_has_orth_spacing_table(db: &OdbDb, layer: &str) -> bool;
     }
 }
 
@@ -215,6 +320,109 @@ pub use ffi_gen::{
     inst_is_pad,
     inst_is_physical_only,
     inst_is_placed,
+    iterm_get_b_term,
+    iterm_get_block,
+    iterm_get_ext_id,
+    iterm_get_inst,
+    iterm_get_io_type,
+    iterm_get_m_term,
+    iterm_get_mod_net,
+    iterm_get_net,
+    iterm_get_sig_type,
+    iterm_is_clocked,
+    iterm_is_connected,
+    iterm_is_set_mark,
+    iterm_is_special,
+    iterm_is_spef,
+    iterm_sta_vertex_id,
+    layer_get_alias,
+    layer_get_capacitance,
+    layer_get_const_name,
+    layer_get_edge_capacitance,
+    layer_get_first_last_pitch,
+    layer_get_layer_adjustment,
+    layer_get_lef58_type_string,
+    layer_get_lower_layer,
+    layer_get_max_width,
+    layer_get_min_step,
+    layer_get_min_step_max_edges,
+    layer_get_min_step_max_length,
+    layer_get_min_width,
+    layer_get_name,
+    layer_get_num_masks,
+    layer_get_number,
+    layer_get_offset,
+    layer_get_offset_x,
+    layer_get_offset_y,
+    layer_get_pitch,
+    layer_get_pitch_x,
+    layer_get_pitch_y,
+    layer_get_protrusion_from_width,
+    layer_get_protrusion_length,
+    layer_get_protrusion_width,
+    layer_get_resistance,
+    layer_get_routing_level,
+    layer_get_spacing,
+    layer_get_tech,
+    layer_get_two_widths_spacing_table_num_widths,
+    layer_get_upper_layer,
+    layer_get_width,
+    layer_get_wire_extension,
+    layer_get_wrong_way_min_width,
+    layer_get_wrong_way_width,
+    layer_has_alias,
+    layer_has_area,
+    layer_has_default_antenna_rule,
+    layer_has_max_width,
+    layer_has_min_step,
+    layer_has_min_step_max_edges,
+    layer_has_min_step_max_length,
+    layer_has_orth_spacing_table,
+    layer_has_oxide2_antenna_rule,
+    layer_has_protrusion,
+    layer_has_two_widths_spacing_rules,
+    layer_has_v55_spacing_rules,
+    layer_has_x_y_offset,
+    layer_has_x_y_pitch,
+    layer_is_backside,
+    layer_is_rect_only,
+    layer_is_rect_only_except_non_core_pins,
+    layer_is_right_way_on_grid_only,
+    layer_is_right_way_on_grid_only_check_mask,
+    master_get_const_name,
+    master_get_e_e_q,
+    master_get_height,
+    master_get_l_e_q,
+    master_get_lib,
+    master_get_m_term_count,
+    master_get_master_id,
+    master_get_name,
+    master_get_site,
+    master_get_symmetry_r90,
+    master_get_symmetry_x,
+    master_get_symmetry_y,
+    master_get_width,
+    master_is_backside_bridge,
+    master_is_block,
+    master_is_core,
+    master_is_core_auto_placeable,
+    master_is_cover,
+    master_is_end_cap,
+    master_is_filler,
+    master_is_frozen,
+    master_is_marked,
+    master_is_pad,
+    master_is_sequential,
+    master_is_special_power,
+    mterm_get_const_name,
+    mterm_get_index,
+    mterm_get_io_type,
+    mterm_get_master,
+    mterm_get_name,
+    mterm_get_sig_type,
+    mterm_has_default_antenna_model,
+    mterm_has_oxide2_antenna_model,
+    mterm_is_set_mark,
     net_find_mod_net_in_highest_hier,
     net_get1st_b_term,
     net_get1st_cap_node_id,
@@ -274,6 +482,7 @@ pub use ffi_gen::{
     nth_block_get_vias,
     nth_inst_get_children,
     nth_inst_get_i_terms,
+    nth_master_get_m_terms,
     nth_net_get_b_terms,
     nth_net_get_i_terms,
     num_block_get_b_terms,
@@ -288,6 +497,7 @@ pub use ffi_gen::{
     num_block_get_vias,
     num_inst_get_children,
     num_inst_get_i_terms,
+    num_master_get_m_terms,
     num_net_get_b_terms,
     num_net_get_i_terms,
 };
