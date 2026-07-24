@@ -49,6 +49,12 @@ TARGETS = {
     "dbTechVia":   {"key": "techvia","args": ["via"],             "resolve": "gen_techvia(h, via)"},
     "dbTechNonDefaultRule": {"key": "ndr", "args": ["rule"],      "resolve": "gen_ndr(h, rule)"},
     "dbSite":      {"key": "site",   "args": ["site"],            "resolve": "gen_site(h, site)"},
+    # index-addressed collections (no names) — addressed by position, and dbBox/dbWire by owner.
+    "dbObstruction": {"key": "obs",  "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_obstruction(h, idx)"},
+    "dbSWire":     {"key": "swire",  "args": ["net", {"name": "idx", "type": "idx"}], "resolve": "gen_swire(h, net, idx)"},
+    "dbWire":      {"key": "wire",   "args": ["net"],             "resolve": "gen_wire(h, net)"},
+    "dbFill":      {"key": "fill",   "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_fill(h, idx)"},
+    "dbBox":       {"key": "box",    "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_box(h, idx)"},
 }
 
 
@@ -80,6 +86,26 @@ def norm(t: str) -> str:
 
 def snake(name: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+
+
+def normalize_args(args):
+    """Args may be a bare str (a name-string key, C++ rust::Str / Rust &str) or a dict
+    {name, type:'idx'} for an integer index (C++ std::size_t / Rust usize)."""
+    out = []
+    for a in args:
+        if isinstance(a, str):
+            out.append((a, "str"))
+        else:
+            out.append((a["name"], a.get("type", "str")))
+    return out
+
+
+def _cty(kind: str) -> str:
+    return "std::size_t" if kind == "idx" else "rust::Str"
+
+
+def _rty(kind: str) -> str:
+    return "usize" if kind == "idx" else "&str"
 
 
 def nameable_classes(db_h: str) -> dict[str, str]:
@@ -133,18 +159,17 @@ class Emit:
 
     def add(self, cls, spec, m, nameable, reserved_fn, reserved_db, seen):
         key, resolve = spec["key"], spec["resolve"]
-        args = spec["args"]
+        argspecs = normalize_args(spec["args"])
         kind, ret, name = m["kind"], m["return"], m["name"]
         fn = f"{key}_{snake(name)}"
         if fn in seen or fn in reserved_fn or fn in reserved_db:
             return False
 
-        # C++ / Rust argument fragments
-        c_params = "".join(f", rust::Str {a}" for a in args)
-        r_params = "".join(f", {a}: &str" for a in args)
-        c_call_args = "".join(f", {a}" for a in args)  # forwarding in Db wrappers is Rust-side
-        rust_args_sig = "".join(f", {a}: &str" for a in args)
-        rust_fwd = "".join(f", {a}" for a in args)
+        # C++ / Rust argument fragments (name-string or integer-index args)
+        c_params = "".join(f", {_cty(k)} {n}" for n, k in argspecs)
+        r_params = "".join(f", {n}: {_rty(k)}" for n, k in argspecs)
+        rust_args_sig = r_params
+        rust_fwd = "".join(f", {n}" for n, k in argspecs)
 
         nret = norm(ret)
         target = ret.rstrip("*").strip() if kind == "relation" else None
@@ -315,6 +340,20 @@ def main() -> int:
         "  std::string name = gs(n);\n"
         "  for (odb::dbLib* lib : h.db->getLibs()) { if (auto* s = lib->findSite(name.c_str())) return s; }\n"
         "  return nullptr; }\n"
+        "static odb::dbObstruction* gen_obstruction(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbObstruction* o : b->getObstructions()) { if (k++ == i) return o; }\n"
+        "  return nullptr; }\n"
+        "static odb::dbSWire* gen_swire(const OdbDb& h, rust::Str net, std::size_t i) {\n"
+        "  odb::dbNet* n = gen_net(h, net); if (!n) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbSWire* w : n->getSWires()) { if (k++ == i) return w; } return nullptr; }\n"
+        "static odb::dbWire* gen_wire(const OdbDb& h, rust::Str net) {\n"
+        "  odb::dbNet* n = gen_net(h, net); return n ? n->getWire() : nullptr; }\n"
+        "static odb::dbFill* gen_fill(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbFill* f : b->getFills()) { if (k++ == i) return f; } return nullptr; }\n"
+        "static odb::dbBox* gen_box(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbObstruction* o = gen_obstruction(h, i); return o ? o->getBBox() : nullptr; }\n"
         "}  // namespace\n")
     (LIB / "src/generated.cc").write_text(
         "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +

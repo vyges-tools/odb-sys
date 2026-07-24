@@ -37,9 +37,19 @@ long tail of accessors is bound *mechanically* instead of by hand:
 | `dbTechNonDefaultRule` | name | `block`/`tech` `->findNonDefaultRule` |
 | `dbRow` | name (scan rows) | `block->getRows()` match |
 
-**Not yet covered:** classes with *no name* — `dbSWire`, `dbObstruction`, `dbBox`, `dbWire`,
-`dbFill`, `dbRSeg`, `dbCapNode` — are index-addressed collections, so they need an
-index-based resolver (a future generator mode), not the by-name model above.
+Classes with **no name** are addressed by **position** instead (the index-addressing mode —
+an arg typed `idx` → `usize`/`std::size_t`):
+
+| Class | Addressed by | Resolver |
+| --- | --- | --- |
+| `dbObstruction` · `dbFill` | `idx` | i-th of `block->get{Obstructions,Fills}()` |
+| `dbSWire` | `net` + `idx` | i-th of `net->getSWires()` |
+| `dbWire` | `net` | `net->getWire()` (1:1 with the net) |
+| `dbBox` | `idx` | i-th obstruction's `getBBox()` — surfaces box geometry (`xMin`/`getDX`/…) |
+
+**Still uncovered:** `dbRSeg`/`dbCapNode` (parasitics — addressable by id, low instrumentation
+value) and the polymorphic ownership of `dbBox` beyond obstructions (inst/master/pin bboxes)
+— both fit the same index/owner mechanism when needed.
 
 Run:
 

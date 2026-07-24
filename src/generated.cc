@@ -39,6 +39,20 @@ static odb::dbSite* gen_site(const OdbDb& h, rust::Str n) {
   std::string name = gs(n);
   for (odb::dbLib* lib : h.db->getLibs()) { if (auto* s = lib->findSite(name.c_str())) return s; }
   return nullptr; }
+static odb::dbObstruction* gen_obstruction(const OdbDb& h, std::size_t i) {
+  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;
+  std::size_t k = 0; for (odb::dbObstruction* o : b->getObstructions()) { if (k++ == i) return o; }
+  return nullptr; }
+static odb::dbSWire* gen_swire(const OdbDb& h, rust::Str net, std::size_t i) {
+  odb::dbNet* n = gen_net(h, net); if (!n) return nullptr;
+  std::size_t k = 0; for (odb::dbSWire* w : n->getSWires()) { if (k++ == i) return w; } return nullptr; }
+static odb::dbWire* gen_wire(const OdbDb& h, rust::Str net) {
+  odb::dbNet* n = gen_net(h, net); return n ? n->getWire() : nullptr; }
+static odb::dbFill* gen_fill(const OdbDb& h, std::size_t i) {
+  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;
+  std::size_t k = 0; for (odb::dbFill* f : b->getFills()) { if (k++ == i) return f; } return nullptr; }
+static odb::dbBox* gen_box(const OdbDb& h, std::size_t i) {
+  odb::dbObstruction* o = gen_obstruction(h, i); return o ? o->getBBox() : nullptr; }
 }  // namespace
 
 rust::String block_get_name(const OdbDb& h) { auto* p = gen_block(h); return p ? rust::String(p->getName()) : rust::String(); }
@@ -331,3 +345,39 @@ bool site_get_symmetry_r90(const OdbDb& h, rust::Str site) { auto* p = gen_site(
 bool site_has_row_pattern(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->hasRowPattern() : false; }
 bool site_is_hybrid(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->isHybrid() : false; }
 rust::String site_get_lib(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); if (!p) return rust::String(); auto* t = p->getLib(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String obs_get_instance(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); if (!p) return rust::String(); auto* t = p->getInstance(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool obs_is_slot_obstruction(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->isSlotObstruction() : false; }
+bool obs_is_fill_obstruction(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->isFillObstruction() : false; }
+bool obs_is_except_p_g_nets_obstruction(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->isExceptPGNetsObstruction() : false; }
+bool obs_is_pushed_down(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->isPushedDown() : false; }
+bool obs_has_effective_width(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->hasEffectiveWidth() : false; }
+int32_t obs_get_effective_width(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->getEffectiveWidth() : 0; }
+bool obs_has_min_spacing(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->hasMinSpacing() : false; }
+int32_t obs_get_min_spacing(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->getMinSpacing() : 0; }
+rust::String obs_get_block(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool obs_is_system_reserved(const OdbDb& h, std::size_t idx) { auto* p = gen_obstruction(h, idx); return p ? p->isSystemReserved() : false; }
+rust::String swire_get_block(const OdbDb& h, rust::Str net, std::size_t idx) { auto* p = gen_swire(h, net, idx); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String swire_get_net(const OdbDb& h, rust::Str net, std::size_t idx) { auto* p = gen_swire(h, net, idx); if (!p) return rust::String(); auto* t = p->getNet(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String swire_get_wire_type(const OdbDb& h, rust::Str net, std::size_t idx) { auto* p = gen_swire(h, net, idx); return p ? rust::String(p->getWireType().getString()) : rust::String(); }
+rust::String swire_get_shield(const OdbDb& h, rust::Str net, std::size_t idx) { auto* p = gen_swire(h, net, idx); if (!p) return rust::String(); auto* t = p->getShield(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String wire_get_block(const OdbDb& h, rust::Str net) { auto* p = gen_wire(h, net); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String wire_get_net(const OdbDb& h, rust::Str net) { auto* p = gen_wire(h, net); if (!p) return rust::String(); auto* t = p->getNet(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool wire_is_global_wire(const OdbDb& h, rust::Str net) { auto* p = gen_wire(h, net); return p ? p->isGlobalWire() : false; }
+uint32_t wire_length(const OdbDb& h, rust::Str net) { auto* p = gen_wire(h, net); return p ? p->length() : 0; }
+uint32_t wire_count(const OdbDb& h, rust::Str net) { auto* p = gen_wire(h, net); return p ? p->count() : 0; }
+bool fill_needs_o_p_c(const OdbDb& h, std::size_t idx) { auto* p = gen_fill(h, idx); return p ? p->needsOPC() : false; }
+uint32_t fill_mask_number(const OdbDb& h, std::size_t idx) { auto* p = gen_fill(h, idx); return p ? p->maskNumber() : 0; }
+rust::String fill_get_tech_layer(const OdbDb& h, std::size_t idx) { auto* p = gen_fill(h, idx); if (!p) return rust::String(); auto* t = p->getTechLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+int32_t box_x_min(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->xMin() : 0; }
+int32_t box_y_min(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->yMin() : 0; }
+int32_t box_x_max(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->xMax() : 0; }
+int32_t box_y_max(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->yMax() : 0; }
+bool box_is_via(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->isVia() : false; }
+rust::String box_get_tech_via(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); if (!p) return rust::String(); auto* t = p->getTechVia(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String box_get_block_via(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); if (!p) return rust::String(); auto* t = p->getBlockVia(); return t ? rust::String(t->getConstName()) : rust::String(); }
+uint32_t box_get_d_x(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getDX() : 0; }
+int32_t box_get_design_rule_width(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getDesignRuleWidth() : 0; }
+uint32_t box_get_d_y(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getDY() : 0; }
+bool box_is_soft(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->isSoft() : false; }
+rust::String box_get_tech_layer(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); if (!p) return rust::String(); auto* t = p->getTechLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+uint32_t box_get_layer_mask(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getLayerMask() : 0; }

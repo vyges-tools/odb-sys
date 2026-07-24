@@ -298,6 +298,42 @@ mod ffi_gen {
         fn site_has_row_pattern(db: &OdbDb, site: &str) -> bool;
         fn site_is_hybrid(db: &OdbDb, site: &str) -> bool;
         fn site_get_lib(db: &OdbDb, site: &str) -> String;
+        fn obs_get_instance(db: &OdbDb, idx: usize) -> String;
+        fn obs_is_slot_obstruction(db: &OdbDb, idx: usize) -> bool;
+        fn obs_is_fill_obstruction(db: &OdbDb, idx: usize) -> bool;
+        fn obs_is_except_p_g_nets_obstruction(db: &OdbDb, idx: usize) -> bool;
+        fn obs_is_pushed_down(db: &OdbDb, idx: usize) -> bool;
+        fn obs_has_effective_width(db: &OdbDb, idx: usize) -> bool;
+        fn obs_get_effective_width(db: &OdbDb, idx: usize) -> i32;
+        fn obs_has_min_spacing(db: &OdbDb, idx: usize) -> bool;
+        fn obs_get_min_spacing(db: &OdbDb, idx: usize) -> i32;
+        fn obs_get_block(db: &OdbDb, idx: usize) -> String;
+        fn obs_is_system_reserved(db: &OdbDb, idx: usize) -> bool;
+        fn swire_get_block(db: &OdbDb, net: &str, idx: usize) -> String;
+        fn swire_get_net(db: &OdbDb, net: &str, idx: usize) -> String;
+        fn swire_get_wire_type(db: &OdbDb, net: &str, idx: usize) -> String;
+        fn swire_get_shield(db: &OdbDb, net: &str, idx: usize) -> String;
+        fn wire_get_block(db: &OdbDb, net: &str) -> String;
+        fn wire_get_net(db: &OdbDb, net: &str) -> String;
+        fn wire_is_global_wire(db: &OdbDb, net: &str) -> bool;
+        fn wire_length(db: &OdbDb, net: &str) -> u32;
+        fn wire_count(db: &OdbDb, net: &str) -> u32;
+        fn fill_needs_o_p_c(db: &OdbDb, idx: usize) -> bool;
+        fn fill_mask_number(db: &OdbDb, idx: usize) -> u32;
+        fn fill_get_tech_layer(db: &OdbDb, idx: usize) -> String;
+        fn box_x_min(db: &OdbDb, idx: usize) -> i32;
+        fn box_y_min(db: &OdbDb, idx: usize) -> i32;
+        fn box_x_max(db: &OdbDb, idx: usize) -> i32;
+        fn box_y_max(db: &OdbDb, idx: usize) -> i32;
+        fn box_is_via(db: &OdbDb, idx: usize) -> bool;
+        fn box_get_tech_via(db: &OdbDb, idx: usize) -> String;
+        fn box_get_block_via(db: &OdbDb, idx: usize) -> String;
+        fn box_get_d_x(db: &OdbDb, idx: usize) -> u32;
+        fn box_get_design_rule_width(db: &OdbDb, idx: usize) -> i32;
+        fn box_get_d_y(db: &OdbDb, idx: usize) -> u32;
+        fn box_is_soft(db: &OdbDb, idx: usize) -> bool;
+        fn box_get_tech_layer(db: &OdbDb, idx: usize) -> String;
+        fn box_get_layer_mask(db: &OdbDb, idx: usize) -> u32;
     }
 }
 
@@ -318,6 +354,19 @@ pub use ffi_gen::{
     block_get_parent,
     block_get_parent_inst,
     block_get_tech,
+    box_get_block_via,
+    box_get_d_x,
+    box_get_d_y,
+    box_get_design_rule_width,
+    box_get_layer_mask,
+    box_get_tech_layer,
+    box_get_tech_via,
+    box_is_soft,
+    box_is_via,
+    box_x_max,
+    box_x_min,
+    box_y_max,
+    box_y_min,
     bterm_get_block,
     bterm_get_const_name,
     bterm_get_ext_id,
@@ -337,6 +386,9 @@ pub use ffi_gen::{
     bterm_is_set_spef_mark,
     bterm_is_special,
     bterm_sta_vertex_id,
+    fill_get_tech_layer,
+    fill_mask_number,
+    fill_needs_o_p_c,
     inst_get_block,
     inst_get_child,
     inst_get_const_name,
@@ -550,6 +602,17 @@ pub use ffi_gen::{
     num_master_get_m_terms,
     num_net_get_b_terms,
     num_net_get_i_terms,
+    obs_get_block,
+    obs_get_effective_width,
+    obs_get_instance,
+    obs_get_min_spacing,
+    obs_has_effective_width,
+    obs_has_min_spacing,
+    obs_is_except_p_g_nets_obstruction,
+    obs_is_fill_obstruction,
+    obs_is_pushed_down,
+    obs_is_slot_obstruction,
+    obs_is_system_reserved,
     row_get_block,
     row_get_const_name,
     row_get_name,
@@ -567,6 +630,10 @@ pub use ffi_gen::{
     site_get_width,
     site_has_row_pattern,
     site_is_hybrid,
+    swire_get_block,
+    swire_get_net,
+    swire_get_shield,
+    swire_get_wire_type,
     techvia_get_bottom_layer,
     techvia_get_const_name,
     techvia_get_name,
@@ -592,4 +659,9 @@ pub use ffi_gen::{
     via_has_params,
     via_is_default,
     via_is_via_rotated,
+    wire_count,
+    wire_get_block,
+    wire_get_net,
+    wire_is_global_wire,
+    wire_length,
 };
