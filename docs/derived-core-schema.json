@@ -5,7 +5,7 @@
   "scope": "hand-written core only",
   "class_count": 44,
   "method_count": 1137,
-  "bridged_count": 537,
+  "bridged_count": 656,
   "classes": [
     {
       "name": "dbBPin",
@@ -2803,7 +2803,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getTargetNodeNum",
@@ -2811,7 +2811,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getSourceNet",
@@ -2819,7 +2819,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbNet"
         },
         {
@@ -2828,7 +2828,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbNet"
         },
         {
@@ -2837,7 +2837,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "incrInfileCnt",
@@ -3146,7 +3146,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getShapeId",
@@ -3154,7 +3154,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setNode",
@@ -3167,7 +3167,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isName",
@@ -3175,7 +3175,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isITerm",
@@ -3183,7 +3183,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isBTerm",
@@ -3191,7 +3191,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isInternal",
@@ -3199,7 +3199,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isBranch",
@@ -3207,7 +3207,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isDangling",
@@ -3215,7 +3215,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isForeign",
@@ -3223,7 +3223,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isTreeNode",
@@ -3231,7 +3231,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isSourceTerm",
@@ -3286,7 +3286,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getChildrenCnt",
@@ -3294,7 +3294,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setChildrenCnt",
@@ -3307,7 +3307,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setNameFlag",
@@ -3315,7 +3315,7 @@
           "params": [],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setBTermFlag",
@@ -3323,7 +3323,7 @@
           "params": [],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setITermFlag",
@@ -3331,7 +3331,7 @@
           "params": [],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setInternalFlag",
@@ -3339,7 +3339,7 @@
           "params": [],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setBranchFlag",
@@ -3347,7 +3347,7 @@
           "params": [],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setForeignFlag",
@@ -3355,7 +3355,7 @@
           "params": [],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "resetNameFlag",
@@ -3411,7 +3411,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setSortIndex",
@@ -3424,7 +3424,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getTermCoords",
@@ -3489,7 +3489,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getCCSegs",
@@ -3520,7 +3520,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setNext",
@@ -3533,7 +3533,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "addToNet",
@@ -4952,7 +4952,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbSite"
         },
         {
@@ -4975,7 +4975,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setLefUnits",
@@ -4988,7 +4988,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getHierarchyDelimiter",
@@ -8007,7 +8007,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getGroundCapacitance",
@@ -8087,7 +8087,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getCapTable",
@@ -8160,7 +8160,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getSourceNode",
@@ -8168,7 +8168,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getSourceCapNode",
@@ -8190,7 +8190,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getTargetNode",
@@ -8198,7 +8198,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getTargetCapNode",
@@ -8220,7 +8220,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getShapeId",
@@ -8228,7 +8228,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setCoords",
@@ -8245,7 +8245,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getCoords",
@@ -8262,7 +8262,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "updateShapeId",
@@ -8283,7 +8283,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "allocatedCap",
@@ -8291,7 +8291,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getLengthWidth",
@@ -8603,7 +8603,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getViaCutLayerMask",
@@ -8611,7 +8611,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getViaTopLayerMask",
@@ -8619,7 +8619,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setViaLayerMask",
@@ -8640,7 +8640,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "hasViaLayerMasks",
@@ -8648,7 +8648,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "smashVia",
@@ -8956,7 +8956,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getExtractionRulesFile",
@@ -8964,7 +8964,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getDbUnitsPerMicron",
@@ -8980,7 +8980,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbTechLayer"
         },
         {
@@ -9031,7 +9031,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -9040,7 +9040,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -9072,7 +9072,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setLefUnits",
@@ -9085,7 +9085,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getLefVersion",
@@ -9093,7 +9093,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getLefVersionStr",
@@ -9101,7 +9101,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setLefVersion",
@@ -9114,7 +9114,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "hasNoWireExtAtPin",
@@ -9122,7 +9122,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getNoWireExtAtPin",
@@ -9172,7 +9172,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getClearanceMeasure",
@@ -9201,7 +9201,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getUseMinSpacingObs",
@@ -9230,7 +9230,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getUseMinSpacingPin",
@@ -9259,7 +9259,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getManufacturingGrid",
@@ -9267,7 +9267,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setManufacturingGrid",
@@ -9280,7 +9280,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getLayerCount",
@@ -9288,7 +9288,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getRoutingLayerCount",
@@ -9296,7 +9296,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getViaCount",
@@ -9304,7 +9304,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getNonDefaultRules",
@@ -9366,7 +9366,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbTechViaRule"
         },
         {
@@ -9375,7 +9375,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbTechViaGenerateRule"
         },
         {
@@ -9589,7 +9589,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setGatePlusDiffFactor",
@@ -9602,7 +9602,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setAreaMinusDiffFactor",
@@ -9615,7 +9615,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setAreaFactor",
@@ -9632,7 +9632,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setSideAreaFactor",
@@ -9649,7 +9649,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "hasAreaFactor",
@@ -9657,7 +9657,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "hasSideAreaFactor",
@@ -9665,7 +9665,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getAreaFactor",
@@ -9673,7 +9673,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getSideAreaFactor",
@@ -9681,7 +9681,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isAreaFactorDiffUseOnly",
@@ -9689,7 +9689,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isSideAreaFactorDiffUseOnly",
@@ -9697,7 +9697,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "hasAntennaCumRoutingPlusCut",
@@ -9705,7 +9705,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setAntennaCumRoutingPlusCut",
@@ -9718,7 +9718,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getPAR",
@@ -9726,7 +9726,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getCAR",
@@ -9734,7 +9734,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getPSR",
@@ -9742,7 +9742,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getCSR",
@@ -9750,7 +9750,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getGatePlusDiffFactor",
@@ -9758,7 +9758,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getAreaMinusDiffFactor",
@@ -9766,7 +9766,7 @@
           "params": [],
           "const": true,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setPAR",
@@ -9779,7 +9779,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setCAR",
@@ -9792,7 +9792,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setPSR",
@@ -9805,7 +9805,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setCSR",
@@ -9818,7 +9818,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getDiffPAR",
@@ -9879,7 +9879,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setDiffCAR",
@@ -9892,7 +9892,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setDiffPSR",
@@ -9905,7 +9905,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setDiffCSR",
@@ -9918,7 +9918,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         }
       ],
       "hand_written": true
@@ -9933,7 +9933,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -10647,7 +10647,7 @@
           ],
           "const": true,
           "kind": "other",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setEnclosure",
@@ -10660,7 +10660,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getEnclosureWidth",
@@ -11195,7 +11195,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getViaLayerRule",
@@ -11224,7 +11224,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -11254,7 +11254,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getWidth",
@@ -11296,7 +11296,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getEnclosure",
@@ -11313,7 +11313,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setEnclosure",
@@ -11330,7 +11330,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "hasOverhang",
@@ -11338,7 +11338,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getOverhang",
@@ -11346,7 +11346,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setOverhang",
@@ -11359,7 +11359,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "hasMetalOverhang",
@@ -11367,7 +11367,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getMetalOverhang",
@@ -11375,7 +11375,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setMetalOverhang",
@@ -11388,7 +11388,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "hasRect",
@@ -11396,7 +11396,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getRect",
@@ -11430,7 +11430,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getSpacing",
@@ -11472,7 +11472,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setResistance",
@@ -11529,7 +11529,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getVia",
@@ -11551,7 +11551,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getViaLayerRule",

@@ -191,6 +191,56 @@ mod ffi_gen_write {
         fn level_shifter_set_cell_name(db: &OdbDb, name: &str, cell_name: &str) -> Result<()>;
         fn level_shifter_set_cell_input(db: &OdbDb, name: &str, cell_input: &str) -> Result<()>;
         fn level_shifter_set_cell_output(db: &OdbDb, name: &str, cell_output: &str) -> Result<()>;
+        fn tech_set_extraction_rules_file(db: &OdbDb, path: &str) -> Result<()>;
+        fn tech_set_lef_units(db: &OdbDb, units: i32) -> Result<()>;
+        fn tech_set_lef_version(db: &OdbDb, inver: f64) -> Result<()>;
+        fn tech_set_manufacturing_grid(db: &OdbDb, ingrd: i32) -> Result<()>;
+        fn lib_set_lef_units(db: &OdbDb, name: &str, units: i32) -> Result<()>;
+        fn capnode_set_capacitance(db: &OdbDb, idx: usize, cap: f64, corner: i32) -> Result<()>;
+        fn capnode_set_node(db: &OdbDb, idx: usize, nodeid: u32) -> Result<()>;
+        fn capnode_set_select(db: &OdbDb, idx: usize, value: bool) -> Result<()>;
+        fn capnode_set_children_cnt(db: &OdbDb, idx: usize, cnt: u32) -> Result<()>;
+        fn capnode_set_name_flag(db: &OdbDb, idx: usize) -> Result<()>;
+        fn capnode_set_b_term_flag(db: &OdbDb, idx: usize) -> Result<()>;
+        fn capnode_set_i_term_flag(db: &OdbDb, idx: usize) -> Result<()>;
+        fn capnode_set_internal_flag(db: &OdbDb, idx: usize) -> Result<()>;
+        fn capnode_set_branch_flag(db: &OdbDb, idx: usize) -> Result<()>;
+        fn capnode_set_foreign_flag(db: &OdbDb, idx: usize) -> Result<()>;
+        fn capnode_set_sort_index(db: &OdbDb, idx: usize, a0: u32) -> Result<()>;
+        fn capnode_set_net(db: &OdbDb, idx: usize, netid: u32) -> Result<()>;
+        fn capnode_set_next(db: &OdbDb, idx: usize, nextid: u32) -> Result<()>;
+        fn rseg_set_capacitance(db: &OdbDb, idx: usize, cap: f64, corner: i32) -> Result<()>;
+        fn rseg_set_resistance(db: &OdbDb, idx: usize, res: f64, corner: i32) -> Result<()>;
+        fn rseg_set_next(db: &OdbDb, idx: usize, next_id: u32) -> Result<()>;
+        fn rseg_set_source_node(db: &OdbDb, idx: usize, nodeid: u32) -> Result<()>;
+        fn rseg_set_target_node(db: &OdbDb, idx: usize, nodeid: u32) -> Result<()>;
+        fn rseg_set_coords(db: &OdbDb, idx: usize, x: i32, y: i32) -> Result<()>;
+        fn ccseg_set_capacitance(db: &OdbDb, idx: usize, cap: f64, corner: i32) -> Result<()>;
+        fn ccseg_set_mark(db: &OdbDb, idx: usize, value: bool) -> Result<()>;
+        fn sbox_set_via_layer_mask(db: &OdbDb, net: &str, swire_idx: usize, sbox_idx: usize, bottom: u32, cut: u32, top: u32) -> Result<()>;
+        fn bpin_set_placement_status(db: &OdbDb, bterm: &str, idx: usize, status: &str) -> Result<()>;
+        fn bpin_set_effective_width(db: &OdbDb, bterm: &str, idx: usize, w: i32) -> Result<()>;
+        fn bpin_set_min_spacing(db: &OdbDb, bterm: &str, idx: usize, w: i32) -> Result<()>;
+        fn mpin_clear_pin_access(db: &OdbDb, master: &str, term: &str, idx: usize, pin_access_idx: i32) -> Result<()>;
+        fn techvialayerrule_set_width(db: &OdbDb, gen_idx: usize, layer_idx: usize, min_width: i32, max_width: i32) -> Result<()>;
+        fn techvialayerrule_set_enclosure(db: &OdbDb, gen_idx: usize, layer_idx: usize, overhang1: i32, overhang2: i32) -> Result<()>;
+        fn techvialayerrule_set_overhang(db: &OdbDb, gen_idx: usize, layer_idx: usize, overhang: i32) -> Result<()>;
+        fn techvialayerrule_set_metal_overhang(db: &OdbDb, gen_idx: usize, layer_idx: usize, overhang: i32) -> Result<()>;
+        fn techvialayerrule_set_spacing(db: &OdbDb, gen_idx: usize, layer_idx: usize, x_spacing: i32, y_spacing: i32) -> Result<()>;
+        fn techvialayerrule_set_resistance(db: &OdbDb, gen_idx: usize, layer_idx: usize, r: f64) -> Result<()>;
+        fn layerantenna_set_gate_plus_diff_factor(db: &OdbDb, layer: &str, factor: f64) -> Result<()>;
+        fn layerantenna_set_area_minus_diff_factor(db: &OdbDb, layer: &str, factor: f64) -> Result<()>;
+        fn layerantenna_set_area_factor(db: &OdbDb, layer: &str, factor: f64, diffuse: bool) -> Result<()>;
+        fn layerantenna_set_side_area_factor(db: &OdbDb, layer: &str, factor: f64, diffuse: bool) -> Result<()>;
+        fn layerantenna_set_antenna_cum_routing_plus_cut(db: &OdbDb, layer: &str, value: bool) -> Result<()>;
+        fn layerantenna_set_p_a_r(db: &OdbDb, layer: &str, ratio: f64) -> Result<()>;
+        fn layerantenna_set_c_a_r(db: &OdbDb, layer: &str, ratio: f64) -> Result<()>;
+        fn layerantenna_set_p_s_r(db: &OdbDb, layer: &str, ratio: f64) -> Result<()>;
+        fn layerantenna_set_c_s_r(db: &OdbDb, layer: &str, ratio: f64) -> Result<()>;
+        fn layerantenna_set_diff_p_a_r(db: &OdbDb, layer: &str, ratio: f64) -> Result<()>;
+        fn layerantenna_set_diff_c_a_r(db: &OdbDb, layer: &str, ratio: f64) -> Result<()>;
+        fn layerantenna_set_diff_p_s_r(db: &OdbDb, layer: &str, ratio: f64) -> Result<()>;
+        fn layerantenna_set_diff_c_s_r(db: &OdbDb, layer: &str, ratio: f64) -> Result<()>;
     }
 }
 
@@ -212,12 +262,30 @@ pub use ffi_gen_write::{
     blockage_set_soft,
     box_set_layer_mask,
     box_set_soft,
+    bpin_set_effective_width,
+    bpin_set_min_spacing,
+    bpin_set_placement_status,
     bterm_set_ext_id,
     bterm_set_io_type,
     bterm_set_mark,
     bterm_set_sig_type,
     bterm_set_special,
     bterm_set_spef_mark,
+    capnode_set_b_term_flag,
+    capnode_set_branch_flag,
+    capnode_set_capacitance,
+    capnode_set_children_cnt,
+    capnode_set_foreign_flag,
+    capnode_set_i_term_flag,
+    capnode_set_internal_flag,
+    capnode_set_name_flag,
+    capnode_set_net,
+    capnode_set_next,
+    capnode_set_node,
+    capnode_set_select,
+    capnode_set_sort_index,
+    ccseg_set_capacitance,
+    ccseg_set_mark,
     inst_clear_user_flag1,
     inst_clear_user_flag2,
     inst_clear_user_flag3,
@@ -279,6 +347,19 @@ pub use ffi_gen_write::{
     layer_set_wire_extension,
     layer_set_wrong_way_min_width,
     layer_set_wrong_way_width,
+    layerantenna_set_antenna_cum_routing_plus_cut,
+    layerantenna_set_area_factor,
+    layerantenna_set_area_minus_diff_factor,
+    layerantenna_set_c_a_r,
+    layerantenna_set_c_s_r,
+    layerantenna_set_diff_c_a_r,
+    layerantenna_set_diff_c_s_r,
+    layerantenna_set_diff_p_a_r,
+    layerantenna_set_diff_p_s_r,
+    layerantenna_set_gate_plus_diff_factor,
+    layerantenna_set_p_a_r,
+    layerantenna_set_p_s_r,
+    layerantenna_set_side_area_factor,
     level_shifter_set_applies_to,
     level_shifter_set_applies_to_boundary,
     level_shifter_set_cell_input,
@@ -297,6 +378,7 @@ pub use ffi_gen_write::{
     level_shifter_set_source,
     level_shifter_set_threshold,
     level_shifter_set_use_functional_equivalence,
+    lib_set_lef_units,
     marker_cat_set_description,
     marker_cat_set_max_markers,
     marker_cat_set_source,
@@ -317,6 +399,7 @@ pub use ffi_gen_write::{
     master_set_symmetry_x,
     master_set_symmetry_y,
     master_set_width,
+    mpin_clear_pin_access,
     mterm_set_mark,
     mterm_set_sig_type,
     ndr_set_hard_spacing,
@@ -366,16 +449,33 @@ pub use ffi_gen_write::{
     pwr_domain_set_voltage,
     pwr_switch_set_out_supply_port,
     region_set_invalid,
+    rseg_set_capacitance,
+    rseg_set_coords,
+    rseg_set_next,
+    rseg_set_resistance,
+    rseg_set_source_node,
+    rseg_set_target_node,
+    sbox_set_via_layer_mask,
     site_set_height,
     site_set_symmetry_r90,
     site_set_symmetry_x,
     site_set_symmetry_y,
     site_set_width,
     swire_set_wire_type,
+    tech_set_extraction_rules_file,
+    tech_set_lef_units,
+    tech_set_lef_version,
+    tech_set_manufacturing_grid,
     techvia_set_default,
     techvia_set_pattern,
     techvia_set_resistance,
     techvia_set_top_of_stack,
+    techvialayerrule_set_enclosure,
+    techvialayerrule_set_metal_overhang,
+    techvialayerrule_set_overhang,
+    techvialayerrule_set_resistance,
+    techvialayerrule_set_spacing,
+    techvialayerrule_set_width,
     via_set_pattern,
     wire_set_property,
 };

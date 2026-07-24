@@ -40,6 +40,10 @@ long tail of accessors is bound *mechanically* instead of by hand:
 | `dbMarkerCategory` | name | `block->findMarkerCategory` |
 | `dbModInst` · `dbModNet` | hierarchical name | `block->find{ModInst,ModNet}` |
 | `dbPowerDomain` · `dbPowerSwitch` · `dbIsolation` · `dbLevelShifter` | name | `block->find*` (UPF power intent) |
+| `dbTech` | (singleton) | `db->getTech()` |
+| `dbLib` | name (scan) | `db->getLibs()` match |
+| `dbTechLayerAntennaRule` | `layer` | `layer->getDefaultAntennaRule()` |
+| `dbTechAntennaPinModel` | `master` + `term` | `mterm->getDefaultAntennaModel()` |
 
 Classes with **no name** are addressed by **position** instead (the index-addressing mode —
 an arg typed `idx` → `usize`/`std::size_t`):
@@ -53,6 +57,12 @@ an arg typed `idx` → `usize`/`std::size_t`):
 | `dbBlockage` · `dbTrackGrid` | `idx` | i-th of `block->get{Blockages,TrackGrids}()` |
 | `dbMarker` | `category` + `idx` | i-th of `markerCategory->getMarkers()` — DRC violation (`get_b_box_*`, `get_tech_layer`, `is_waived`, `get_comment`) |
 | `dbModBTerm` · `dbModITerm` | `module`/`modinst` + `idx` | i-th of the parent's `getMod{BTerms,ITerms}()` |
+| `dbCapNode` · `dbRSeg` · `dbCCSeg` | `idx` | i-th of `block->get{CapNodes,RSegs,CCSegs}()` (parasitics) |
+| `dbBPin` | `bterm` + `idx` | i-th of `bterm->getBPins()` |
+| `dbMPin` | `master` + `term` + `idx` | i-th of `mterm->getMPins()` |
+| `dbSBox` | `net` + `swire_idx` + `sbox_idx` | i-th box of the net's j-th special wire |
+| `dbTechViaRule` · `dbTechViaGenerateRule` | `idx` | i-th of `tech->getVia{,Generate}Rules()` |
+| `dbTechViaLayerRule` | `gen_idx` + `layer_idx` | `genRule->getViaLayerRule(layer_idx)` |
 
 **Still uncovered:** `dbRSeg`/`dbCapNode` (parasitics — addressable by id, low instrumentation
 value) and the polymorphic ownership of `dbBox` beyond obstructions (inst/master/pin bboxes)

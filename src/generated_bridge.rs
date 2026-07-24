@@ -598,6 +598,135 @@ mod ffi_gen {
         fn level_shifter_get_cell_name(db: &OdbDb, name: &str) -> String;
         fn level_shifter_get_cell_input(db: &OdbDb, name: &str) -> String;
         fn level_shifter_get_cell_output(db: &OdbDb, name: &str) -> String;
+        fn tech_get_name(db: &OdbDb) -> String;
+        fn tech_get_extraction_rules_file(db: &OdbDb) -> String;
+        fn tech_get_db_units_per_micron(db: &OdbDb) -> i32;
+        fn num_tech_get_layers(db: &OdbDb) -> usize;
+        fn nth_tech_get_layers(db: &OdbDb, i: usize) -> String;
+        fn tech_first_frontside_routing_layer(db: &OdbDb) -> String;
+        fn tech_first_backside_routing_layer(db: &OdbDb) -> String;
+        fn num_tech_get_vias(db: &OdbDb) -> usize;
+        fn nth_tech_get_vias(db: &OdbDb, i: usize) -> String;
+        fn tech_get_lef_units(db: &OdbDb) -> i32;
+        fn tech_get_lef_version(db: &OdbDb) -> f64;
+        fn tech_get_lef_version_str(db: &OdbDb) -> String;
+        fn tech_has_no_wire_ext_at_pin(db: &OdbDb) -> bool;
+        fn tech_has_clearance_measure(db: &OdbDb) -> bool;
+        fn tech_has_use_min_spacing_obs(db: &OdbDb) -> bool;
+        fn tech_has_use_min_spacing_pin(db: &OdbDb) -> bool;
+        fn tech_has_manufacturing_grid(db: &OdbDb) -> bool;
+        fn tech_get_manufacturing_grid(db: &OdbDb) -> i32;
+        fn tech_get_layer_count(db: &OdbDb) -> i32;
+        fn tech_get_routing_layer_count(db: &OdbDb) -> i32;
+        fn tech_get_via_count(db: &OdbDb) -> i32;
+        fn num_tech_get_non_default_rules(db: &OdbDb) -> usize;
+        fn nth_tech_get_non_default_rules(db: &OdbDb, i: usize) -> String;
+        fn num_tech_get_via_rules(db: &OdbDb) -> usize;
+        fn nth_tech_get_via_rules(db: &OdbDb, i: usize) -> String;
+        fn num_tech_get_via_generate_rules(db: &OdbDb) -> usize;
+        fn nth_tech_get_via_generate_rules(db: &OdbDb, i: usize) -> String;
+        fn lib_get_name(db: &OdbDb, name: &str) -> String;
+        fn lib_get_const_name(db: &OdbDb, name: &str) -> String;
+        fn lib_get_db_units_per_micron(db: &OdbDb, name: &str) -> i32;
+        fn lib_get_tech(db: &OdbDb, name: &str) -> String;
+        fn num_lib_get_masters(db: &OdbDb, name: &str) -> usize;
+        fn nth_lib_get_masters(db: &OdbDb, name: &str, i: usize) -> String;
+        fn num_lib_get_sites(db: &OdbDb, name: &str) -> usize;
+        fn nth_lib_get_sites(db: &OdbDb, name: &str, i: usize) -> String;
+        fn lib_get_lef_units(db: &OdbDb, name: &str) -> i32;
+        fn capnode_get_node(db: &OdbDb, idx: usize) -> u32;
+        fn capnode_get_shape_id(db: &OdbDb, idx: usize) -> u32;
+        fn capnode_is_name(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_is_i_term(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_is_b_term(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_is_internal(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_is_branch(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_is_dangling(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_is_foreign(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_is_tree_node(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_is_select(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_incr_children_cnt(db: &OdbDb, idx: usize) -> u32;
+        fn capnode_get_children_cnt(db: &OdbDb, idx: usize) -> u32;
+        fn capnode_get_sort_index(db: &OdbDb, idx: usize) -> u32;
+        fn capnode_check_c_c(db: &OdbDb, idx: usize) -> bool;
+        fn capnode_get_net(db: &OdbDb, idx: usize) -> String;
+        fn rseg_updated_cap(db: &OdbDb, idx: usize) -> bool;
+        fn rseg_check_c_c(db: &OdbDb, idx: usize) -> bool;
+        fn rseg_get_source_node(db: &OdbDb, idx: usize) -> u32;
+        fn rseg_get_target_node(db: &OdbDb, idx: usize) -> u32;
+        fn rseg_get_shape_id(db: &OdbDb, idx: usize) -> u32;
+        fn rseg_path_low_to_high(db: &OdbDb, idx: usize) -> bool;
+        fn rseg_allocated_cap(db: &OdbDb, idx: usize) -> bool;
+        fn rseg_get_net(db: &OdbDb, idx: usize) -> String;
+        fn rseg_get_coords_x(db: &OdbDb, idx: usize) -> i32;
+        fn rseg_get_coords_y(db: &OdbDb, idx: usize) -> i32;
+        fn ccseg_get_source_node_num(db: &OdbDb, idx: usize) -> u32;
+        fn ccseg_get_target_node_num(db: &OdbDb, idx: usize) -> u32;
+        fn ccseg_get_source_net(db: &OdbDb, idx: usize) -> String;
+        fn ccseg_get_target_net(db: &OdbDb, idx: usize) -> String;
+        fn ccseg_get_infile_cnt(db: &OdbDb, idx: usize) -> u32;
+        fn ccseg_is_marked(db: &OdbDb, idx: usize) -> bool;
+        fn sbox_get_via_bottom_layer_mask(db: &OdbDb, net: &str, swire_idx: usize, sbox_idx: usize) -> u32;
+        fn sbox_get_via_cut_layer_mask(db: &OdbDb, net: &str, swire_idx: usize, sbox_idx: usize) -> u32;
+        fn sbox_get_via_top_layer_mask(db: &OdbDb, net: &str, swire_idx: usize, sbox_idx: usize) -> u32;
+        fn sbox_has_via_layer_masks(db: &OdbDb, net: &str, swire_idx: usize, sbox_idx: usize) -> bool;
+        fn bpin_get_placement_status(db: &OdbDb, bterm: &str, idx: usize) -> String;
+        fn bpin_get_b_term(db: &OdbDb, bterm: &str, idx: usize) -> String;
+        fn bpin_get_b_box_x_min(db: &OdbDb, bterm: &str, idx: usize) -> i32;
+        fn bpin_get_b_box_y_min(db: &OdbDb, bterm: &str, idx: usize) -> i32;
+        fn bpin_get_b_box_x_max(db: &OdbDb, bterm: &str, idx: usize) -> i32;
+        fn bpin_get_b_box_y_max(db: &OdbDb, bterm: &str, idx: usize) -> i32;
+        fn bpin_get_b_box_dx(db: &OdbDb, bterm: &str, idx: usize) -> i32;
+        fn bpin_get_b_box_dy(db: &OdbDb, bterm: &str, idx: usize) -> i32;
+        fn bpin_has_effective_width(db: &OdbDb, bterm: &str, idx: usize) -> bool;
+        fn bpin_get_effective_width(db: &OdbDb, bterm: &str, idx: usize) -> i32;
+        fn bpin_has_min_spacing(db: &OdbDb, bterm: &str, idx: usize) -> bool;
+        fn bpin_get_min_spacing(db: &OdbDb, bterm: &str, idx: usize) -> i32;
+        fn mpin_get_m_term(db: &OdbDb, master: &str, term: &str, idx: usize) -> String;
+        fn mpin_get_master(db: &OdbDb, master: &str, term: &str, idx: usize) -> String;
+        fn mpin_get_b_box_x_min(db: &OdbDb, master: &str, term: &str, idx: usize) -> i32;
+        fn mpin_get_b_box_y_min(db: &OdbDb, master: &str, term: &str, idx: usize) -> i32;
+        fn mpin_get_b_box_x_max(db: &OdbDb, master: &str, term: &str, idx: usize) -> i32;
+        fn mpin_get_b_box_y_max(db: &OdbDb, master: &str, term: &str, idx: usize) -> i32;
+        fn mpin_get_b_box_dx(db: &OdbDb, master: &str, term: &str, idx: usize) -> i32;
+        fn mpin_get_b_box_dy(db: &OdbDb, master: &str, term: &str, idx: usize) -> i32;
+        fn techviarule_get_name(db: &OdbDb, idx: usize) -> String;
+        fn techviarule_get_via_count(db: &OdbDb, idx: usize) -> u32;
+        fn techviarule_get_via_layer_rule_count(db: &OdbDb, idx: usize) -> u32;
+        fn techviagenrule_get_name(db: &OdbDb, idx: usize) -> String;
+        fn techviagenrule_is_default(db: &OdbDb, idx: usize) -> bool;
+        fn techviagenrule_get_via_layer_rule_count(db: &OdbDb, idx: usize) -> u32;
+        fn techvialayerrule_get_layer(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> String;
+        fn techvialayerrule_has_width(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> bool;
+        fn techvialayerrule_has_enclosure(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> bool;
+        fn techvialayerrule_has_overhang(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> bool;
+        fn techvialayerrule_get_overhang(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> i32;
+        fn techvialayerrule_has_metal_overhang(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> bool;
+        fn techvialayerrule_get_metal_overhang(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> i32;
+        fn techvialayerrule_has_rect(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> bool;
+        fn techvialayerrule_has_spacing(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> bool;
+        fn techvialayerrule_has_resistance(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> bool;
+        fn techvialayerrule_get_resistance(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> f64;
+        fn techvialayerrule_get_width_min_width(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> i32;
+        fn techvialayerrule_get_width_max_width(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> i32;
+        fn techvialayerrule_get_enclosure_overhang1(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> i32;
+        fn techvialayerrule_get_enclosure_overhang2(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> i32;
+        fn techvialayerrule_get_spacing_x_spacing(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> i32;
+        fn techvialayerrule_get_spacing_y_spacing(db: &OdbDb, gen_idx: usize, layer_idx: usize) -> i32;
+        fn layerantenna_is_valid(db: &OdbDb, layer: &str) -> bool;
+        fn layerantenna_has_area_factor(db: &OdbDb, layer: &str) -> bool;
+        fn layerantenna_has_side_area_factor(db: &OdbDb, layer: &str) -> bool;
+        fn layerantenna_get_area_factor(db: &OdbDb, layer: &str) -> f64;
+        fn layerantenna_get_side_area_factor(db: &OdbDb, layer: &str) -> f64;
+        fn layerantenna_is_area_factor_diff_use_only(db: &OdbDb, layer: &str) -> bool;
+        fn layerantenna_is_side_area_factor_diff_use_only(db: &OdbDb, layer: &str) -> bool;
+        fn layerantenna_has_antenna_cum_routing_plus_cut(db: &OdbDb, layer: &str) -> bool;
+        fn layerantenna_get_p_a_r(db: &OdbDb, layer: &str) -> f64;
+        fn layerantenna_get_c_a_r(db: &OdbDb, layer: &str) -> f64;
+        fn layerantenna_get_p_s_r(db: &OdbDb, layer: &str) -> f64;
+        fn layerantenna_get_c_s_r(db: &OdbDb, layer: &str) -> f64;
+        fn layerantenna_get_gate_plus_diff_factor(db: &OdbDb, layer: &str) -> f64;
+        fn layerantenna_get_area_minus_diff_factor(db: &OdbDb, layer: &str) -> f64;
     }
 }
 
@@ -659,6 +788,18 @@ pub use ffi_gen::{
     box_x_min,
     box_y_max,
     box_y_min,
+    bpin_get_b_box_dx,
+    bpin_get_b_box_dy,
+    bpin_get_b_box_x_max,
+    bpin_get_b_box_x_min,
+    bpin_get_b_box_y_max,
+    bpin_get_b_box_y_min,
+    bpin_get_b_term,
+    bpin_get_effective_width,
+    bpin_get_min_spacing,
+    bpin_get_placement_status,
+    bpin_has_effective_width,
+    bpin_has_min_spacing,
     bterm_get_b_box_dx,
     bterm_get_b_box_dy,
     bterm_get_b_box_x_max,
@@ -684,6 +825,28 @@ pub use ffi_gen::{
     bterm_is_set_spef_mark,
     bterm_is_special,
     bterm_sta_vertex_id,
+    capnode_check_c_c,
+    capnode_get_children_cnt,
+    capnode_get_net,
+    capnode_get_node,
+    capnode_get_shape_id,
+    capnode_get_sort_index,
+    capnode_incr_children_cnt,
+    capnode_is_b_term,
+    capnode_is_branch,
+    capnode_is_dangling,
+    capnode_is_foreign,
+    capnode_is_i_term,
+    capnode_is_internal,
+    capnode_is_name,
+    capnode_is_select,
+    capnode_is_tree_node,
+    ccseg_get_infile_cnt,
+    ccseg_get_source_net,
+    ccseg_get_source_node_num,
+    ccseg_get_target_net,
+    ccseg_get_target_node_num,
+    ccseg_is_marked,
     fill_get_tech_layer,
     fill_mask_number,
     fill_needs_o_p_c,
@@ -817,6 +980,20 @@ pub use ffi_gen::{
     layer_is_rect_only_except_non_core_pins,
     layer_is_right_way_on_grid_only,
     layer_is_right_way_on_grid_only_check_mask,
+    layerantenna_get_area_factor,
+    layerantenna_get_area_minus_diff_factor,
+    layerantenna_get_c_a_r,
+    layerantenna_get_c_s_r,
+    layerantenna_get_gate_plus_diff_factor,
+    layerantenna_get_p_a_r,
+    layerantenna_get_p_s_r,
+    layerantenna_get_side_area_factor,
+    layerantenna_has_antenna_cum_routing_plus_cut,
+    layerantenna_has_area_factor,
+    layerantenna_has_side_area_factor,
+    layerantenna_is_area_factor_diff_use_only,
+    layerantenna_is_side_area_factor_diff_use_only,
+    layerantenna_is_valid,
     level_shifter_get_applies_to,
     level_shifter_get_applies_to_boundary,
     level_shifter_get_cell_input,
@@ -837,6 +1014,11 @@ pub use ffi_gen::{
     level_shifter_is_force_shift,
     level_shifter_is_no_shift,
     level_shifter_is_use_functional_equivalence,
+    lib_get_const_name,
+    lib_get_db_units_per_micron,
+    lib_get_lef_units,
+    lib_get_name,
+    lib_get_tech,
     marker_cat_get_description,
     marker_cat_get_marker_count,
     marker_cat_get_max_markers,
@@ -917,6 +1099,14 @@ pub use ffi_gen::{
     module_get_owner,
     module_get_parent_module,
     module_is_top,
+    mpin_get_b_box_dx,
+    mpin_get_b_box_dy,
+    mpin_get_b_box_x_max,
+    mpin_get_b_box_x_min,
+    mpin_get_b_box_y_max,
+    mpin_get_b_box_y_min,
+    mpin_get_m_term,
+    mpin_get_master,
     mterm_get_b_box_dx,
     mterm_get_b_box_dy,
     mterm_get_b_box_x_max,
@@ -1028,6 +1218,8 @@ pub use ffi_gen::{
     nth_inst_get_i_terms,
     nth_isolation_get_isolation_cells,
     nth_layer_get_tech_layer_cut_class_rules,
+    nth_lib_get_masters,
+    nth_lib_get_sites,
     nth_marker_cat_get_marker_categories,
     nth_marker_cat_get_markers,
     nth_master_get_m_terms,
@@ -1052,6 +1244,11 @@ pub use ffi_gen::{
     nth_pwr_domain_get_power_switches,
     nth_region_get_groups,
     nth_region_get_region_insts,
+    nth_tech_get_layers,
+    nth_tech_get_non_default_rules,
+    nth_tech_get_via_generate_rules,
+    nth_tech_get_via_rules,
+    nth_tech_get_vias,
     num_block_get_b_terms,
     num_block_get_children,
     num_block_get_component_mask_shift,
@@ -1083,6 +1280,8 @@ pub use ffi_gen::{
     num_inst_get_i_terms,
     num_isolation_get_isolation_cells,
     num_layer_get_tech_layer_cut_class_rules,
+    num_lib_get_masters,
+    num_lib_get_sites,
     num_marker_cat_get_marker_categories,
     num_marker_cat_get_markers,
     num_master_get_m_terms,
@@ -1107,6 +1306,11 @@ pub use ffi_gen::{
     num_pwr_domain_get_power_switches,
     num_region_get_groups,
     num_region_get_region_insts,
+    num_tech_get_layers,
+    num_tech_get_non_default_rules,
+    num_tech_get_via_generate_rules,
+    num_tech_get_via_rules,
+    num_tech_get_vias,
     obs_get_block,
     obs_get_effective_width,
     obs_get_instance,
@@ -1144,6 +1348,20 @@ pub use ffi_gen::{
     row_get_site,
     row_get_site_count,
     row_get_spacing,
+    rseg_allocated_cap,
+    rseg_check_c_c,
+    rseg_get_coords_x,
+    rseg_get_coords_y,
+    rseg_get_net,
+    rseg_get_shape_id,
+    rseg_get_source_node,
+    rseg_get_target_node,
+    rseg_path_low_to_high,
+    rseg_updated_cap,
+    sbox_get_via_bottom_layer_mask,
+    sbox_get_via_cut_layer_mask,
+    sbox_get_via_top_layer_mask,
+    sbox_has_via_layer_masks,
     site_get_const_name,
     site_get_height,
     site_get_lib,
@@ -1158,6 +1376,23 @@ pub use ffi_gen::{
     swire_get_net,
     swire_get_shield,
     swire_get_wire_type,
+    tech_first_backside_routing_layer,
+    tech_first_frontside_routing_layer,
+    tech_get_db_units_per_micron,
+    tech_get_extraction_rules_file,
+    tech_get_layer_count,
+    tech_get_lef_units,
+    tech_get_lef_version,
+    tech_get_lef_version_str,
+    tech_get_manufacturing_grid,
+    tech_get_name,
+    tech_get_routing_layer_count,
+    tech_get_via_count,
+    tech_has_clearance_measure,
+    tech_has_manufacturing_grid,
+    tech_has_no_wire_ext_at_pin,
+    tech_has_use_min_spacing_obs,
+    tech_has_use_min_spacing_pin,
     techvia_get_bottom_layer,
     techvia_get_const_name,
     techvia_get_name,
@@ -1170,6 +1405,29 @@ pub use ffi_gen::{
     techvia_has_params,
     techvia_is_default,
     techvia_is_top_of_stack,
+    techviagenrule_get_name,
+    techviagenrule_get_via_layer_rule_count,
+    techviagenrule_is_default,
+    techvialayerrule_get_enclosure_overhang1,
+    techvialayerrule_get_enclosure_overhang2,
+    techvialayerrule_get_layer,
+    techvialayerrule_get_metal_overhang,
+    techvialayerrule_get_overhang,
+    techvialayerrule_get_resistance,
+    techvialayerrule_get_spacing_x_spacing,
+    techvialayerrule_get_spacing_y_spacing,
+    techvialayerrule_get_width_max_width,
+    techvialayerrule_get_width_min_width,
+    techvialayerrule_has_enclosure,
+    techvialayerrule_has_metal_overhang,
+    techvialayerrule_has_overhang,
+    techvialayerrule_has_rect,
+    techvialayerrule_has_resistance,
+    techvialayerrule_has_spacing,
+    techvialayerrule_has_width,
+    techviarule_get_name,
+    techviarule_get_via_count,
+    techviarule_get_via_layer_rule_count,
     trackgrid_get_block,
     trackgrid_get_num_grid_patterns_x,
     trackgrid_get_num_grid_patterns_y,

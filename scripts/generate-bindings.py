@@ -74,6 +74,21 @@ TARGETS = {
     "dbPowerSwitch":  {"key": "pwr_switch",    "args": ["name"], "resolve": "gen_pwrswitch(h, name)"},
     "dbIsolation":    {"key": "isolation",     "args": ["name"], "resolve": "gen_isolation(h, name)"},
     "dbLevelShifter": {"key": "level_shifter", "args": ["name"], "resolve": "gen_levelshifter(h, name)"},
+    # tech / lib (core) + parasitics (core, block-indexed — mostly scalar R/C getters)
+    "dbTech":     {"key": "tech",    "args": [],                            "resolve": "gen_tech(h)"},
+    "dbLib":      {"key": "lib",     "args": ["name"],                      "resolve": "gen_lib(h, name)"},
+    "dbCapNode":  {"key": "capnode", "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_capnode(h, idx)"},
+    "dbRSeg":     {"key": "rseg",    "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_rseg(h, idx)"},
+    "dbCCSeg":    {"key": "ccseg",   "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_ccseg(h, idx)"},
+    # physical pins / special-wire boxes + tech via & antenna rules (all core classes)
+    "dbSBox":     {"key": "sbox",  "args": ["net", {"name": "swire_idx", "type": "idx"}, {"name": "sbox_idx", "type": "idx"}], "resolve": "gen_sbox(h, net, swire_idx, sbox_idx)"},
+    "dbBPin":     {"key": "bpin",  "args": ["bterm", {"name": "idx", "type": "idx"}], "resolve": "gen_bpin(h, bterm, idx)"},
+    "dbMPin":     {"key": "mpin",  "args": ["master", "term", {"name": "idx", "type": "idx"}], "resolve": "gen_mpin(h, master, term, idx)"},
+    "dbTechViaRule":         {"key": "techviarule",      "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_techviarule(h, idx)"},
+    "dbTechViaGenerateRule": {"key": "techviagenrule",   "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_techviagenrule(h, idx)"},
+    "dbTechViaLayerRule":    {"key": "techvialayerrule", "args": [{"name": "gen_idx", "type": "idx"}, {"name": "layer_idx", "type": "idx"}], "resolve": "gen_techvialayerrule(h, gen_idx, layer_idx)"},
+    "dbTechLayerAntennaRule": {"key": "layerantenna",     "args": ["layer"], "resolve": "gen_layerantenna(h, layer)"},
+    "dbTechAntennaPinModel":  {"key": "antennapinmodel",  "args": ["master", "term"], "resolve": "gen_antennapinmodel(h, master, term)"},
 }
 
 
@@ -674,6 +689,40 @@ def main() -> int:
         "  odb::dbBlock* b = gen_block(h); return b ? b->findIsolation(gs(n).c_str()) : nullptr; }\n"
         "static odb::dbLevelShifter* gen_levelshifter(const OdbDb& h, rust::Str n) {\n"
         "  odb::dbBlock* b = gen_block(h); return b ? b->findLevelShifter(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbTech* gen_tech(const OdbDb& h) { return h.db->getTech(); }\n"
+        "static odb::dbLib* gen_lib(const OdbDb& h, rust::Str n) {\n"
+        "  std::string name = gs(n);\n"
+        "  for (odb::dbLib* l : h.db->getLibs()) { if (l->getName() == name) return l; } return nullptr; }\n"
+        "static odb::dbCapNode* gen_capnode(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbCapNode* x : b->getCapNodes()) { if (k++ == i) return x; } return nullptr; }\n"
+        "static odb::dbRSeg* gen_rseg(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbRSeg* x : b->getRSegs()) { if (k++ == i) return x; } return nullptr; }\n"
+        "static odb::dbCCSeg* gen_ccseg(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbCCSeg* x : b->getCCSegs()) { if (k++ == i) return x; } return nullptr; }\n"
+        "static odb::dbSBox* gen_sbox(const OdbDb& h, rust::Str net, std::size_t swire_i, std::size_t sbox_i) {\n"
+        "  odb::dbSWire* w = gen_swire(h, net, swire_i); if (!w) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbSBox* b : w->getWires()) { if (k++ == sbox_i) return b; } return nullptr; }\n"
+        "static odb::dbBPin* gen_bpin(const OdbDb& h, rust::Str bterm, std::size_t i) {\n"
+        "  odb::dbBTerm* t = gen_bterm(h, bterm); if (!t) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbBPin* p : t->getBPins()) { if (k++ == i) return p; } return nullptr; }\n"
+        "static odb::dbMPin* gen_mpin(const OdbDb& h, rust::Str master, rust::Str term, std::size_t i) {\n"
+        "  odb::dbMTerm* mt = gen_mterm(h, master, term); if (!mt) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbMPin* p : mt->getMPins()) { if (k++ == i) return p; } return nullptr; }\n"
+        "static odb::dbTechViaRule* gen_techviarule(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbTech* t = h.db->getTech(); if (!t) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbTechViaRule* x : t->getViaRules()) { if (k++ == i) return x; } return nullptr; }\n"
+        "static odb::dbTechViaGenerateRule* gen_techviagenrule(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbTech* t = h.db->getTech(); if (!t) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbTechViaGenerateRule* x : t->getViaGenerateRules()) { if (k++ == i) return x; } return nullptr; }\n"
+        "static odb::dbTechViaLayerRule* gen_techvialayerrule(const OdbDb& h, std::size_t gen_i, std::size_t layer_i) {\n"
+        "  odb::dbTechViaGenerateRule* g = gen_techviagenrule(h, gen_i); return g ? g->getViaLayerRule(layer_i) : nullptr; }\n"
+        "static odb::dbTechLayerAntennaRule* gen_layerantenna(const OdbDb& h, rust::Str layer) {\n"
+        "  odb::dbTechLayer* l = gen_techlayer(h, layer); return l ? l->getDefaultAntennaRule() : nullptr; }\n"
+        "static odb::dbTechAntennaPinModel* gen_antennapinmodel(const OdbDb& h, rust::Str master, rust::Str term) {\n"
+        "  odb::dbMTerm* mt = gen_mterm(h, master, term); return mt ? mt->getDefaultAntennaModel() : nullptr; }\n"
         "}  // namespace\n")
 
     # ---- generated_resolvers.h (shared by the read + write .cc) -----------------

@@ -86,3 +86,37 @@ inline odb::dbIsolation* gen_isolation(const OdbDb& h, rust::Str n) {
   odb::dbBlock* b = gen_block(h); return b ? b->findIsolation(gs(n).c_str()) : nullptr; }
 inline odb::dbLevelShifter* gen_levelshifter(const OdbDb& h, rust::Str n) {
   odb::dbBlock* b = gen_block(h); return b ? b->findLevelShifter(gs(n).c_str()) : nullptr; }
+inline odb::dbTech* gen_tech(const OdbDb& h) { return h.db->getTech(); }
+inline odb::dbLib* gen_lib(const OdbDb& h, rust::Str n) {
+  std::string name = gs(n);
+  for (odb::dbLib* l : h.db->getLibs()) { if (l->getName() == name) return l; } return nullptr; }
+inline odb::dbCapNode* gen_capnode(const OdbDb& h, std::size_t i) {
+  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;
+  std::size_t k = 0; for (odb::dbCapNode* x : b->getCapNodes()) { if (k++ == i) return x; } return nullptr; }
+inline odb::dbRSeg* gen_rseg(const OdbDb& h, std::size_t i) {
+  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;
+  std::size_t k = 0; for (odb::dbRSeg* x : b->getRSegs()) { if (k++ == i) return x; } return nullptr; }
+inline odb::dbCCSeg* gen_ccseg(const OdbDb& h, std::size_t i) {
+  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;
+  std::size_t k = 0; for (odb::dbCCSeg* x : b->getCCSegs()) { if (k++ == i) return x; } return nullptr; }
+inline odb::dbSBox* gen_sbox(const OdbDb& h, rust::Str net, std::size_t swire_i, std::size_t sbox_i) {
+  odb::dbSWire* w = gen_swire(h, net, swire_i); if (!w) return nullptr;
+  std::size_t k = 0; for (odb::dbSBox* b : w->getWires()) { if (k++ == sbox_i) return b; } return nullptr; }
+inline odb::dbBPin* gen_bpin(const OdbDb& h, rust::Str bterm, std::size_t i) {
+  odb::dbBTerm* t = gen_bterm(h, bterm); if (!t) return nullptr;
+  std::size_t k = 0; for (odb::dbBPin* p : t->getBPins()) { if (k++ == i) return p; } return nullptr; }
+inline odb::dbMPin* gen_mpin(const OdbDb& h, rust::Str master, rust::Str term, std::size_t i) {
+  odb::dbMTerm* mt = gen_mterm(h, master, term); if (!mt) return nullptr;
+  std::size_t k = 0; for (odb::dbMPin* p : mt->getMPins()) { if (k++ == i) return p; } return nullptr; }
+inline odb::dbTechViaRule* gen_techviarule(const OdbDb& h, std::size_t i) {
+  odb::dbTech* t = h.db->getTech(); if (!t) return nullptr;
+  std::size_t k = 0; for (odb::dbTechViaRule* x : t->getViaRules()) { if (k++ == i) return x; } return nullptr; }
+inline odb::dbTechViaGenerateRule* gen_techviagenrule(const OdbDb& h, std::size_t i) {
+  odb::dbTech* t = h.db->getTech(); if (!t) return nullptr;
+  std::size_t k = 0; for (odb::dbTechViaGenerateRule* x : t->getViaGenerateRules()) { if (k++ == i) return x; } return nullptr; }
+inline odb::dbTechViaLayerRule* gen_techvialayerrule(const OdbDb& h, std::size_t gen_i, std::size_t layer_i) {
+  odb::dbTechViaGenerateRule* g = gen_techviagenrule(h, gen_i); return g ? g->getViaLayerRule(layer_i) : nullptr; }
+inline odb::dbTechLayerAntennaRule* gen_layerantenna(const OdbDb& h, rust::Str layer) {
+  odb::dbTechLayer* l = gen_techlayer(h, layer); return l ? l->getDefaultAntennaRule() : nullptr; }
+inline odb::dbTechAntennaPinModel* gen_antennapinmodel(const OdbDb& h, rust::Str master, rust::Str term) {
+  odb::dbMTerm* mt = gen_mterm(h, master, term); return mt ? mt->getDefaultAntennaModel() : nullptr; }
