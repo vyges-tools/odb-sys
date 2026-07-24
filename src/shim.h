@@ -35,6 +35,10 @@ rust::String output_pin(const OdbDb& db, rust::Str inst);        // first output
 rust::String net_of(const OdbDb& db, rust::Str inst, rust::Str pin);  // net on a pin, "" if none
 int32_t inst_x(const OdbDb& db, rust::Str inst);   // instance origin x in DBU (0 if not found)
 int32_t inst_y(const OdbDb& db, rust::Str inst);   // instance origin y in DBU (0 if not found)
+rust::String nth_bterm_name(const OdbDb& db, std::size_t i);         // block port (bterm), "" if out of range
+rust::String bterm_net(const OdbDb& db, rust::Str bterm);            // net on a port, "" if none
+int32_t bterm_x(const OdbDb& db, rust::Str bterm);                   // port first-pin x in DBU (0 if none)
+int32_t bterm_y(const OdbDb& db, rust::Str bterm);                   // port first-pin y in DBU (0 if none)
 
 // ---- write / ECO primitives (the InsertECOBuffers building blocks) -----------
 void create_net(const OdbDb& db, rust::Str name);                       // throws on dup/failure

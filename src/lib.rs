@@ -35,6 +35,10 @@ mod ffi {
         fn net_of(db: &OdbDb, inst: &str, pin: &str) -> String;
         fn inst_x(db: &OdbDb, inst: &str) -> i32;
         fn inst_y(db: &OdbDb, inst: &str) -> i32;
+        fn nth_bterm_name(db: &OdbDb, i: usize) -> String;
+        fn bterm_net(db: &OdbDb, bterm: &str) -> String;
+        fn bterm_x(db: &OdbDb, bterm: &str) -> i32;
+        fn bterm_y(db: &OdbDb, bterm: &str) -> i32;
 
         // write / ECO primitives
         fn create_net(db: &OdbDb, name: &str) -> Result<()>;
@@ -48,7 +52,8 @@ mod ffi {
 
 #[cfg(unix)]
 pub use ffi::{
-    block_name, connect, create_inst, create_net, disconnect, find_master, first_master_name,
-    input_pin, inst_x, inst_y, net_of, nth_inst_name, num_bterms, num_insts, num_nets, open_db,
-    output_pin, set_inst_location, set_inst_orient, write_db, OdbDb,
+    block_name, bterm_net, bterm_x, bterm_y, connect, create_inst, create_net, disconnect,
+    find_master, first_master_name, input_pin, inst_x, inst_y, net_of, nth_bterm_name,
+    nth_inst_name, num_bterms, num_insts, num_nets, open_db, output_pin, set_inst_location,
+    set_inst_orient, write_db, OdbDb,
 };

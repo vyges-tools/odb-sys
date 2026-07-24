@@ -6,6 +6,7 @@
 #include <string>
 
 using odb::dbBlock;
+using odb::dbBTerm;
 using odb::dbInst;
 using odb::dbITerm;
 using odb::dbMaster;
@@ -113,6 +114,35 @@ int32_t inst_x(const OdbDb& h, rust::Str inst) {
   int x = 0, y = 0;
   i->getLocation(x, y);
   return x;
+}
+rust::String nth_bterm_name(const OdbDb& h, std::size_t i) {
+  dbBlock* b = block_of(h);
+  if (!b) return rust::String();
+  std::size_t k = 0;
+  for (dbBTerm* bt : b->getBTerms()) {
+    if (k++ == i) return rust::String(bt->getName());
+  }
+  return rust::String();
+}
+rust::String bterm_net(const OdbDb& h, rust::Str bterm) {
+  dbBlock* b = block_of(h);
+  dbBTerm* bt = b ? b->findBTerm(s(bterm).c_str()) : nullptr;
+  dbNet* n = bt ? bt->getNet() : nullptr;
+  return rust::String(n ? n->getName() : std::string());
+}
+int32_t bterm_x(const OdbDb& h, rust::Str bterm) {
+  dbBlock* b = block_of(h);
+  dbBTerm* bt = b ? b->findBTerm(s(bterm).c_str()) : nullptr;
+  int x = 0, y = 0;
+  if (bt) bt->getFirstPinLocation(x, y);
+  return x;
+}
+int32_t bterm_y(const OdbDb& h, rust::Str bterm) {
+  dbBlock* b = block_of(h);
+  dbBTerm* bt = b ? b->findBTerm(s(bterm).c_str()) : nullptr;
+  int x = 0, y = 0;
+  if (bt) bt->getFirstPinLocation(x, y);
+  return y;
 }
 int32_t inst_y(const OdbDb& h, rust::Str inst) {
   dbBlock* b = block_of(h);
