@@ -39,6 +39,7 @@ long tail of accessors is bound *mechanically* instead of by hand:
 | `dbModule` · `dbGroup` · `dbRegion` | name | `block->find{Module,Group,Region}` |
 | `dbMarkerCategory` | name | `block->findMarkerCategory` |
 | `dbModInst` · `dbModNet` | hierarchical name | `block->find{ModInst,ModNet}` |
+| `dbPowerDomain` · `dbPowerSwitch` · `dbIsolation` · `dbLevelShifter` | name | `block->find*` (UPF power intent) |
 
 Classes with **no name** are addressed by **position** instead (the index-addressing mode —
 an arg typed `idx` → `usize`/`std::size_t`):

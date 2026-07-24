@@ -165,6 +165,32 @@ mod ffi_gen_write {
         fn marker_set_visited(db: &OdbDb, category: &str, idx: usize, visited: bool) -> Result<()>;
         fn marker_set_visible(db: &OdbDb, category: &str, idx: usize, visible: bool) -> Result<()>;
         fn marker_set_waived(db: &OdbDb, category: &str, idx: usize, waived: bool) -> Result<()>;
+        fn pwr_domain_set_top(db: &OdbDb, name: &str, top: bool) -> Result<()>;
+        fn pwr_domain_set_voltage(db: &OdbDb, name: &str, voltage: f32) -> Result<()>;
+        fn pwr_switch_set_out_supply_port(db: &OdbDb, name: &str, out_port: &str, net: &str) -> Result<()>;
+        fn isolation_set_applies_to(db: &OdbDb, name: &str, applies_to: &str) -> Result<()>;
+        fn isolation_set_clamp_value(db: &OdbDb, name: &str, clamp_value: &str) -> Result<()>;
+        fn isolation_set_isolation_signal(db: &OdbDb, name: &str, isolation_signal: &str) -> Result<()>;
+        fn isolation_set_isolation_sense(db: &OdbDb, name: &str, isolation_sense: &str) -> Result<()>;
+        fn isolation_set_location(db: &OdbDb, name: &str, location: &str) -> Result<()>;
+        fn level_shifter_set_source(db: &OdbDb, name: &str, source: &str) -> Result<()>;
+        fn level_shifter_set_sink(db: &OdbDb, name: &str, sink: &str) -> Result<()>;
+        fn level_shifter_set_use_functional_equivalence(db: &OdbDb, name: &str, use_functional_equivalence: bool) -> Result<()>;
+        fn level_shifter_set_applies_to(db: &OdbDb, name: &str, applies_to: &str) -> Result<()>;
+        fn level_shifter_set_applies_to_boundary(db: &OdbDb, name: &str, applies_to_boundary: &str) -> Result<()>;
+        fn level_shifter_set_rule(db: &OdbDb, name: &str, rule: &str) -> Result<()>;
+        fn level_shifter_set_threshold(db: &OdbDb, name: &str, threshold: f32) -> Result<()>;
+        fn level_shifter_set_no_shift(db: &OdbDb, name: &str, no_shift: bool) -> Result<()>;
+        fn level_shifter_set_force_shift(db: &OdbDb, name: &str, force_shift: bool) -> Result<()>;
+        fn level_shifter_set_location(db: &OdbDb, name: &str, location: &str) -> Result<()>;
+        fn level_shifter_set_input_supply(db: &OdbDb, name: &str, input_supply: &str) -> Result<()>;
+        fn level_shifter_set_output_supply(db: &OdbDb, name: &str, output_supply: &str) -> Result<()>;
+        fn level_shifter_set_internal_supply(db: &OdbDb, name: &str, internal_supply: &str) -> Result<()>;
+        fn level_shifter_set_name_prefix(db: &OdbDb, name: &str, name_prefix: &str) -> Result<()>;
+        fn level_shifter_set_name_suffix(db: &OdbDb, name: &str, name_suffix: &str) -> Result<()>;
+        fn level_shifter_set_cell_name(db: &OdbDb, name: &str, cell_name: &str) -> Result<()>;
+        fn level_shifter_set_cell_input(db: &OdbDb, name: &str, cell_input: &str) -> Result<()>;
+        fn level_shifter_set_cell_output(db: &OdbDb, name: &str, cell_output: &str) -> Result<()>;
     }
 }
 
@@ -211,6 +237,11 @@ pub use ffi_gen_write::{
     inst_set_user_flag2,
     inst_set_user_flag3,
     inst_set_weight,
+    isolation_set_applies_to,
+    isolation_set_clamp_value,
+    isolation_set_isolation_sense,
+    isolation_set_isolation_signal,
+    isolation_set_location,
     iterm_clear_connected,
     iterm_clear_pref_access_points,
     iterm_clear_special,
@@ -248,6 +279,24 @@ pub use ffi_gen_write::{
     layer_set_wire_extension,
     layer_set_wrong_way_min_width,
     layer_set_wrong_way_width,
+    level_shifter_set_applies_to,
+    level_shifter_set_applies_to_boundary,
+    level_shifter_set_cell_input,
+    level_shifter_set_cell_name,
+    level_shifter_set_cell_output,
+    level_shifter_set_force_shift,
+    level_shifter_set_input_supply,
+    level_shifter_set_internal_supply,
+    level_shifter_set_location,
+    level_shifter_set_name_prefix,
+    level_shifter_set_name_suffix,
+    level_shifter_set_no_shift,
+    level_shifter_set_output_supply,
+    level_shifter_set_rule,
+    level_shifter_set_sink,
+    level_shifter_set_source,
+    level_shifter_set_threshold,
+    level_shifter_set_use_functional_equivalence,
     marker_cat_set_description,
     marker_cat_set_max_markers,
     marker_cat_set_source,
@@ -313,6 +362,9 @@ pub use ffi_gen_write::{
     obs_set_min_spacing,
     obs_set_pushed_down,
     obs_set_slot_obstruction,
+    pwr_domain_set_top,
+    pwr_domain_set_voltage,
+    pwr_switch_set_out_supply_port,
     region_set_invalid,
     site_set_height,
     site_set_symmetry_r90,

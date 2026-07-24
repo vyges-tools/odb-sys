@@ -552,3 +552,46 @@ rust::String moditerm_get_parent(const OdbDb& h, rust::Str modinst, std::size_t 
 rust::String moditerm_get_hierarchical_name(const OdbDb& h, rust::Str modinst, std::size_t idx) { auto* p = gen_moditerm(h, modinst, idx); return p ? rust::String(p->getHierarchicalName()) : rust::String(); }
 rust::String moditerm_get_mod_net(const OdbDb& h, rust::Str modinst, std::size_t idx) { auto* p = gen_moditerm(h, modinst, idx); if (!p) return rust::String(); auto* t = p->getModNet(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String moditerm_get_child_mod_b_term(const OdbDb& h, rust::Str modinst, std::size_t idx) { auto* p = gen_moditerm(h, modinst, idx); if (!p) return rust::String(); auto* t = p->getChildModBTerm(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String pwr_domain_get_name(const OdbDb& h, rust::Str name) { auto* p = gen_pwrdomain(h, name); if (!p) return rust::String(); const char* v = p->getName(); return rust::String(v ? v : ""); }
+rust::String pwr_domain_get_group(const OdbDb& h, rust::Str name) { auto* p = gen_pwrdomain(h, name); if (!p) return rust::String(); auto* t = p->getGroup(); return t ? rust::String(t->getName()) : rust::String(); }
+bool pwr_domain_is_top(const OdbDb& h, rust::Str name) { auto* p = gen_pwrdomain(h, name); return p ? p->isTop() : false; }
+rust::String pwr_domain_get_parent(const OdbDb& h, rust::Str name) { auto* p = gen_pwrdomain(h, name); if (!p) return rust::String(); auto* t = p->getParent(); return t ? rust::String(t->getName()) : rust::String(); }
+float pwr_domain_get_voltage(const OdbDb& h, rust::Str name) { auto* p = gen_pwrdomain(h, name); return p ? p->getVoltage() : 0.0f; }
+std::size_t num_pwr_domain_get_power_switches(const OdbDb& h, rust::Str name) { auto* p = gen_pwrdomain(h, name); return p ? p->getPowerSwitches().size() : 0; }
+rust::String nth_pwr_domain_get_power_switches(const OdbDb& h, rust::Str name, std::size_t i) { auto* p = gen_pwrdomain(h, name); if (!p) return rust::String(); auto v = p->getPowerSwitches(); if (i >= v.size()) return rust::String(); auto* e = v[i]; return rust::String(e->getName()); }
+std::size_t num_pwr_domain_get_isolations(const OdbDb& h, rust::Str name) { auto* p = gen_pwrdomain(h, name); return p ? p->getIsolations().size() : 0; }
+rust::String nth_pwr_domain_get_isolations(const OdbDb& h, rust::Str name, std::size_t i) { auto* p = gen_pwrdomain(h, name); if (!p) return rust::String(); auto v = p->getIsolations(); if (i >= v.size()) return rust::String(); auto* e = v[i]; return rust::String(e->getName()); }
+std::size_t num_pwr_domain_get_level_shifters(const OdbDb& h, rust::Str name) { auto* p = gen_pwrdomain(h, name); return p ? p->getLevelShifters().size() : 0; }
+rust::String nth_pwr_domain_get_level_shifters(const OdbDb& h, rust::Str name, std::size_t i) { auto* p = gen_pwrdomain(h, name); if (!p) return rust::String(); auto v = p->getLevelShifters(); if (i >= v.size()) return rust::String(); auto* e = v[i]; return rust::String(e->getName()); }
+rust::String pwr_switch_get_name(const OdbDb& h, rust::Str name) { auto* p = gen_pwrswitch(h, name); if (!p) return rust::String(); const char* v = p->getName(); return rust::String(v ? v : ""); }
+rust::String pwr_switch_get_power_domain(const OdbDb& h, rust::Str name) { auto* p = gen_pwrswitch(h, name); if (!p) return rust::String(); auto* t = p->getPowerDomain(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String pwr_switch_get_lib_cell(const OdbDb& h, rust::Str name) { auto* p = gen_pwrswitch(h, name); if (!p) return rust::String(); auto* t = p->getLibCell(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String isolation_get_name(const OdbDb& h, rust::Str name) { auto* p = gen_isolation(h, name); if (!p) return rust::String(); const char* v = p->getName(); return rust::String(v ? v : ""); }
+rust::String isolation_get_applies_to(const OdbDb& h, rust::Str name) { auto* p = gen_isolation(h, name); return p ? rust::String(p->getAppliesTo()) : rust::String(); }
+rust::String isolation_get_clamp_value(const OdbDb& h, rust::Str name) { auto* p = gen_isolation(h, name); return p ? rust::String(p->getClampValue()) : rust::String(); }
+rust::String isolation_get_isolation_signal(const OdbDb& h, rust::Str name) { auto* p = gen_isolation(h, name); return p ? rust::String(p->getIsolationSignal()) : rust::String(); }
+rust::String isolation_get_isolation_sense(const OdbDb& h, rust::Str name) { auto* p = gen_isolation(h, name); return p ? rust::String(p->getIsolationSense()) : rust::String(); }
+rust::String isolation_get_location(const OdbDb& h, rust::Str name) { auto* p = gen_isolation(h, name); return p ? rust::String(p->getLocation()) : rust::String(); }
+rust::String isolation_get_power_domain(const OdbDb& h, rust::Str name) { auto* p = gen_isolation(h, name); if (!p) return rust::String(); auto* t = p->getPowerDomain(); return t ? rust::String(t->getName()) : rust::String(); }
+std::size_t num_isolation_get_isolation_cells(const OdbDb& h, rust::Str name) { auto* p = gen_isolation(h, name); return p ? p->getIsolationCells().size() : 0; }
+rust::String nth_isolation_get_isolation_cells(const OdbDb& h, rust::Str name, std::size_t i) { auto* p = gen_isolation(h, name); if (!p) return rust::String(); auto v = p->getIsolationCells(); if (i >= v.size()) return rust::String(); auto* e = v[i]; return rust::String(e->getConstName()); }
+rust::String level_shifter_get_name(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); if (!p) return rust::String(); const char* v = p->getName(); return rust::String(v ? v : ""); }
+rust::String level_shifter_get_domain(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); if (!p) return rust::String(); auto* t = p->getDomain(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String level_shifter_get_source(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getSource()) : rust::String(); }
+rust::String level_shifter_get_sink(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getSink()) : rust::String(); }
+bool level_shifter_is_use_functional_equivalence(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? p->isUseFunctionalEquivalence() : false; }
+rust::String level_shifter_get_applies_to(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getAppliesTo()) : rust::String(); }
+rust::String level_shifter_get_applies_to_boundary(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getAppliesToBoundary()) : rust::String(); }
+rust::String level_shifter_get_rule(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getRule()) : rust::String(); }
+float level_shifter_get_threshold(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? p->getThreshold() : 0.0f; }
+bool level_shifter_is_no_shift(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? p->isNoShift() : false; }
+bool level_shifter_is_force_shift(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? p->isForceShift() : false; }
+rust::String level_shifter_get_location(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getLocation()) : rust::String(); }
+rust::String level_shifter_get_input_supply(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getInputSupply()) : rust::String(); }
+rust::String level_shifter_get_output_supply(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getOutputSupply()) : rust::String(); }
+rust::String level_shifter_get_internal_supply(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getInternalSupply()) : rust::String(); }
+rust::String level_shifter_get_name_prefix(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getNamePrefix()) : rust::String(); }
+rust::String level_shifter_get_name_suffix(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getNameSuffix()) : rust::String(); }
+rust::String level_shifter_get_cell_name(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getCellName()) : rust::String(); }
+rust::String level_shifter_get_cell_input(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getCellInput()) : rust::String(); }
+rust::String level_shifter_get_cell_output(const OdbDb& h, rust::Str name) { auto* p = gen_levelshifter(h, name); return p ? rust::String(p->getCellOutput()) : rust::String(); }

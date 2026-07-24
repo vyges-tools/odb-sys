@@ -555,6 +555,49 @@ mod ffi_gen {
         fn moditerm_get_hierarchical_name(db: &OdbDb, modinst: &str, idx: usize) -> String;
         fn moditerm_get_mod_net(db: &OdbDb, modinst: &str, idx: usize) -> String;
         fn moditerm_get_child_mod_b_term(db: &OdbDb, modinst: &str, idx: usize) -> String;
+        fn pwr_domain_get_name(db: &OdbDb, name: &str) -> String;
+        fn pwr_domain_get_group(db: &OdbDb, name: &str) -> String;
+        fn pwr_domain_is_top(db: &OdbDb, name: &str) -> bool;
+        fn pwr_domain_get_parent(db: &OdbDb, name: &str) -> String;
+        fn pwr_domain_get_voltage(db: &OdbDb, name: &str) -> f32;
+        fn num_pwr_domain_get_power_switches(db: &OdbDb, name: &str) -> usize;
+        fn nth_pwr_domain_get_power_switches(db: &OdbDb, name: &str, i: usize) -> String;
+        fn num_pwr_domain_get_isolations(db: &OdbDb, name: &str) -> usize;
+        fn nth_pwr_domain_get_isolations(db: &OdbDb, name: &str, i: usize) -> String;
+        fn num_pwr_domain_get_level_shifters(db: &OdbDb, name: &str) -> usize;
+        fn nth_pwr_domain_get_level_shifters(db: &OdbDb, name: &str, i: usize) -> String;
+        fn pwr_switch_get_name(db: &OdbDb, name: &str) -> String;
+        fn pwr_switch_get_power_domain(db: &OdbDb, name: &str) -> String;
+        fn pwr_switch_get_lib_cell(db: &OdbDb, name: &str) -> String;
+        fn isolation_get_name(db: &OdbDb, name: &str) -> String;
+        fn isolation_get_applies_to(db: &OdbDb, name: &str) -> String;
+        fn isolation_get_clamp_value(db: &OdbDb, name: &str) -> String;
+        fn isolation_get_isolation_signal(db: &OdbDb, name: &str) -> String;
+        fn isolation_get_isolation_sense(db: &OdbDb, name: &str) -> String;
+        fn isolation_get_location(db: &OdbDb, name: &str) -> String;
+        fn isolation_get_power_domain(db: &OdbDb, name: &str) -> String;
+        fn num_isolation_get_isolation_cells(db: &OdbDb, name: &str) -> usize;
+        fn nth_isolation_get_isolation_cells(db: &OdbDb, name: &str, i: usize) -> String;
+        fn level_shifter_get_name(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_domain(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_source(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_sink(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_is_use_functional_equivalence(db: &OdbDb, name: &str) -> bool;
+        fn level_shifter_get_applies_to(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_applies_to_boundary(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_rule(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_threshold(db: &OdbDb, name: &str) -> f32;
+        fn level_shifter_is_no_shift(db: &OdbDb, name: &str) -> bool;
+        fn level_shifter_is_force_shift(db: &OdbDb, name: &str) -> bool;
+        fn level_shifter_get_location(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_input_supply(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_output_supply(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_internal_supply(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_name_prefix(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_name_suffix(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_cell_name(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_cell_input(db: &OdbDb, name: &str) -> String;
+        fn level_shifter_get_cell_output(db: &OdbDb, name: &str) -> String;
     }
 }
 
@@ -688,6 +731,13 @@ pub use ffi_gen::{
     inst_is_pad,
     inst_is_physical_only,
     inst_is_placed,
+    isolation_get_applies_to,
+    isolation_get_clamp_value,
+    isolation_get_isolation_sense,
+    isolation_get_isolation_signal,
+    isolation_get_location,
+    isolation_get_name,
+    isolation_get_power_domain,
     iterm_get_b_box_dx,
     iterm_get_b_box_dy,
     iterm_get_b_box_x_max,
@@ -767,6 +817,26 @@ pub use ffi_gen::{
     layer_is_rect_only_except_non_core_pins,
     layer_is_right_way_on_grid_only,
     layer_is_right_way_on_grid_only_check_mask,
+    level_shifter_get_applies_to,
+    level_shifter_get_applies_to_boundary,
+    level_shifter_get_cell_input,
+    level_shifter_get_cell_name,
+    level_shifter_get_cell_output,
+    level_shifter_get_domain,
+    level_shifter_get_input_supply,
+    level_shifter_get_internal_supply,
+    level_shifter_get_location,
+    level_shifter_get_name,
+    level_shifter_get_name_prefix,
+    level_shifter_get_name_suffix,
+    level_shifter_get_output_supply,
+    level_shifter_get_rule,
+    level_shifter_get_sink,
+    level_shifter_get_source,
+    level_shifter_get_threshold,
+    level_shifter_is_force_shift,
+    level_shifter_is_no_shift,
+    level_shifter_is_use_functional_equivalence,
     marker_cat_get_description,
     marker_cat_get_marker_count,
     marker_cat_get_max_markers,
@@ -956,6 +1026,7 @@ pub use ffi_gen::{
     nth_group_get_power_nets,
     nth_inst_get_children,
     nth_inst_get_i_terms,
+    nth_isolation_get_isolation_cells,
     nth_layer_get_tech_layer_cut_class_rules,
     nth_marker_cat_get_marker_categories,
     nth_marker_cat_get_markers,
@@ -976,6 +1047,9 @@ pub use ffi_gen::{
     nth_module_get_ports,
     nth_net_get_b_terms,
     nth_net_get_i_terms,
+    nth_pwr_domain_get_isolations,
+    nth_pwr_domain_get_level_shifters,
+    nth_pwr_domain_get_power_switches,
     nth_region_get_groups,
     nth_region_get_region_insts,
     num_block_get_b_terms,
@@ -1007,6 +1081,7 @@ pub use ffi_gen::{
     num_group_get_power_nets,
     num_inst_get_children,
     num_inst_get_i_terms,
+    num_isolation_get_isolation_cells,
     num_layer_get_tech_layer_cut_class_rules,
     num_marker_cat_get_marker_categories,
     num_marker_cat_get_markers,
@@ -1027,6 +1102,9 @@ pub use ffi_gen::{
     num_module_get_ports,
     num_net_get_b_terms,
     num_net_get_i_terms,
+    num_pwr_domain_get_isolations,
+    num_pwr_domain_get_level_shifters,
+    num_pwr_domain_get_power_switches,
     num_region_get_groups,
     num_region_get_region_insts,
     obs_get_block,
@@ -1040,6 +1118,14 @@ pub use ffi_gen::{
     obs_is_pushed_down,
     obs_is_slot_obstruction,
     obs_is_system_reserved,
+    pwr_domain_get_group,
+    pwr_domain_get_name,
+    pwr_domain_get_parent,
+    pwr_domain_get_voltage,
+    pwr_domain_is_top,
+    pwr_switch_get_lib_cell,
+    pwr_switch_get_name,
+    pwr_switch_get_power_domain,
     region_get_block,
     region_get_name,
     region_is_invalid,

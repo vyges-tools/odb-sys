@@ -69,6 +69,11 @@ TARGETS = {
     "dbModNet":   {"key": "modnet",   "args": ["name"], "resolve": "gen_modnet(h, name)"},
     "dbModBTerm": {"key": "modbterm", "args": ["module", {"name": "idx", "type": "idx"}], "resolve": "gen_modbterm(h, module, idx)"},
     "dbModITerm": {"key": "moditerm", "args": ["modinst", {"name": "idx", "type": "idx"}], "resolve": "gen_moditerm(h, modinst, idx)"},
+    # power intent (UPF) — all name-addressable via block->find*
+    "dbPowerDomain":  {"key": "pwr_domain",    "args": ["name"], "resolve": "gen_pwrdomain(h, name)"},
+    "dbPowerSwitch":  {"key": "pwr_switch",    "args": ["name"], "resolve": "gen_pwrswitch(h, name)"},
+    "dbIsolation":    {"key": "isolation",     "args": ["name"], "resolve": "gen_isolation(h, name)"},
+    "dbLevelShifter": {"key": "level_shifter", "args": ["name"], "resolve": "gen_levelshifter(h, name)"},
 }
 
 
@@ -661,6 +666,14 @@ def main() -> int:
         "static odb::dbModITerm* gen_moditerm(const OdbDb& h, rust::Str modinst, std::size_t i) {\n"
         "  odb::dbModInst* mi = gen_modinst(h, modinst); if (!mi) return nullptr;\n"
         "  std::size_t k = 0; for (odb::dbModITerm* t : mi->getModITerms()) { if (k++ == i) return t; } return nullptr; }\n"
+        "static odb::dbPowerDomain* gen_pwrdomain(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findPowerDomain(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbPowerSwitch* gen_pwrswitch(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findPowerSwitch(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbIsolation* gen_isolation(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findIsolation(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbLevelShifter* gen_levelshifter(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findLevelShifter(gs(n).c_str()) : nullptr; }\n"
         "}  // namespace\n")
 
     # ---- generated_resolvers.h (shared by the read + write .cc) -----------------
