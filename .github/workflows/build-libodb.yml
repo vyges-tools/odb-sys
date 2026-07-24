@@ -12,10 +12,10 @@
 #             which covers current mainstream distros); the manifest records the exact floor.
 name: build-libodb
 
+# Manual only — no schedule. Each run spins up 6 legs incl. two macOS runners (billed 10x),
+# so we don't auto-burn Actions minutes; trigger deliberately when the pin or build changes.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * 1"   # weekly canary; artifacts still deliberate/manual
 
 jobs:
   # ---- functional correctness, native per-arch (this is where arm64 gets tested) ----------
@@ -78,7 +78,10 @@ jobs:
           OSX=""
           [ "${{ runner.os }}" = "macOS" ] && OSX="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_PREFIX_PATH=$(brew --prefix)"
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVYGES_ODB_SMOKE=ON $OSX
-          cmake --build build -j
+          # Build ONLY odb_smoke (pulls in libodb + the abseil subset odb actually uses). The
+          # default `all` target also compiles abseil libs odb never links (flags/status/...),
+          # whose extra parallel TUs spike memory and get the runner OOM/shutdown-killed (143).
+          cmake --build build --target odb_smoke -j
 
       - name: Smoke test (round-trip a real .odb)
         run: |
