@@ -724,3 +724,22 @@ double layerantenna_get_p_s_r(const OdbDb& h, rust::Str layer) { auto* p = gen_l
 double layerantenna_get_c_s_r(const OdbDb& h, rust::Str layer) { auto* p = gen_layerantenna(h, layer); return p ? p->getCSR() : 0.0; }
 double layerantenna_get_gate_plus_diff_factor(const OdbDb& h, rust::Str layer) { auto* p = gen_layerantenna(h, layer); return p ? p->getGatePlusDiffFactor() : 0.0; }
 double layerantenna_get_area_minus_diff_factor(const OdbDb& h, rust::Str layer) { auto* p = gen_layerantenna(h, layer); return p ? p->getAreaMinusDiffFactor() : 0.0; }
+int32_t via_params_get_x_cut_size(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getXCutSize() : 0; }
+int32_t via_params_get_y_cut_size(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getYCutSize() : 0; }
+int32_t via_params_get_x_cut_spacing(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getXCutSpacing() : 0; }
+int32_t via_params_get_y_cut_spacing(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getYCutSpacing() : 0; }
+int32_t via_params_get_x_top_enclosure(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getXTopEnclosure() : 0; }
+int32_t via_params_get_y_top_enclosure(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getYTopEnclosure() : 0; }
+int32_t via_params_get_x_bottom_enclosure(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getXBottomEnclosure() : 0; }
+int32_t via_params_get_y_bottom_enclosure(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getYBottomEnclosure() : 0; }
+int32_t via_params_get_num_cut_rows(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getNumCutRows() : 0; }
+int32_t via_params_get_num_cut_cols(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getNumCutCols() : 0; }
+int32_t via_params_get_x_origin(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getXOrigin() : 0; }
+int32_t via_params_get_y_origin(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getYOrigin() : 0; }
+int32_t via_params_get_x_top_offset(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getXTopOffset() : 0; }
+int32_t via_params_get_y_top_offset(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getYTopOffset() : 0; }
+int32_t via_params_get_x_bottom_offset(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getXBottomOffset() : 0; }
+int32_t via_params_get_y_bottom_offset(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); return p ? p->getYBottomOffset() : 0; }
+rust::String via_params_get_top_layer(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); if (!p) return rust::String(); auto* t = p->getTopLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String via_params_get_cut_layer(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); if (!p) return rust::String(); auto* t = p->getCutLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String via_params_get_bottom_layer(const OdbDb& h, rust::Str via) { auto* p = gen_via_params(h, via); if (!p) return rust::String(); auto* t = p->getBottomLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }

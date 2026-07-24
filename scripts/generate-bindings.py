@@ -89,6 +89,10 @@ TARGETS = {
     "dbTechViaLayerRule":    {"key": "techvialayerrule", "args": [{"name": "gen_idx", "type": "idx"}, {"name": "layer_idx", "type": "idx"}], "resolve": "gen_techvialayerrule(h, gen_idx, layer_idx)"},
     "dbTechLayerAntennaRule": {"key": "layerantenna",     "args": ["layer"], "resolve": "gen_layerantenna(h, layer)"},
     "dbTechAntennaPinModel":  {"key": "antennapinmodel",  "args": ["master", "term"], "resolve": "gen_antennapinmodel(h, master, term)"},
+    # via cut geometry (value-struct via dbVia::getViaParams(), stashed thread-local) — see resolver.
+    # read_only: the resolver hands back a pointer to a COPY, so setters wouldn't persist to the via
+    # (a value-struct is written via via->setViaParams(...)); emit getters only.
+    "dbViaParams": {"key": "via_params", "args": ["via"], "resolve": "gen_via_params(h, via)", "read_only": True},
 }
 
 
@@ -594,9 +598,10 @@ def main() -> int:
             if m["kind"] == "setter" and m["name"].startswith("get"):
                 e.add_outparam_getter(cls, spec, m, reserved_fn, reserved_db, seen)
         seen_w: set[str] = set()
-        for m in by_name[cls]["methods"]:
-            if m["kind"] == "setter":
-                e.add_setter(cls, spec, m, reserved_fn, reserved_db, seen_w)
+        if not spec.get("read_only"):  # value-struct targets expose getters only (see dbViaParams)
+            for m in by_name[cls]["methods"]:
+                if m["kind"] == "setter":
+                    e.add_setter(cls, spec, m, reserved_fn, reserved_db, seen_w)
 
     # ---- generated.h -----------------------------------------------------------
     (LIB / "src/generated.h").write_text(
@@ -723,6 +728,11 @@ def main() -> int:
         "  odb::dbTechLayer* l = gen_techlayer(h, layer); return l ? l->getDefaultAntennaRule() : nullptr; }\n"
         "static odb::dbTechAntennaPinModel* gen_antennapinmodel(const OdbDb& h, rust::Str master, rust::Str term) {\n"
         "  odb::dbMTerm* mt = gen_mterm(h, master, term); return mt ? mt->getDefaultAntennaModel() : nullptr; }\n"
+        "// dbViaParams is a VALUE returned by dbVia::getViaParams(); stash it in a thread-local so the\n"
+        "// existing pointer-based marshalling reuses unchanged (pointer valid until the next call).\n"
+        "static odb::dbViaParams* gen_via_params(const OdbDb& h, rust::Str via) {\n"
+        "  thread_local odb::dbViaParams vp;\n"  # block-scope thread_local is already static storage
+        "  odb::dbVia* v = gen_via(h, via); if (!v) return nullptr; vp = v->getViaParams(); return &vp; }\n"
         "}  // namespace\n")
 
     # ---- generated_resolvers.h (shared by the read + write .cc) -----------------

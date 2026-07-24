@@ -120,3 +120,8 @@ inline odb::dbTechLayerAntennaRule* gen_layerantenna(const OdbDb& h, rust::Str l
   odb::dbTechLayer* l = gen_techlayer(h, layer); return l ? l->getDefaultAntennaRule() : nullptr; }
 inline odb::dbTechAntennaPinModel* gen_antennapinmodel(const OdbDb& h, rust::Str master, rust::Str term) {
   odb::dbMTerm* mt = gen_mterm(h, master, term); return mt ? mt->getDefaultAntennaModel() : nullptr; }
+// dbViaParams is a VALUE returned by dbVia::getViaParams(); stash it in a thread-local so the
+// existing pointer-based marshalling reuses unchanged (pointer valid until the next call).
+inline odb::dbViaParams* gen_via_params(const OdbDb& h, rust::Str via) {
+  thread_local odb::dbViaParams vp;
+  odb::dbVia* v = gen_via(h, via); if (!v) return nullptr; vp = v->getViaParams(); return &vp; }

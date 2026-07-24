@@ -727,6 +727,25 @@ mod ffi_gen {
         fn layerantenna_get_c_s_r(db: &OdbDb, layer: &str) -> f64;
         fn layerantenna_get_gate_plus_diff_factor(db: &OdbDb, layer: &str) -> f64;
         fn layerantenna_get_area_minus_diff_factor(db: &OdbDb, layer: &str) -> f64;
+        fn via_params_get_x_cut_size(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_y_cut_size(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_x_cut_spacing(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_y_cut_spacing(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_x_top_enclosure(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_y_top_enclosure(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_x_bottom_enclosure(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_y_bottom_enclosure(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_num_cut_rows(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_num_cut_cols(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_x_origin(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_y_origin(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_x_top_offset(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_y_top_offset(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_x_bottom_offset(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_y_bottom_offset(db: &OdbDb, via: &str) -> i32;
+        fn via_params_get_top_layer(db: &OdbDb, via: &str) -> String;
+        fn via_params_get_cut_layer(db: &OdbDb, via: &str) -> String;
+        fn via_params_get_bottom_layer(db: &OdbDb, via: &str) -> String;
     }
 }
 
@@ -1445,6 +1464,25 @@ pub use ffi_gen::{
     via_has_params,
     via_is_default,
     via_is_via_rotated,
+    via_params_get_bottom_layer,
+    via_params_get_cut_layer,
+    via_params_get_num_cut_cols,
+    via_params_get_num_cut_rows,
+    via_params_get_top_layer,
+    via_params_get_x_bottom_enclosure,
+    via_params_get_x_bottom_offset,
+    via_params_get_x_cut_size,
+    via_params_get_x_cut_spacing,
+    via_params_get_x_origin,
+    via_params_get_x_top_enclosure,
+    via_params_get_x_top_offset,
+    via_params_get_y_bottom_enclosure,
+    via_params_get_y_bottom_offset,
+    via_params_get_y_cut_size,
+    via_params_get_y_cut_spacing,
+    via_params_get_y_origin,
+    via_params_get_y_top_enclosure,
+    via_params_get_y_top_offset,
     wire_count,
     wire_get_block,
     wire_get_net,

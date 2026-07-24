@@ -63,6 +63,7 @@ an arg typed `idx` → `usize`/`std::size_t`):
 | `dbSBox` | `net` + `swire_idx` + `sbox_idx` | i-th box of the net's j-th special wire |
 | `dbTechViaRule` · `dbTechViaGenerateRule` | `idx` | i-th of `tech->getVia{,Generate}Rules()` |
 | `dbTechViaLayerRule` | `gen_idx` + `layer_idx` | `genRule->getViaLayerRule(layer_idx)` |
+| `dbViaParams` | `via` (read-only) | `via->getViaParams()` value-struct via a thread-local ptr — cut size/spacing/enclosure/rows-cols geometry |
 
 **Still uncovered:** `dbRSeg`/`dbCapNode` (parasitics — addressable by id, low instrumentation
 value) and the polymorphic ownership of `dbBox` beyond obstructions (inst/master/pin bboxes)
