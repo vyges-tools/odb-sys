@@ -85,9 +85,20 @@ fn main() {
         }
     }
     println!("cargo:rustc-link-lib=dylib=z");
+    // libodb v1 (LEF/DEF I/O) pulls boost::iostreams (gzipped LEF/DEF). STATIC-link it so the
+    // binary stays self-contained (glibc/libstdc++/zlib only) — no libboost runtime dep. On macOS
+    // Homebrew's lib dir isn't on the default search path, so add it.
+    if cfg!(target_os = "macos") {
+        let brew = if Path::new("/opt/homebrew").exists() { "/opt/homebrew" } else { "/usr/local" };
+        println!("cargo:rustc-link-search=native={brew}/lib");
+    }
+    println!("cargo:rustc-link-lib=static=boost_iostreams");
     if cfg!(target_os = "macos") {
         println!("cargo:rustc-link-lib=dylib=c++");
     } else {
+        // Linux boost_iostreams is built with the bzip2 filter → it references libbz2. (macOS
+        // Homebrew's is not, so it needs no bz2.) bz2 stays dynamic — a universal system lib.
+        println!("cargo:rustc-link-lib=dylib=bz2");
         println!("cargo:rustc-link-lib=dylib=stdc++");
     }
 

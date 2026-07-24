@@ -28,7 +28,7 @@ endif()
 # binary does not depend on the host's (often older, incompatible) system versions. This is
 # what makes libodb portable — the version floor is glibc, not the distro's C++ libs.
 # (Versions mirrored in openroad-pin.yaml for the provenance manifest.)
-find_package(Boost REQUIRED)   # header-only for the db core
+find_package(Boost REQUIRED COMPONENTS iostreams)  # iostreams (compiled) for gzipped LEF/DEF
 find_package(ZLIB  REQUIRED)
 
 include(FetchContent)
@@ -89,7 +89,7 @@ target_include_directories(odb PUBLIC
 target_link_libraries(odb PUBLIC
   fmt::fmt spdlog::spdlog
   absl::synchronization absl::strings absl::hash absl::flat_hash_map absl::base
-  Boost::headers ZLIB::ZLIB)
+  Boost::headers Boost::iostreams ZLIB::ZLIB)
 # The si2 parser C code trips -Wclass-memaccess on GCC (not an error — no -Werror); silence it.
 target_compile_options(odb PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-class-memaccess>)
 

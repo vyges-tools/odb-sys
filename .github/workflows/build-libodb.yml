@@ -45,7 +45,7 @@ jobs:
         # abseil are built from source by CMake — installing the system copies would shadow the pins.
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ git binutils bison libboost-dev zlib1g-dev
+          sudo apt-get install -y cmake g++ git binutils bison libboost-dev libboost-iostreams-dev libbz2-dev zlib1g-dev
 
       - name: Toolchain (macOS)
         if: runner.os == 'macOS'

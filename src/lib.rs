@@ -21,6 +21,7 @@ mod ffi {
         // open / read / write
         fn open_db(path: &str) -> Result<UniquePtr<OdbDb>>;
         fn write_db(db: &OdbDb, path: &str) -> Result<()>;
+        fn write_def(db: &OdbDb, path: &str) -> Result<()>;
 
         // read / inspect
         fn block_name(db: &OdbDb) -> String;
@@ -65,5 +66,5 @@ pub use ffi::{
     connect, create_inst, create_net, disconnect, find_master, first_master_name, input_pin,
     inst_master, inst_x, inst_y, net_of, nth_bterm_name, nth_inst_name, nth_iterm_name, num_bterms,
     num_insts, num_iterms, num_nets, num_obstructions, open_db, output_pin, place_bterm,
-    set_inst_location, set_inst_orient, total_wire_length, write_db, OdbDb,
+    set_inst_location, set_inst_orient, total_wire_length, write_db, write_def, OdbDb,
 };

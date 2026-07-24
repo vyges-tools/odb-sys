@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "shim.h"
 
+#include "odb/defout.h"  // LEF/DEF I/O (libodb v1)
+
 #include <cstdint>
 #include <fstream>
 #include <stdexcept>
@@ -235,6 +237,14 @@ std::uint64_t total_wire_length(const OdbDb& h) {
     if (w) total += w->getLength();
   }
   return total;
+}
+void write_def(const OdbDb& h, rust::Str path) {
+  dbBlock* b = require_block(h);
+  // the OdbDb owns its logger; DefOut wants a non-const Logger* (logically mutable, like h.db).
+  odb::DefOut writer(const_cast<utl::Logger*>(&h.logger));
+  if (!writer.writeBlock(b, s(path).c_str())) {
+    throw std::runtime_error("vyges-opendb: DEF write failed: " + s(path));
+  }
 }
 void place_bterm(const OdbDb& h, rust::Str bterm, rust::Str layer, int32_t x1, int32_t y1,
                  int32_t x2, int32_t y2) {
