@@ -1,53 +1,25 @@
 # SPDX-License-Identifier: Apache-2.0
 # Per-arch build of the standalone libodb from the pinned OpenROAD subtree.
-# Not on push — manual (workflow_dispatch) + a weekly canary for upstream drift.
+# Manual only (workflow_dispatch) — each run spins up 3 legs incl. a macOS runner (billed 10x),
+# so we don't auto-burn Actions minutes; trigger deliberately when the pin or build changes.
 #
-# Two jobs:
-#   test    — cargo test on x86_64 / arm64 Linux / Apple Silicon. The real per-arch
-#             correctness proof of the cxx bridge -> shim -> libodb (incl. arm64).
-#   bundle  — the shippable artifact. fmt/spdlog/abseil are built FROM SOURCE at the pinned
-#             versions (never the system's — those lag and would shadow the pins), the glibc
-#             floor is MEASURED from the smoke binary, and a provenance manifest.json is
-#             emitted next to the .a + headers bundle. Built on ubuntu-24.04 (glibc floor ~2.38,
-#             which covers current mainstream distros); the manifest records the exact floor.
+# ONE build per platform (x86_64 / arm64 Linux, Apple Silicon):
+#   1. cmake-build libodb + odb_smoke from source (fmt/spdlog/abseil are built FROM SOURCE at the
+#      pinned versions — never the system's, which lag and would shadow the pins).
+#   2. smoke-test a real .odb round-trip + MEASURE the glibc floor from the smoke binary.
+#   3. assemble the shippable bundle (static .a's + headers) with a provenance manifest.json.
+#   4. `cargo test` REUSES that build via VYGES_ODB_PREBUILT_DIR (no second C++ compile) — the
+#      per-arch correctness proof of the cxx bridge -> shim -> libodb.
+# Previously this was two parallel jobs (test + bundle), each compiling the whole C++ stack — the
+# duplicate heavy build doubled minutes and was the leg that kept OOM/hang-failing on Linux.
 name: build-libodb
 
-# Manual only — no schedule. Each run spins up 6 legs incl. two macOS runners (billed 10x),
-# so we don't auto-burn Actions minutes; trigger deliberately when the pin or build changes.
 on:
   workflow_dispatch:
 
 jobs:
-  # ---- functional correctness, native per-arch (this is where arm64 gets tested) ----------
-  test:
-    name: test-${{ matrix.label }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { os: ubuntu-latest,    label: linux-x86_64 }
-          - { os: ubuntu-24.04-arm, label: linux-arm64  }
-          - { os: macos-15,         label: macos-arm64  }   # Apple Silicon, Xcode 16 (new enough for cxx, stable for fmt 11.0.2; macos-latest/Xcode 26.5 breaks fmt consteval)
-    steps:
-      - uses: actions/checkout@v4
-      - name: Toolchain (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          # Boost (headers) + zlib only. fmt/spdlog/abseil are built from source by CMake —
-          # installing the system copies here would shadow the pinned versions and break the link.
-          sudo apt-get install -y cmake g++ git libboost-dev zlib1g-dev
-      - name: Toolchain (macOS)
-        if: runner.os == 'macOS'
-        run: brew install cmake boost   # NOT fmt/spdlog/abseil — built from source
-      - uses: dtolnay/rust-toolchain@stable
-      - name: cargo test (build-from-source, end-to-end bridge)
-        run: cargo test --release --verbose
-
-  # ---- shippable bundle: deps from source, measured glibc floor, provenance manifest ------
-  bundle:
-    name: bundle-${{ matrix.label }}
+  build:
+    name: build-${{ matrix.label }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -55,25 +27,28 @@ jobs:
         include:
           - { os: ubuntu-latest,    label: linux-x86_64, base: "ubuntu-24.04" }
           - { os: ubuntu-24.04-arm, label: linux-arm64,  base: "ubuntu-24.04" }
-          - { os: macos-15,         label: macos-arm64,  base: "macos>=11.0"  }   # Apple Silicon, Xcode 16 (macos-latest/Xcode 26.5 breaks fmt 11.0.2 consteval)
+          - { os: macos-15,         label: macos-arm64,  base: "macos>=11.0"  }   # Apple Silicon, Xcode 16 (new enough for cxx, stable for fmt 11.0.2; macos-latest/Xcode 26.5 breaks fmt consteval)
     steps:
       - uses: actions/checkout@v4
 
       - name: Toolchain (Linux)
         if: runner.os == 'Linux'
+        # Boost (headers) + zlib + binutils(objdump, for the glibc-floor measurement). fmt/spdlog/
+        # abseil are built from source by CMake — installing the system copies would shadow the pins.
         run: |
           sudo apt-get update
-          # binutils for objdump (glibc-floor measurement); no system fmt/spdlog/abseil.
           sudo apt-get install -y cmake g++ git binutils libboost-dev zlib1g-dev
 
       - name: Toolchain (macOS)
         if: runner.os == 'macOS'
-        run: brew install cmake boost
+        run: brew install cmake boost   # NOT fmt/spdlog/abseil — built from source
+
+      - uses: dtolnay/rust-toolchain@stable
 
       - name: Fetch pinned odb subtree (sparse)
         run: scripts/fetch-odb-src.sh
 
-      - name: Configure + build (libodb + fmt/spdlog/abseil from source, static)
+      - name: Configure + build libodb + odb_smoke (from source, static)
         run: |
           OSX=""
           [ "${{ runner.os }}" = "macOS" ] && OSX="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_PREFIX_PATH=$(brew --prefix)"
@@ -134,6 +109,11 @@ jobs:
           }
           EOF
           echo "--- manifest.json ---"; cat prebuilt/manifest.json
+
+      - name: cargo test (reuses the built libodb via VYGES_ODB_PREBUILT_DIR — no second C++ build)
+        env:
+          VYGES_ODB_PREBUILT_DIR: ${{ github.workspace }}/prebuilt
+        run: cargo test --release --verbose
 
       - name: Upload prebuilt libodb bundle
         uses: actions/upload-artifact@v4
