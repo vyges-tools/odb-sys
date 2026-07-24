@@ -48,6 +48,9 @@ mod ffi {
         fn create_inst(db: &OdbDb, master: &str, name: &str) -> Result<()>;
         fn set_inst_location(db: &OdbDb, inst: &str, x: i32, y: i32) -> Result<()>;
         fn set_inst_orient(db: &OdbDb, inst: &str, orient: &str) -> Result<()>;
+        fn add_obstruction(db: &OdbDb, layer: &str, x1: i32, y1: i32, x2: i32, y2: i32) -> Result<()>;
+        fn num_obstructions(db: &OdbDb) -> usize;
+        fn clear_obstructions(db: &OdbDb) -> usize;
         fn connect(db: &OdbDb, inst: &str, pin: &str, net: &str) -> Result<()>;
         fn disconnect(db: &OdbDb, inst: &str, pin: &str) -> Result<()>;
     }
@@ -55,8 +58,9 @@ mod ffi {
 
 #[cfg(unix)]
 pub use ffi::{
-    block_name, bterm_net, bterm_x, bterm_y, connect, create_inst, create_net, disconnect,
-    find_master, first_master_name, input_pin, inst_master, inst_x, inst_y, net_of, nth_bterm_name,
-    nth_inst_name, nth_iterm_name, num_bterms, num_insts, num_iterms, num_nets, open_db, output_pin,
-    set_inst_location, set_inst_orient, write_db, OdbDb,
+    add_obstruction, block_name, bterm_net, bterm_x, bterm_y, clear_obstructions, connect,
+    create_inst, create_net, disconnect, find_master, first_master_name, input_pin, inst_master,
+    inst_x, inst_y, net_of, nth_bterm_name, nth_inst_name, nth_iterm_name, num_bterms,
+    num_insts, num_iterms, num_nets, num_obstructions, open_db, output_pin, set_inst_location,
+    set_inst_orient, write_db, OdbDb,
 };

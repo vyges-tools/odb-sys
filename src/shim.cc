@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 using odb::dbBlock;
 using odb::dbBTerm;
@@ -11,6 +12,9 @@ using odb::dbInst;
 using odb::dbITerm;
 using odb::dbMaster;
 using odb::dbNet;
+using odb::dbObstruction;
+using odb::dbTech;
+using odb::dbTechLayer;
 
 static std::string s(rust::Str v) { return std::string(v.data(), v.size()); }
 
@@ -193,6 +197,25 @@ void set_inst_location(const OdbDb& h, rust::Str inst, int32_t x, int32_t y) {
 void set_inst_orient(const OdbDb& h, rust::Str inst, rust::Str orient) {
   // dbOrientType parses "R0"/"R90"/"R180"/"R270"/"MX"/"MY"/"MXR90"/"MYR90".
   require_inst(h, inst)->setOrient(odb::dbOrientType(s(orient).c_str()));
+}
+void add_obstruction(const OdbDb& h, rust::Str layer, int32_t x1, int32_t y1, int32_t x2,
+                     int32_t y2) {
+  dbBlock* b = require_block(h);
+  dbTech* tech = b->getTech();
+  dbTechLayer* l = tech ? tech->findLayer(s(layer).c_str()) : nullptr;
+  if (!l) throw std::runtime_error("vyges-opendb: tech layer not found: " + s(layer));
+  dbObstruction::create(b, l, x1, y1, x2, y2);
+}
+std::size_t num_obstructions(const OdbDb& h) {
+  dbBlock* b = block_of(h);
+  return b ? b->getObstructions().size() : 0;
+}
+std::size_t clear_obstructions(const OdbDb& h) {
+  dbBlock* b = block_of(h);
+  if (!b) return 0;
+  std::vector<dbObstruction*> obs(b->getObstructions().begin(), b->getObstructions().end());
+  for (dbObstruction* o : obs) dbObstruction::destroy(o);
+  return obs.size();
 }
 void connect(const OdbDb& h, rust::Str inst, rust::Str pin, rust::Str net) {
   dbNet* n = require_block(h)->findNet(s(net).c_str());
