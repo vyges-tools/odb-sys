@@ -38,6 +38,7 @@ long tail of accessors is bound *mechanically* instead of by hand:
 | `dbRow` | name (scan rows) | `block->getRows()` match |
 | `dbModule` · `dbGroup` · `dbRegion` | name | `block->find{Module,Group,Region}` |
 | `dbMarkerCategory` | name | `block->findMarkerCategory` |
+| `dbModInst` · `dbModNet` | hierarchical name | `block->find{ModInst,ModNet}` |
 
 Classes with **no name** are addressed by **position** instead (the index-addressing mode —
 an arg typed `idx` → `usize`/`std::size_t`):
@@ -50,6 +51,7 @@ an arg typed `idx` → `usize`/`std::size_t`):
 | `dbBox` | `idx` | i-th obstruction's `getBBox()` — surfaces box geometry (`xMin`/`getDX`/…) |
 | `dbBlockage` · `dbTrackGrid` | `idx` | i-th of `block->get{Blockages,TrackGrids}()` |
 | `dbMarker` | `category` + `idx` | i-th of `markerCategory->getMarkers()` — DRC violation (`get_b_box_*`, `get_tech_layer`, `is_waived`, `get_comment`) |
+| `dbModBTerm` · `dbModITerm` | `module`/`modinst` + `idx` | i-th of the parent's `getMod{BTerms,ITerms}()` |
 
 **Still uncovered:** `dbRSeg`/`dbCapNode` (parasitics — addressable by id, low instrumentation
 value) and the polymorphic ownership of `dbBox` beyond obstructions (inst/master/pin bboxes)

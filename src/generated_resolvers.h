@@ -68,3 +68,13 @@ inline odb::dbMarkerCategory* gen_marker_cat(const OdbDb& h, rust::Str n) {
 inline odb::dbMarker* gen_marker(const OdbDb& h, rust::Str cat, std::size_t i) {
   odb::dbMarkerCategory* c = gen_marker_cat(h, cat); if (!c) return nullptr;
   std::size_t k = 0; for (odb::dbMarker* m : c->getMarkers()) { if (k++ == i) return m; } return nullptr; }
+inline odb::dbModInst* gen_modinst(const OdbDb& h, rust::Str path) {
+  odb::dbBlock* b = gen_block(h); return b ? b->findModInst(gs(path).c_str()) : nullptr; }
+inline odb::dbModNet* gen_modnet(const OdbDb& h, rust::Str n) {
+  odb::dbBlock* b = gen_block(h); return b ? b->findModNet(gs(n).c_str()) : nullptr; }
+inline odb::dbModBTerm* gen_modbterm(const OdbDb& h, rust::Str module, std::size_t i) {
+  odb::dbModule* m = gen_module(h, module); if (!m) return nullptr;
+  std::size_t k = 0; for (odb::dbModBTerm* t : m->getModBTerms()) { if (k++ == i) return t; } return nullptr; }
+inline odb::dbModITerm* gen_moditerm(const OdbDb& h, rust::Str modinst, std::size_t i) {
+  odb::dbModInst* mi = gen_modinst(h, modinst); if (!mi) return nullptr;
+  std::size_t k = 0; for (odb::dbModITerm* t : mi->getModITerms()) { if (k++ == i) return t; } return nullptr; }

@@ -64,6 +64,11 @@ TARGETS = {
     # DRC / violation markers — category by name, individual markers by (category, index)
     "dbMarkerCategory": {"key": "marker_cat", "args": ["category"], "resolve": "gen_marker_cat(h, category)"},
     "dbMarker": {"key": "marker", "args": ["category", {"name": "idx", "type": "idx"}], "resolve": "gen_marker(h, category, idx)"},
+    # deep module hierarchy — mod-inst/net by block-level hierarchical name; mod-bterm/iterm scoped
+    "dbModInst":  {"key": "modinst",  "args": ["path"], "resolve": "gen_modinst(h, path)"},
+    "dbModNet":   {"key": "modnet",   "args": ["name"], "resolve": "gen_modnet(h, name)"},
+    "dbModBTerm": {"key": "modbterm", "args": ["module", {"name": "idx", "type": "idx"}], "resolve": "gen_modbterm(h, module, idx)"},
+    "dbModITerm": {"key": "moditerm", "args": ["modinst", {"name": "idx", "type": "idx"}], "resolve": "gen_moditerm(h, modinst, idx)"},
 }
 
 
@@ -646,6 +651,16 @@ def main() -> int:
         "static odb::dbMarker* gen_marker(const OdbDb& h, rust::Str cat, std::size_t i) {\n"
         "  odb::dbMarkerCategory* c = gen_marker_cat(h, cat); if (!c) return nullptr;\n"
         "  std::size_t k = 0; for (odb::dbMarker* m : c->getMarkers()) { if (k++ == i) return m; } return nullptr; }\n"
+        "static odb::dbModInst* gen_modinst(const OdbDb& h, rust::Str path) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findModInst(gs(path).c_str()) : nullptr; }\n"
+        "static odb::dbModNet* gen_modnet(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findModNet(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbModBTerm* gen_modbterm(const OdbDb& h, rust::Str module, std::size_t i) {\n"
+        "  odb::dbModule* m = gen_module(h, module); if (!m) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbModBTerm* t : m->getModBTerms()) { if (k++ == i) return t; } return nullptr; }\n"
+        "static odb::dbModITerm* gen_moditerm(const OdbDb& h, rust::Str modinst, std::size_t i) {\n"
+        "  odb::dbModInst* mi = gen_modinst(h, modinst); if (!mi) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbModITerm* t : mi->getModITerms()) { if (k++ == i) return t; } return nullptr; }\n"
         "}  // namespace\n")
 
     # ---- generated_resolvers.h (shared by the read + write .cc) -----------------

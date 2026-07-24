@@ -516,6 +516,45 @@ mod ffi_gen {
         fn marker_get_b_box_y_max(db: &OdbDb, category: &str, idx: usize) -> i32;
         fn marker_get_b_box_dx(db: &OdbDb, category: &str, idx: usize) -> i32;
         fn marker_get_b_box_dy(db: &OdbDb, category: &str, idx: usize) -> i32;
+        fn modinst_get_name(db: &OdbDb, path: &str) -> String;
+        fn modinst_get_parent(db: &OdbDb, path: &str) -> String;
+        fn modinst_get_master(db: &OdbDb, path: &str) -> String;
+        fn modinst_get_group(db: &OdbDb, path: &str) -> String;
+        fn modinst_get_hierarchical_name(db: &OdbDb, path: &str) -> String;
+        fn num_modinst_get_mod_i_terms(db: &OdbDb, path: &str) -> usize;
+        fn nth_modinst_get_mod_i_terms(db: &OdbDb, path: &str, i: usize) -> String;
+        fn modnet_get_parent(db: &OdbDb, name: &str) -> String;
+        fn num_modnet_get_mod_i_terms(db: &OdbDb, name: &str) -> usize;
+        fn nth_modnet_get_mod_i_terms(db: &OdbDb, name: &str, i: usize) -> String;
+        fn num_modnet_get_mod_b_terms(db: &OdbDb, name: &str) -> usize;
+        fn nth_modnet_get_mod_b_terms(db: &OdbDb, name: &str, i: usize) -> String;
+        fn num_modnet_get_i_terms(db: &OdbDb, name: &str) -> usize;
+        fn nth_modnet_get_i_terms(db: &OdbDb, name: &str, i: usize) -> String;
+        fn num_modnet_get_b_terms(db: &OdbDb, name: &str) -> usize;
+        fn nth_modnet_get_b_terms(db: &OdbDb, name: &str, i: usize) -> String;
+        fn modnet_get_name(db: &OdbDb, name: &str) -> String;
+        fn modnet_get_const_name(db: &OdbDb, name: &str) -> String;
+        fn modnet_get_hierarchical_name(db: &OdbDb, name: &str) -> String;
+        fn modnet_find_related_net(db: &OdbDb, name: &str) -> String;
+        fn num_modnet_get_next_mod_nets_in_fanin(db: &OdbDb, name: &str) -> usize;
+        fn nth_modnet_get_next_mod_nets_in_fanin(db: &OdbDb, name: &str, i: usize) -> String;
+        fn num_modnet_get_next_mod_nets_in_fanout(db: &OdbDb, name: &str) -> usize;
+        fn nth_modnet_get_next_mod_nets_in_fanout(db: &OdbDb, name: &str, i: usize) -> String;
+        fn modnet_get_first_parent_mod_net(db: &OdbDb, name: &str) -> String;
+        fn modbterm_get_name(db: &OdbDb, module: &str, idx: usize) -> String;
+        fn modbterm_get_parent(db: &OdbDb, module: &str, idx: usize) -> String;
+        fn modbterm_get_hierarchical_name(db: &OdbDb, module: &str, idx: usize) -> String;
+        fn modbterm_get_parent_mod_i_term(db: &OdbDb, module: &str, idx: usize) -> String;
+        fn modbterm_get_mod_net(db: &OdbDb, module: &str, idx: usize) -> String;
+        fn modbterm_get_sig_type(db: &OdbDb, module: &str, idx: usize) -> String;
+        fn modbterm_get_io_type(db: &OdbDb, module: &str, idx: usize) -> String;
+        fn modbterm_is_bus_port(db: &OdbDb, module: &str, idx: usize) -> bool;
+        fn modbterm_get_mod_inst(db: &OdbDb, module: &str, idx: usize) -> String;
+        fn moditerm_get_name(db: &OdbDb, modinst: &str, idx: usize) -> String;
+        fn moditerm_get_parent(db: &OdbDb, modinst: &str, idx: usize) -> String;
+        fn moditerm_get_hierarchical_name(db: &OdbDb, modinst: &str, idx: usize) -> String;
+        fn moditerm_get_mod_net(db: &OdbDb, modinst: &str, idx: usize) -> String;
+        fn moditerm_get_child_mod_b_term(db: &OdbDb, modinst: &str, idx: usize) -> String;
     }
 }
 
@@ -775,6 +814,31 @@ pub use ffi_gen::{
     master_is_pad,
     master_is_sequential,
     master_is_special_power,
+    modbterm_get_hierarchical_name,
+    modbterm_get_io_type,
+    modbterm_get_mod_inst,
+    modbterm_get_mod_net,
+    modbterm_get_name,
+    modbterm_get_parent,
+    modbterm_get_parent_mod_i_term,
+    modbterm_get_sig_type,
+    modbterm_is_bus_port,
+    modinst_get_group,
+    modinst_get_hierarchical_name,
+    modinst_get_master,
+    modinst_get_name,
+    modinst_get_parent,
+    moditerm_get_child_mod_b_term,
+    moditerm_get_hierarchical_name,
+    moditerm_get_mod_net,
+    moditerm_get_name,
+    moditerm_get_parent,
+    modnet_find_related_net,
+    modnet_get_const_name,
+    modnet_get_first_parent_mod_net,
+    modnet_get_hierarchical_name,
+    modnet_get_name,
+    modnet_get_parent,
     module_get_db_inst_count,
     module_get_hierarchical_name,
     module_get_mod_inst,
@@ -896,6 +960,13 @@ pub use ffi_gen::{
     nth_marker_cat_get_marker_categories,
     nth_marker_cat_get_markers,
     nth_master_get_m_terms,
+    nth_modinst_get_mod_i_terms,
+    nth_modnet_get_b_terms,
+    nth_modnet_get_i_terms,
+    nth_modnet_get_mod_b_terms,
+    nth_modnet_get_mod_i_terms,
+    nth_modnet_get_next_mod_nets_in_fanin,
+    nth_modnet_get_next_mod_nets_in_fanout,
     nth_module_get_children,
     nth_module_get_insts,
     nth_module_get_leaf_insts,
@@ -940,6 +1011,13 @@ pub use ffi_gen::{
     num_marker_cat_get_marker_categories,
     num_marker_cat_get_markers,
     num_master_get_m_terms,
+    num_modinst_get_mod_i_terms,
+    num_modnet_get_b_terms,
+    num_modnet_get_i_terms,
+    num_modnet_get_mod_b_terms,
+    num_modnet_get_mod_i_terms,
+    num_modnet_get_next_mod_nets_in_fanin,
+    num_modnet_get_next_mod_nets_in_fanout,
     num_module_get_children,
     num_module_get_insts,
     num_module_get_leaf_insts,
