@@ -55,6 +55,13 @@ mod ffi {
         fn clear_obstructions(db: &OdbDb) -> usize;
         fn bterm_direction(db: &OdbDb, bterm: &str) -> String;
         fn total_wire_length(db: &OdbDb) -> u64;
+        fn nth_net_name(db: &OdbDb, i: usize) -> String;
+        fn net_sigtype(db: &OdbDb, net: &str) -> String;
+        fn net_is_special(db: &OdbDb, net: &str) -> bool;
+        fn num_net_iterms(db: &OdbDb, net: &str) -> usize;
+        fn nth_net_iterm(db: &OdbDb, net: &str, i: usize) -> String;
+        fn num_net_bterms(db: &OdbDb, net: &str) -> usize;
+        fn nth_net_bterm(db: &OdbDb, net: &str, i: usize) -> String;
         fn place_bterm(db: &OdbDb, bterm: &str, layer: &str, x1: i32, y1: i32, x2: i32, y2: i32) -> Result<()>;
         fn connect(db: &OdbDb, inst: &str, pin: &str, net: &str) -> Result<()>;
         fn disconnect(db: &OdbDb, inst: &str, pin: &str) -> Result<()>;
@@ -67,5 +74,7 @@ pub use ffi::{
     connect, create_inst, create_net, disconnect, find_master, first_master_name, input_pin,
     inst_master, inst_x, inst_y, net_of, nth_bterm_name, nth_inst_name, nth_iterm_name, num_bterms,
     num_insts, num_iterms, num_nets, num_obstructions, open_db, output_pin, place_bterm,
-    read_def, set_inst_location, set_inst_orient, total_wire_length, write_db, write_def, OdbDb,
+    net_is_special, net_sigtype, nth_net_bterm, nth_net_iterm, nth_net_name, num_net_bterms,
+    num_net_iterms, read_def, set_inst_location, set_inst_orient, total_wire_length, write_db,
+    write_def, OdbDb,
 };

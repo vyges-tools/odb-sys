@@ -55,6 +55,16 @@ std::size_t num_obstructions(const OdbDb& db);
 std::size_t clear_obstructions(const OdbDb& db);   // destroy all obstructions, returns the count removed
 rust::String bterm_direction(const OdbDb& db, rust::Str bterm);   // port direction: INPUT/OUTPUT/INOUT/…
 uint64_t total_wire_length(const OdbDb& db);                      // sum of routed wire length over nets (DBU)
+
+// ---- net traversal + connectivity graph (instrumentation core) ---------------
+rust::String nth_net_name(const OdbDb& db, std::size_t i);        // i-th net name ("" out of range)
+rust::String net_sigtype(const OdbDb& db, rust::Str net);         // SIGNAL/POWER/GROUND/CLOCK/… ("" if not found)
+bool net_is_special(const OdbDb& db, rust::Str net);              // special (power/routing) net?
+std::size_t num_net_iterms(const OdbDb& db, rust::Str net);       // instance pins on the net
+rust::String nth_net_iterm(const OdbDb& db, rust::Str net, std::size_t i);  // i-th as "inst/pin" ("" out of range)
+std::size_t num_net_bterms(const OdbDb& db, rust::Str net);       // block ports on the net
+rust::String nth_net_bterm(const OdbDb& db, rust::Str net, std::size_t i);  // i-th port name ("" out of range)
+
 void place_bterm(const OdbDb& db, rust::Str bterm, rust::Str layer, int32_t x1, int32_t y1, int32_t x2, int32_t y2);  // place a port pin box on a layer
 void connect(const OdbDb& db, rust::Str inst, rust::Str pin, rust::Str net);    // iterm -> net
 void disconnect(const OdbDb& db, rust::Str inst, rust::Str pin);               // iterm -> (none)

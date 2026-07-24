@@ -239,6 +239,54 @@ std::uint64_t total_wire_length(const OdbDb& h) {
   }
   return total;
 }
+// ---- net traversal + connectivity graph (instrumentation core) ---------------
+static dbNet* find_net(const OdbDb& h, rust::Str net) {
+  dbBlock* b = block_of(h);
+  return b ? b->findNet(s(net).c_str()) : nullptr;
+}
+rust::String nth_net_name(const OdbDb& h, std::size_t i) {
+  dbBlock* b = block_of(h);
+  if (!b) return rust::String();
+  std::size_t k = 0;
+  for (dbNet* n : b->getNets()) {
+    if (k++ == i) return rust::String(n->getName());
+  }
+  return rust::String();
+}
+rust::String net_sigtype(const OdbDb& h, rust::Str net) {
+  dbNet* n = find_net(h, net);
+  return rust::String(n ? std::string(n->getSigType().getString()) : std::string());  // SIGNAL/POWER/…
+}
+bool net_is_special(const OdbDb& h, rust::Str net) {
+  dbNet* n = find_net(h, net);
+  return n ? n->isSpecial() : false;
+}
+std::size_t num_net_iterms(const OdbDb& h, rust::Str net) {
+  dbNet* n = find_net(h, net);
+  return n ? n->getITerms().size() : 0;
+}
+rust::String nth_net_iterm(const OdbDb& h, rust::Str net, std::size_t i) {
+  dbNet* n = find_net(h, net);
+  if (!n) return rust::String();
+  std::size_t k = 0;
+  for (dbITerm* t : n->getITerms()) {
+    if (k++ == i) return rust::String(t->getInst()->getName() + "/" + t->getMTerm()->getName());
+  }
+  return rust::String();
+}
+std::size_t num_net_bterms(const OdbDb& h, rust::Str net) {
+  dbNet* n = find_net(h, net);
+  return n ? n->getBTerms().size() : 0;
+}
+rust::String nth_net_bterm(const OdbDb& h, rust::Str net, std::size_t i) {
+  dbNet* n = find_net(h, net);
+  if (!n) return rust::String();
+  std::size_t k = 0;
+  for (dbBTerm* bt : n->getBTerms()) {
+    if (k++ == i) return rust::String(bt->getName());
+  }
+  return rust::String();
+}
 void write_def(const OdbDb& h, rust::Str path) {
   dbBlock* b = require_block(h);
   // the OdbDb owns its logger; DefOut wants a non-const Logger* (logically mutable, like h.db).
