@@ -5,7 +5,7 @@
 # DERIVED from OpenROAD's db.h by scripts/generate-bindings.py + derive-schema.py — nothing here is
 # hand-written per API. This job re-runs the generators against the pinned db.h and fails if the
 # committed output drifted, so an OpenROAD SHA bump (or a generator edit) can never land with stale
-# generated code. See docs/derived-core-schema.md and the architecture note in vyges-tools-internal.
+# generated code. See docs/derived-core-schema.md for the full binding-generator reference.
 name: generated-freshness
 
 on:
