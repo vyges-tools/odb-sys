@@ -252,6 +252,52 @@ mod ffi_gen {
         fn layer_get_upper_layer(db: &OdbDb, layer: &str) -> String;
         fn layer_get_tech(db: &OdbDb, layer: &str) -> String;
         fn layer_has_orth_spacing_table(db: &OdbDb, layer: &str) -> bool;
+        fn row_get_name(db: &OdbDb, row: &str) -> String;
+        fn row_get_const_name(db: &OdbDb, row: &str) -> String;
+        fn row_get_site(db: &OdbDb, row: &str) -> String;
+        fn row_get_orient(db: &OdbDb, row: &str) -> String;
+        fn row_get_site_count(db: &OdbDb, row: &str) -> i32;
+        fn row_get_spacing(db: &OdbDb, row: &str) -> i32;
+        fn row_get_block(db: &OdbDb, row: &str) -> String;
+        fn via_get_name(db: &OdbDb, via: &str) -> String;
+        fn via_get_const_name(db: &OdbDb, via: &str) -> String;
+        fn via_get_pattern(db: &OdbDb, via: &str) -> String;
+        fn via_get_via_generate_rule(db: &OdbDb, via: &str) -> String;
+        fn via_has_params(db: &OdbDb, via: &str) -> bool;
+        fn via_get_block(db: &OdbDb, via: &str) -> String;
+        fn via_get_top_layer(db: &OdbDb, via: &str) -> String;
+        fn via_get_bottom_layer(db: &OdbDb, via: &str) -> String;
+        fn via_is_via_rotated(db: &OdbDb, via: &str) -> bool;
+        fn via_get_orient(db: &OdbDb, via: &str) -> String;
+        fn via_get_tech_via(db: &OdbDb, via: &str) -> String;
+        fn via_get_block_via(db: &OdbDb, via: &str) -> String;
+        fn via_is_default(db: &OdbDb, via: &str) -> bool;
+        fn techvia_get_name(db: &OdbDb, via: &str) -> String;
+        fn techvia_get_const_name(db: &OdbDb, via: &str) -> String;
+        fn techvia_is_default(db: &OdbDb, via: &str) -> bool;
+        fn techvia_is_top_of_stack(db: &OdbDb, via: &str) -> bool;
+        fn techvia_get_resistance(db: &OdbDb, via: &str) -> f64;
+        fn techvia_get_pattern(db: &OdbDb, via: &str) -> String;
+        fn techvia_get_via_generate_rule(db: &OdbDb, via: &str) -> String;
+        fn techvia_has_params(db: &OdbDb, via: &str) -> bool;
+        fn techvia_get_tech(db: &OdbDb, via: &str) -> String;
+        fn techvia_get_top_layer(db: &OdbDb, via: &str) -> String;
+        fn techvia_get_bottom_layer(db: &OdbDb, via: &str) -> String;
+        fn techvia_get_non_default_rule(db: &OdbDb, via: &str) -> String;
+        fn ndr_get_name(db: &OdbDb, rule: &str) -> String;
+        fn ndr_get_const_name(db: &OdbDb, rule: &str) -> String;
+        fn ndr_is_block_rule(db: &OdbDb, rule: &str) -> bool;
+        fn ndr_get_hard_spacing(db: &OdbDb, rule: &str) -> bool;
+        fn site_get_name(db: &OdbDb, site: &str) -> String;
+        fn site_get_const_name(db: &OdbDb, site: &str) -> String;
+        fn site_get_width(db: &OdbDb, site: &str) -> i32;
+        fn site_get_height(db: &OdbDb, site: &str) -> i32;
+        fn site_get_symmetry_x(db: &OdbDb, site: &str) -> bool;
+        fn site_get_symmetry_y(db: &OdbDb, site: &str) -> bool;
+        fn site_get_symmetry_r90(db: &OdbDb, site: &str) -> bool;
+        fn site_has_row_pattern(db: &OdbDb, site: &str) -> bool;
+        fn site_is_hybrid(db: &OdbDb, site: &str) -> bool;
+        fn site_get_lib(db: &OdbDb, site: &str) -> String;
     }
 }
 
@@ -423,6 +469,10 @@ pub use ffi_gen::{
     mterm_has_default_antenna_model,
     mterm_has_oxide2_antenna_model,
     mterm_is_set_mark,
+    ndr_get_const_name,
+    ndr_get_hard_spacing,
+    ndr_get_name,
+    ndr_is_block_rule,
     net_find_mod_net_in_highest_hier,
     net_get1st_b_term,
     net_get1st_cap_node_id,
@@ -500,4 +550,46 @@ pub use ffi_gen::{
     num_master_get_m_terms,
     num_net_get_b_terms,
     num_net_get_i_terms,
+    row_get_block,
+    row_get_const_name,
+    row_get_name,
+    row_get_orient,
+    row_get_site,
+    row_get_site_count,
+    row_get_spacing,
+    site_get_const_name,
+    site_get_height,
+    site_get_lib,
+    site_get_name,
+    site_get_symmetry_r90,
+    site_get_symmetry_x,
+    site_get_symmetry_y,
+    site_get_width,
+    site_has_row_pattern,
+    site_is_hybrid,
+    techvia_get_bottom_layer,
+    techvia_get_const_name,
+    techvia_get_name,
+    techvia_get_non_default_rule,
+    techvia_get_pattern,
+    techvia_get_resistance,
+    techvia_get_tech,
+    techvia_get_top_layer,
+    techvia_get_via_generate_rule,
+    techvia_has_params,
+    techvia_is_default,
+    techvia_is_top_of_stack,
+    via_get_block,
+    via_get_block_via,
+    via_get_bottom_layer,
+    via_get_const_name,
+    via_get_name,
+    via_get_orient,
+    via_get_pattern,
+    via_get_tech_via,
+    via_get_top_layer,
+    via_get_via_generate_rule,
+    via_has_params,
+    via_is_default,
+    via_is_via_rotated,
 };

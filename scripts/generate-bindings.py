@@ -44,6 +44,11 @@ TARGETS = {
     "dbITerm":     {"key": "iterm",  "args": ["inst", "pin"],     "resolve": "gen_iterm(h, inst, pin)"},
     "dbMTerm":     {"key": "mterm",  "args": ["master", "term"],  "resolve": "gen_mterm(h, master, term)"},
     "dbTechLayer": {"key": "layer",  "args": ["layer"],           "resolve": "gen_techlayer(h, layer)"},
+    "dbRow":       {"key": "row",    "args": ["row"],             "resolve": "gen_row(h, row)"},
+    "dbVia":       {"key": "via",    "args": ["via"],             "resolve": "gen_via(h, via)"},
+    "dbTechVia":   {"key": "techvia","args": ["via"],             "resolve": "gen_techvia(h, via)"},
+    "dbTechNonDefaultRule": {"key": "ndr", "args": ["rule"],      "resolve": "gen_ndr(h, rule)"},
+    "dbSite":      {"key": "site",   "args": ["site"],            "resolve": "gen_site(h, site)"},
 }
 
 
@@ -295,6 +300,21 @@ def main() -> int:
         "  odb::dbMaster* m = gen_master(h, master); return m ? m->findMTerm(gs(term).c_str()) : nullptr; }\n"
         "static odb::dbTechLayer* gen_techlayer(const OdbDb& h, rust::Str n) {\n"
         "  odb::dbTech* t = h.db->getTech(); return t ? t->findLayer(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbRow* gen_row(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr; std::string name = gs(n);\n"
+        "  for (odb::dbRow* r : b->getRows()) { if (r->getName() == name) return r; } return nullptr; }\n"
+        "static odb::dbVia* gen_via(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findVia(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbTechVia* gen_techvia(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbTech* t = h.db->getTech(); return t ? t->findVia(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbTechNonDefaultRule* gen_ndr(const OdbDb& h, rust::Str n) {\n"
+        "  std::string name = gs(n); odb::dbBlock* b = gen_block(h);\n"
+        "  if (b) { if (auto* r = b->findNonDefaultRule(name.c_str())) return r; }\n"
+        "  odb::dbTech* t = h.db->getTech(); return t ? t->findNonDefaultRule(name.c_str()) : nullptr; }\n"
+        "static odb::dbSite* gen_site(const OdbDb& h, rust::Str n) {\n"
+        "  std::string name = gs(n);\n"
+        "  for (odb::dbLib* lib : h.db->getLibs()) { if (auto* s = lib->findSite(name.c_str())) return s; }\n"
+        "  return nullptr; }\n"
         "}  // namespace\n")
     (LIB / "src/generated.cc").write_text(
         "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +

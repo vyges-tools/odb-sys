@@ -5,7 +5,7 @@
   "scope": "hand-written core only",
   "class_count": 44,
   "method_count": 1137,
-  "bridged_count": 288,
+  "bridged_count": 320,
   "classes": [
     {
       "name": "dbBPin",
@@ -1279,7 +1279,7 @@
           ],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbVia"
         },
         {
@@ -2130,7 +2130,7 @@
           ],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechNonDefaultRule"
         },
         {
@@ -2433,7 +2433,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechVia"
         },
         {
@@ -2442,7 +2442,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbVia"
         },
         {
@@ -4966,7 +4966,7 @@
           ],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbSite"
         },
         {
@@ -8530,7 +8530,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getSpacing",
@@ -8875,7 +8875,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isHybrid",
@@ -8883,7 +8883,7 @@
           "params": [],
           "const": true,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getRowPattern",
@@ -9063,7 +9063,7 @@
           ],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechVia"
         },
         {
@@ -9326,7 +9326,7 @@
           ],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechNonDefaultRule"
         },
         {
@@ -9942,7 +9942,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getNonDefaultRule",
@@ -10717,7 +10717,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getLayerRule",
@@ -10796,7 +10796,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setHardSpacing",
@@ -10993,7 +10993,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setDefault",
@@ -11009,7 +11009,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setTopOfStack",
@@ -11059,7 +11059,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setViaGenerateRule",
@@ -11080,7 +11080,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechViaGenerateRule"
         },
         {
@@ -11089,7 +11089,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setViaParams",
@@ -11145,7 +11145,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -11154,7 +11154,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -11187,7 +11187,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getViaLayerRuleCount",
@@ -11729,7 +11729,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setPattern",
@@ -11763,7 +11763,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechViaGenerateRule"
         },
         {
@@ -11772,7 +11772,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "setViaParams",
@@ -11828,7 +11828,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -11837,7 +11837,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -11846,7 +11846,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getOrient",
@@ -11862,7 +11862,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechVia"
         },
         {
@@ -11871,7 +11871,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbVia"
         },
         {
@@ -11893,7 +11893,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         }
       ],
       "hand_written": true
@@ -12036,7 +12036,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {
@@ -12054,7 +12054,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbTechLayer"
         },
         {

@@ -24,6 +24,21 @@ static odb::dbMTerm* gen_mterm(const OdbDb& h, rust::Str master, rust::Str term)
   odb::dbMaster* m = gen_master(h, master); return m ? m->findMTerm(gs(term).c_str()) : nullptr; }
 static odb::dbTechLayer* gen_techlayer(const OdbDb& h, rust::Str n) {
   odb::dbTech* t = h.db->getTech(); return t ? t->findLayer(gs(n).c_str()) : nullptr; }
+static odb::dbRow* gen_row(const OdbDb& h, rust::Str n) {
+  odb::dbBlock* b = gen_block(h); if (!b) return nullptr; std::string name = gs(n);
+  for (odb::dbRow* r : b->getRows()) { if (r->getName() == name) return r; } return nullptr; }
+static odb::dbVia* gen_via(const OdbDb& h, rust::Str n) {
+  odb::dbBlock* b = gen_block(h); return b ? b->findVia(gs(n).c_str()) : nullptr; }
+static odb::dbTechVia* gen_techvia(const OdbDb& h, rust::Str n) {
+  odb::dbTech* t = h.db->getTech(); return t ? t->findVia(gs(n).c_str()) : nullptr; }
+static odb::dbTechNonDefaultRule* gen_ndr(const OdbDb& h, rust::Str n) {
+  std::string name = gs(n); odb::dbBlock* b = gen_block(h);
+  if (b) { if (auto* r = b->findNonDefaultRule(name.c_str())) return r; }
+  odb::dbTech* t = h.db->getTech(); return t ? t->findNonDefaultRule(name.c_str()) : nullptr; }
+static odb::dbSite* gen_site(const OdbDb& h, rust::Str n) {
+  std::string name = gs(n);
+  for (odb::dbLib* lib : h.db->getLibs()) { if (auto* s = lib->findSite(name.c_str())) return s; }
+  return nullptr; }
 }  // namespace
 
 rust::String block_get_name(const OdbDb& h) { auto* p = gen_block(h); return p ? rust::String(p->getName()) : rust::String(); }
@@ -270,3 +285,49 @@ rust::String layer_get_lower_layer(const OdbDb& h, rust::Str layer) { auto* p = 
 rust::String layer_get_upper_layer(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); if (!p) return rust::String(); auto* t = p->getUpperLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String layer_get_tech(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); if (!p) return rust::String(); auto* t = p->getTech(); return t ? rust::String(t->getName()) : rust::String(); }
 bool layer_has_orth_spacing_table(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->hasOrthSpacingTable() : false; }
+rust::String row_get_name(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String row_get_const_name(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+rust::String row_get_site(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); if (!p) return rust::String(); auto* t = p->getSite(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String row_get_orient(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? rust::String(p->getOrient().getString()) : rust::String(); }
+int32_t row_get_site_count(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getSiteCount() : 0; }
+int32_t row_get_spacing(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); return p ? p->getSpacing() : 0; }
+rust::String row_get_block(const OdbDb& h, rust::Str row) { auto* p = gen_row(h, row); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String via_get_name(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String via_get_const_name(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+rust::String via_get_pattern(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); return p ? rust::String(p->getPattern()) : rust::String(); }
+rust::String via_get_via_generate_rule(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); if (!p) return rust::String(); auto* t = p->getViaGenerateRule(); return t ? rust::String(t->getName()) : rust::String(); }
+bool via_has_params(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); return p ? p->hasParams() : false; }
+rust::String via_get_block(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String via_get_top_layer(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); if (!p) return rust::String(); auto* t = p->getTopLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String via_get_bottom_layer(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); if (!p) return rust::String(); auto* t = p->getBottomLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool via_is_via_rotated(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); return p ? p->isViaRotated() : false; }
+rust::String via_get_orient(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); return p ? rust::String(p->getOrient().getString()) : rust::String(); }
+rust::String via_get_tech_via(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); if (!p) return rust::String(); auto* t = p->getTechVia(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String via_get_block_via(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); if (!p) return rust::String(); auto* t = p->getBlockVia(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool via_is_default(const OdbDb& h, rust::Str via) { auto* p = gen_via(h, via); return p ? p->isDefault() : false; }
+rust::String techvia_get_name(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String techvia_get_const_name(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+bool techvia_is_default(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); return p ? p->isDefault() : false; }
+bool techvia_is_top_of_stack(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); return p ? p->isTopOfStack() : false; }
+double techvia_get_resistance(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); return p ? p->getResistance() : 0.0; }
+rust::String techvia_get_pattern(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); return p ? rust::String(p->getPattern()) : rust::String(); }
+rust::String techvia_get_via_generate_rule(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); if (!p) return rust::String(); auto* t = p->getViaGenerateRule(); return t ? rust::String(t->getName()) : rust::String(); }
+bool techvia_has_params(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); return p ? p->hasParams() : false; }
+rust::String techvia_get_tech(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); if (!p) return rust::String(); auto* t = p->getTech(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String techvia_get_top_layer(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); if (!p) return rust::String(); auto* t = p->getTopLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String techvia_get_bottom_layer(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); if (!p) return rust::String(); auto* t = p->getBottomLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String techvia_get_non_default_rule(const OdbDb& h, rust::Str via) { auto* p = gen_techvia(h, via); if (!p) return rust::String(); auto* t = p->getNonDefaultRule(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String ndr_get_name(const OdbDb& h, rust::Str rule) { auto* p = gen_ndr(h, rule); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String ndr_get_const_name(const OdbDb& h, rust::Str rule) { auto* p = gen_ndr(h, rule); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+bool ndr_is_block_rule(const OdbDb& h, rust::Str rule) { auto* p = gen_ndr(h, rule); return p ? p->isBlockRule() : false; }
+bool ndr_get_hard_spacing(const OdbDb& h, rust::Str rule) { auto* p = gen_ndr(h, rule); return p ? p->getHardSpacing() : false; }
+rust::String site_get_name(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String site_get_const_name(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+int32_t site_get_width(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->getWidth() : 0; }
+int32_t site_get_height(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->getHeight() : 0; }
+bool site_get_symmetry_x(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->getSymmetryX() : false; }
+bool site_get_symmetry_y(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->getSymmetryY() : false; }
+bool site_get_symmetry_r90(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->getSymmetryR90() : false; }
+bool site_has_row_pattern(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->hasRowPattern() : false; }
+bool site_is_hybrid(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); return p ? p->isHybrid() : false; }
+rust::String site_get_lib(const OdbDb& h, rust::Str site) { auto* p = gen_site(h, site); if (!p) return rust::String(); auto* t = p->getLib(); return t ? rust::String(t->getConstName()) : rust::String(); }

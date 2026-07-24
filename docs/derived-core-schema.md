@@ -22,9 +22,26 @@ It also doubles as a **coverage map**: each method is tagged `bridged` if our cx
 
 `scripts/generate-bindings.py` consumes this schema and emits the **read** surface —
 getters, predicates, relations (`dbFoo*` → the target's name), and iterators
-(`dbSet<dbFoo>` → count + nth-name) — for the name-addressable core classes (`dbBlock`,
-`dbInst`, `dbNet`, `dbBTerm`, `dbMaster`, `dbITerm`, `dbMTerm`, `dbTechLayer`), so the long
-tail of accessors is bound *mechanically* instead of by hand:
+(`dbSet<dbFoo>` → count + nth-name) — for the **name-addressable** core classes, so the
+long tail of accessors is bound *mechanically* instead of by hand:
+
+| Class | Addressed by | Resolver |
+| --- | --- | --- |
+| `dbBlock` | (singleton) | `chip->getBlock()` |
+| `dbInst` · `dbNet` · `dbBTerm` | object name | `block->find{Inst,Net,BTerm}` |
+| `dbITerm` | `inst` + `pin` | `inst->findITerm` |
+| `dbMaster` · `dbSite` | name (scan libs) | `lib->find{Master,Site}` |
+| `dbMTerm` | `master` + `term` | `master->findMTerm` |
+| `dbTechLayer` · `dbTechVia` | name | `tech->find{Layer,Via}` |
+| `dbVia` | name | `block->findVia` |
+| `dbTechNonDefaultRule` | name | `block`/`tech` `->findNonDefaultRule` |
+| `dbRow` | name (scan rows) | `block->getRows()` match |
+
+**Not yet covered:** classes with *no name* — `dbSWire`, `dbObstruction`, `dbBox`, `dbWire`,
+`dbFill`, `dbRSeg`, `dbCapNode` — are index-addressed collections, so they need an
+index-based resolver (a future generator mode), not the by-name model above.
+
+Run:
 
 ```sh
 scripts/generate-bindings.py     # then: cargo build
