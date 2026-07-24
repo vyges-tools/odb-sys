@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "shim.h"
 
+#include <cstdint>
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -216,6 +217,22 @@ std::size_t clear_obstructions(const OdbDb& h) {
   std::vector<dbObstruction*> obs(b->getObstructions().begin(), b->getObstructions().end());
   for (dbObstruction* o : obs) dbObstruction::destroy(o);
   return obs.size();
+}
+rust::String bterm_direction(const OdbDb& h, rust::Str bterm) {
+  dbBlock* b = block_of(h);
+  dbBTerm* bt = b ? b->findBTerm(s(bterm).c_str()) : nullptr;
+  if (!bt) return rust::String();
+  return rust::String(std::string(bt->getIoType().getString()));  // INPUT/OUTPUT/INOUT/…
+}
+std::uint64_t total_wire_length(const OdbDb& h) {
+  dbBlock* b = block_of(h);
+  if (!b) return 0;
+  std::uint64_t total = 0;
+  for (dbNet* n : b->getNets()) {
+    odb::dbWire* w = n->getWire();
+    if (w) total += w->getLength();
+  }
+  return total;
 }
 void connect(const OdbDb& h, rust::Str inst, rust::Str pin, rust::Str net) {
   dbNet* n = require_block(h)->findNet(s(net).c_str());

@@ -51,5 +51,7 @@ void set_inst_orient(const OdbDb& db, rust::Str inst, rust::Str orient);        
 void add_obstruction(const OdbDb& db, rust::Str layer, int32_t x1, int32_t y1, int32_t x2, int32_t y2);  // routing/PDN obstruction rect on a layer (throws if layer missing)
 std::size_t num_obstructions(const OdbDb& db);
 std::size_t clear_obstructions(const OdbDb& db);   // destroy all obstructions, returns the count removed
+rust::String bterm_direction(const OdbDb& db, rust::Str bterm);   // port direction: INPUT/OUTPUT/INOUT/…
+uint64_t total_wire_length(const OdbDb& db);                      // sum of routed wire length over nets (DBU)
 void connect(const OdbDb& db, rust::Str inst, rust::Str pin, rust::Str net);    // iterm -> net
 void disconnect(const OdbDb& db, rust::Str inst, rust::Str pin);               // iterm -> (none)
