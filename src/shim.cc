@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "shim.h"
 
-#include "odb/defout.h"  // LEF/DEF I/O (libodb v1)
+#include "odb/defin.h"   // LEF/DEF I/O (libodb v1)
+#include "odb/defout.h"
 
 #include <cstdint>
 #include <fstream>
@@ -245,6 +246,32 @@ void write_def(const OdbDb& h, rust::Str path) {
   if (!writer.writeBlock(b, s(path).c_str())) {
     throw std::runtime_error("vyges-opendb: DEF write failed: " + s(path));
   }
+}
+// Read a DEF into the db. mode: "default" (design from scratch), "floorplan" (update existing
+// COMPONENTS/PINS/DIEAREA/TRACKS/ROWS/NETS — this is Odb.ApplyDEFTemplate), "incremental"
+// (update COMPONENTS/PINS). Non-default modes require an existing design (chip + libs).
+void read_def(const OdbDb& h, rust::Str def_path, rust::Str mode) {
+  odb::dbDatabase* db = h.db;
+  std::string ms = s(mode);
+  odb::defin::MODE m = odb::defin::DEFAULT;
+  if (ms == "floorplan") {
+    m = odb::defin::FLOORPLAN;
+  } else if (ms == "incremental") {
+    m = odb::defin::INCREMENTAL;
+  }
+  odb::dbChip* chip = db->getChip();
+  if (!chip) {
+    if (m != odb::defin::DEFAULT) {
+      throw std::runtime_error("vyges-opendb: no existing design for a floorplan/incremental DEF update");
+    }
+    chip = odb::dbChip::create(db, db->getTech());  // fresh chip (DEFAULT import into a tech-only db)
+  }
+  std::vector<odb::dbLib*> libs;
+  for (odb::dbLib* lib : db->getLibs()) {
+    libs.push_back(lib);
+  }
+  odb::defin reader(db, const_cast<utl::Logger*>(&h.logger), m);
+  reader.readChip(libs, s(def_path).c_str(), chip);
 }
 void place_bterm(const OdbDb& h, rust::Str bterm, rust::Str layer, int32_t x1, int32_t y1,
                  int32_t x2, int32_t y2) {

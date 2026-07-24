@@ -22,6 +22,7 @@ struct OdbDb {
 std::unique_ptr<OdbDb> open_db(rust::Str path);   // throws -> Rust Result
 void write_db(const OdbDb& db, rust::Str path);   // throws -> Rust Result
 void write_def(const OdbDb& db, rust::Str path);  // export the block to a DEF file (libodb v1; throws)
+void read_def(const OdbDb& db, rust::Str def_path, rust::Str mode);  // import DEF / ApplyDEFTemplate (throws)
 
 // ---- read / inspect ----------------------------------------------------------
 rust::String block_name(const OdbDb& db);
