@@ -54,9 +54,12 @@ jobs:
           [ "${{ runner.os }}" = "macOS" ] && OSX="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_PREFIX_PATH=$(brew --prefix)"
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVYGES_ODB_SMOKE=ON $OSX
           # Build ONLY odb_smoke (pulls in libodb + the abseil subset odb actually uses). The
-          # default `all` target also compiles abseil libs odb never links (flags/status/...),
-          # whose extra parallel TUs spike memory and get the runner OOM/shutdown-killed (143).
-          cmake --build build --target odb_smoke -j
+          # default `all` target also compiles abseil libs odb never links (flags/status/...).
+          # BOUND parallelism to ncpu: a bare `-j` means UNLIMITED jobs under make, which spawns
+          # far more than ncpu heavy C++ compiles at once, blows past the runner's RAM, and gets
+          # it OOM/shutdown-killed (143). ncpu matches what the cargo builds (which passed) used.
+          JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          cmake --build build --target odb_smoke --parallel "$JOBS"
 
       - name: Smoke test (round-trip a real .odb)
         run: |
