@@ -63,3 +63,8 @@ inline odb::dbBlockage* gen_blockage(const OdbDb& h, std::size_t i) {
 inline odb::dbTrackGrid* gen_trackgrid(const OdbDb& h, std::size_t i) {
   odb::dbBlock* b = gen_block(h); if (!b) return nullptr;
   std::size_t k = 0; for (odb::dbTrackGrid* x : b->getTrackGrids()) { if (k++ == i) return x; } return nullptr; }
+inline odb::dbMarkerCategory* gen_marker_cat(const OdbDb& h, rust::Str n) {
+  odb::dbBlock* b = gen_block(h); return b ? b->findMarkerCategory(gs(n).c_str()) : nullptr; }
+inline odb::dbMarker* gen_marker(const OdbDb& h, rust::Str cat, std::size_t i) {
+  odb::dbMarkerCategory* c = gen_marker_cat(h, cat); if (!c) return nullptr;
+  std::size_t k = 0; for (odb::dbMarker* m : c->getMarkers()) { if (k++ == i) return m; } return nullptr; }

@@ -489,3 +489,27 @@ rust::String trackgrid_get_tech_layer(const OdbDb& h, std::size_t idx) { auto* p
 rust::String trackgrid_get_block(const OdbDb& h, std::size_t idx) { auto* p = gen_trackgrid(h, idx); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
 int32_t trackgrid_get_num_grid_patterns_x(const OdbDb& h, std::size_t idx) { auto* p = gen_trackgrid(h, idx); return p ? p->getNumGridPatternsX() : 0; }
 int32_t trackgrid_get_num_grid_patterns_y(const OdbDb& h, std::size_t idx) { auto* p = gen_trackgrid(h, idx); return p ? p->getNumGridPatternsY() : 0; }
+rust::String marker_cat_get_name(const OdbDb& h, rust::Str category) { auto* p = gen_marker_cat(h, category); if (!p) return rust::String(); const char* v = p->getName(); return rust::String(v ? v : ""); }
+rust::String marker_cat_get_description(const OdbDb& h, rust::Str category) { auto* p = gen_marker_cat(h, category); return p ? rust::String(p->getDescription()) : rust::String(); }
+int32_t marker_cat_get_max_markers(const OdbDb& h, rust::Str category) { auto* p = gen_marker_cat(h, category); return p ? p->getMaxMarkers() : 0; }
+std::size_t num_marker_cat_get_markers(const OdbDb& h, rust::Str category) { auto* p = gen_marker_cat(h, category); return p ? p->getMarkers().size() : 0; }
+rust::String nth_marker_cat_get_markers(const OdbDb& h, rust::Str category, std::size_t i) { auto* p = gen_marker_cat(h, category); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getMarkers()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_marker_cat_get_marker_categories(const OdbDb& h, rust::Str category) { auto* p = gen_marker_cat(h, category); return p ? p->getMarkerCategories().size() : 0; }
+rust::String nth_marker_cat_get_marker_categories(const OdbDb& h, rust::Str category, std::size_t i) { auto* p = gen_marker_cat(h, category); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getMarkerCategories()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+rust::String marker_cat_get_top_category(const OdbDb& h, rust::Str category) { auto* p = gen_marker_cat(h, category); if (!p) return rust::String(); auto* t = p->getTopCategory(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String marker_cat_get_source(const OdbDb& h, rust::Str category) { auto* p = gen_marker_cat(h, category); return p ? rust::String(p->getSource()) : rust::String(); }
+int32_t marker_cat_get_marker_count(const OdbDb& h, rust::Str category) { auto* p = gen_marker_cat(h, category); return p ? p->getMarkerCount() : 0; }
+rust::String marker_get_comment(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? rust::String(p->getComment()) : rust::String(); }
+int32_t marker_get_line_number(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->getLineNumber() : 0; }
+bool marker_is_visited(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->isVisited() : false; }
+bool marker_is_visible(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->isVisible() : false; }
+bool marker_is_waived(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->isWaived() : false; }
+rust::String marker_get_name(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? rust::String(p->getName()) : rust::String(); }
+rust::String marker_get_category(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); if (!p) return rust::String(); auto* t = p->getCategory(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String marker_get_tech_layer(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); if (!p) return rust::String(); auto* t = p->getTechLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+int32_t marker_get_b_box_x_min(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->getBBox().xMin() : 0; }
+int32_t marker_get_b_box_y_min(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->getBBox().yMin() : 0; }
+int32_t marker_get_b_box_x_max(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->getBBox().xMax() : 0; }
+int32_t marker_get_b_box_y_max(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->getBBox().yMax() : 0; }
+int32_t marker_get_b_box_dx(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->getBBox().dx() : 0; }
+int32_t marker_get_b_box_dy(const OdbDb& h, rust::Str category, std::size_t idx) { auto* p = gen_marker(h, category, idx); return p ? p->getBBox().dy() : 0; }

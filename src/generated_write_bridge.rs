@@ -157,6 +157,14 @@ mod ffi_gen_write {
         fn blockage_set_soft(db: &OdbDb, idx: usize) -> Result<()>;
         fn blockage_set_is_system_reserved(db: &OdbDb, idx: usize, is_system_reserved: bool) -> Result<()>;
         fn blockage_set_max_density(db: &OdbDb, idx: usize, max_density: f32) -> Result<()>;
+        fn marker_cat_set_description(db: &OdbDb, category: &str, description: &str) -> Result<()>;
+        fn marker_cat_set_source(db: &OdbDb, category: &str, source: &str) -> Result<()>;
+        fn marker_cat_set_max_markers(db: &OdbDb, category: &str, max_markers: i32) -> Result<()>;
+        fn marker_set_comment(db: &OdbDb, category: &str, idx: usize, comment: &str) -> Result<()>;
+        fn marker_set_line_number(db: &OdbDb, category: &str, idx: usize, line_number: i32) -> Result<()>;
+        fn marker_set_visited(db: &OdbDb, category: &str, idx: usize, visited: bool) -> Result<()>;
+        fn marker_set_visible(db: &OdbDb, category: &str, idx: usize, visible: bool) -> Result<()>;
+        fn marker_set_waived(db: &OdbDb, category: &str, idx: usize, waived: bool) -> Result<()>;
     }
 }
 
@@ -240,6 +248,14 @@ pub use ffi_gen_write::{
     layer_set_wire_extension,
     layer_set_wrong_way_min_width,
     layer_set_wrong_way_width,
+    marker_cat_set_description,
+    marker_cat_set_max_markers,
+    marker_cat_set_source,
+    marker_set_comment,
+    marker_set_line_number,
+    marker_set_visible,
+    marker_set_visited,
+    marker_set_waived,
     master_clear_pin_access,
     master_set_backside_bridge,
     master_set_frozen,

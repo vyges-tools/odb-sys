@@ -492,6 +492,30 @@ mod ffi_gen {
         fn trackgrid_get_block(db: &OdbDb, idx: usize) -> String;
         fn trackgrid_get_num_grid_patterns_x(db: &OdbDb, idx: usize) -> i32;
         fn trackgrid_get_num_grid_patterns_y(db: &OdbDb, idx: usize) -> i32;
+        fn marker_cat_get_name(db: &OdbDb, category: &str) -> String;
+        fn marker_cat_get_description(db: &OdbDb, category: &str) -> String;
+        fn marker_cat_get_max_markers(db: &OdbDb, category: &str) -> i32;
+        fn num_marker_cat_get_markers(db: &OdbDb, category: &str) -> usize;
+        fn nth_marker_cat_get_markers(db: &OdbDb, category: &str, i: usize) -> String;
+        fn num_marker_cat_get_marker_categories(db: &OdbDb, category: &str) -> usize;
+        fn nth_marker_cat_get_marker_categories(db: &OdbDb, category: &str, i: usize) -> String;
+        fn marker_cat_get_top_category(db: &OdbDb, category: &str) -> String;
+        fn marker_cat_get_source(db: &OdbDb, category: &str) -> String;
+        fn marker_cat_get_marker_count(db: &OdbDb, category: &str) -> i32;
+        fn marker_get_comment(db: &OdbDb, category: &str, idx: usize) -> String;
+        fn marker_get_line_number(db: &OdbDb, category: &str, idx: usize) -> i32;
+        fn marker_is_visited(db: &OdbDb, category: &str, idx: usize) -> bool;
+        fn marker_is_visible(db: &OdbDb, category: &str, idx: usize) -> bool;
+        fn marker_is_waived(db: &OdbDb, category: &str, idx: usize) -> bool;
+        fn marker_get_name(db: &OdbDb, category: &str, idx: usize) -> String;
+        fn marker_get_category(db: &OdbDb, category: &str, idx: usize) -> String;
+        fn marker_get_tech_layer(db: &OdbDb, category: &str, idx: usize) -> String;
+        fn marker_get_b_box_x_min(db: &OdbDb, category: &str, idx: usize) -> i32;
+        fn marker_get_b_box_y_min(db: &OdbDb, category: &str, idx: usize) -> i32;
+        fn marker_get_b_box_x_max(db: &OdbDb, category: &str, idx: usize) -> i32;
+        fn marker_get_b_box_y_max(db: &OdbDb, category: &str, idx: usize) -> i32;
+        fn marker_get_b_box_dx(db: &OdbDb, category: &str, idx: usize) -> i32;
+        fn marker_get_b_box_dy(db: &OdbDb, category: &str, idx: usize) -> i32;
     }
 }
 
@@ -704,6 +728,26 @@ pub use ffi_gen::{
     layer_is_rect_only_except_non_core_pins,
     layer_is_right_way_on_grid_only,
     layer_is_right_way_on_grid_only_check_mask,
+    marker_cat_get_description,
+    marker_cat_get_marker_count,
+    marker_cat_get_max_markers,
+    marker_cat_get_name,
+    marker_cat_get_source,
+    marker_cat_get_top_category,
+    marker_get_b_box_dx,
+    marker_get_b_box_dy,
+    marker_get_b_box_x_max,
+    marker_get_b_box_x_min,
+    marker_get_b_box_y_max,
+    marker_get_b_box_y_min,
+    marker_get_category,
+    marker_get_comment,
+    marker_get_line_number,
+    marker_get_name,
+    marker_get_tech_layer,
+    marker_is_visible,
+    marker_is_visited,
+    marker_is_waived,
     master_get_const_name,
     master_get_e_e_q,
     master_get_height,
@@ -849,6 +893,8 @@ pub use ffi_gen::{
     nth_inst_get_children,
     nth_inst_get_i_terms,
     nth_layer_get_tech_layer_cut_class_rules,
+    nth_marker_cat_get_marker_categories,
+    nth_marker_cat_get_markers,
     nth_master_get_m_terms,
     nth_module_get_children,
     nth_module_get_insts,
@@ -891,6 +937,8 @@ pub use ffi_gen::{
     num_inst_get_children,
     num_inst_get_i_terms,
     num_layer_get_tech_layer_cut_class_rules,
+    num_marker_cat_get_marker_categories,
+    num_marker_cat_get_markers,
     num_master_get_m_terms,
     num_module_get_children,
     num_module_get_insts,

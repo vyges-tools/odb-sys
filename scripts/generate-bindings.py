@@ -61,6 +61,9 @@ TARGETS = {
     "dbRegion":    {"key": "region", "args": ["region"], "resolve": "gen_region(h, region)"},
     "dbBlockage":  {"key": "blockage",  "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_blockage(h, idx)"},
     "dbTrackGrid": {"key": "trackgrid", "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_trackgrid(h, idx)"},
+    # DRC / violation markers — category by name, individual markers by (category, index)
+    "dbMarkerCategory": {"key": "marker_cat", "args": ["category"], "resolve": "gen_marker_cat(h, category)"},
+    "dbMarker": {"key": "marker", "args": ["category", {"name": "idx", "type": "idx"}], "resolve": "gen_marker(h, category, idx)"},
 }
 
 
@@ -119,7 +122,7 @@ def marshal_param(ptype: str, arg: str):
     if n in SCALAR_IN:
         cxx, rty = SCALAR_IN[n]
         return cxx, rty, arg
-    if n == "std::string":
+    if n in ("std::string", "conststd::string&", "std::string&"):
         return "rust::Str", "&str", f"gs({arg})"
     if n in ("constchar*", "char*"):
         return "rust::Str", "&str", f"gs({arg}).c_str()"
@@ -417,8 +420,8 @@ class Emit:
                 self.api.append(
                     f"    pub fn {fn}(&self{rust_args_sig}) -> {rty} "
                     f"{{ sys::{fn}(self.r(){rust_fwd}) }}")
-            elif nret in ("std::string",):
-                reg_kind = "string"
+            elif nret in ("std::string", "conststd::string&", "std::string&"):
+                reg_kind = "string"  # by-value or (const) ref std::string — rust::String copies it
                 self._string(fn, name, resolve, c_params, r_params, rust_args_sig, rust_fwd,
                              f"rust::String(p->{name}())")
             elif nret in ("constchar*", "char*"):
@@ -638,6 +641,11 @@ def main() -> int:
         "static odb::dbTrackGrid* gen_trackgrid(const OdbDb& h, std::size_t i) {\n"
         "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;\n"
         "  std::size_t k = 0; for (odb::dbTrackGrid* x : b->getTrackGrids()) { if (k++ == i) return x; } return nullptr; }\n"
+        "static odb::dbMarkerCategory* gen_marker_cat(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findMarkerCategory(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbMarker* gen_marker(const OdbDb& h, rust::Str cat, std::size_t i) {\n"
+        "  odb::dbMarkerCategory* c = gen_marker_cat(h, cat); if (!c) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbMarker* m : c->getMarkers()) { if (k++ == i) return m; } return nullptr; }\n"
         "}  // namespace\n")
 
     # ---- generated_resolvers.h (shared by the read + write .cc) -----------------
