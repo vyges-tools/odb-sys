@@ -140,6 +140,10 @@ void set_inst_location(const OdbDb& h, rust::Str inst, int32_t x, int32_t y) {
   i->setLocation(x, y);
   i->setPlacementStatus(odb::dbPlacementStatus::PLACED);
 }
+void set_inst_orient(const OdbDb& h, rust::Str inst, rust::Str orient) {
+  // dbOrientType parses "R0"/"R90"/"R180"/"R270"/"MX"/"MY"/"MXR90"/"MYR90".
+  require_inst(h, inst)->setOrient(odb::dbOrientType(s(orient).c_str()));
+}
 void connect(const OdbDb& h, rust::Str inst, rust::Str pin, rust::Str net) {
   dbNet* n = require_block(h)->findNet(s(net).c_str());
   if (!n) throw std::runtime_error("vyges-opendb: net not found: " + s(net));

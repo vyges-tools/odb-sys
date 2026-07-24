@@ -40,6 +40,7 @@ mod ffi {
         fn create_net(db: &OdbDb, name: &str) -> Result<()>;
         fn create_inst(db: &OdbDb, master: &str, name: &str) -> Result<()>;
         fn set_inst_location(db: &OdbDb, inst: &str, x: i32, y: i32) -> Result<()>;
+        fn set_inst_orient(db: &OdbDb, inst: &str, orient: &str) -> Result<()>;
         fn connect(db: &OdbDb, inst: &str, pin: &str, net: &str) -> Result<()>;
         fn disconnect(db: &OdbDb, inst: &str, pin: &str) -> Result<()>;
     }
@@ -49,5 +50,5 @@ mod ffi {
 pub use ffi::{
     block_name, connect, create_inst, create_net, disconnect, find_master, first_master_name,
     input_pin, inst_x, inst_y, net_of, nth_inst_name, num_bterms, num_insts, num_nets, open_db,
-    output_pin, set_inst_location, write_db, OdbDb,
+    output_pin, set_inst_location, set_inst_orient, write_db, OdbDb,
 };

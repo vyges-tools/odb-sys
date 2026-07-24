@@ -40,5 +40,6 @@ int32_t inst_y(const OdbDb& db, rust::Str inst);   // instance origin y in DBU (
 void create_net(const OdbDb& db, rust::Str name);                       // throws on dup/failure
 void create_inst(const OdbDb& db, rust::Str master, rust::Str name);    // throws if master missing
 void set_inst_location(const OdbDb& db, rust::Str inst, int32_t x, int32_t y);  // + PLACED
+void set_inst_orient(const OdbDb& db, rust::Str inst, rust::Str orient);        // R0/R90/MX/…
 void connect(const OdbDb& db, rust::Str inst, rust::Str pin, rust::Str net);    // iterm -> net
 void disconnect(const OdbDb& db, rust::Str inst, rust::Str pin);               // iterm -> (none)
