@@ -100,6 +100,13 @@ if(VYGES_ODB_SMOKE)
   target_link_libraries(odb_smoke PRIVATE odb)
 endif()
 
+# ---- fixture generator: synthesize a hierarchical + marker .odb for the Rust tests ----------
+option(VYGES_ODB_MKFIXTURE "Build the hierarchical-fixture generator (odb_mkfixture)" OFF)
+if(VYGES_ODB_MKFIXTURE)
+  add_executable(odb_mkfixture test/make-hier-fixture.cpp)
+  target_link_libraries(odb_mkfixture PRIVATE odb)
+endif()
+
 # ---- conformance gate: OpenROAD's OWN odb C++ GTests, run against OUR libodb --
 # Proves our standalone/no-Tcl build is behaviorally OpenROAD, and catches drift on a pin bump.
 # Only the tests needing nothing beyond libodb build here: OpenROAD's tst/ framework pulls STA +
