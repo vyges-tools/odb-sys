@@ -96,6 +96,28 @@ Files (all `@generated`): `generated_write.{h,cc}`, `generated_write_bridge.rs`,
 `../vyges-tools-opendb/src/generated_write_api.rs`. Resolvers are shared with the read
 surface via `generated_resolvers.h`.
 
+## Runtime surface — reachable by name (CLI / `vyges mcp`)
+
+Hundreds of typed `Db` methods aren't much use to an agent that can only shell out. The
+generator also emits a **runtime registry** (`../vyges-tools-opendb/src/generated_registry.rs`,
+exposed as `vyges_opendb::registry`) with `FIELDS`/`WRITE_FIELDS` discovery tables and
+`get`/`set` dispatch keyed by `(class, field)` with **string-encoded** keys + values. Three
+generic `vyges-opendb` subcommands sit on top, so the whole surface is reachable — and
+self-describing to `vyges mcp` via `--describe` — without a subcommand per accessor:
+
+```sh
+vyges-opendb fields [--class dbInst] [--writable]        # discover fields (JSON)
+vyges-opendb get --input d.odb --class dbNet --field get_sig_type --key VPWR   # -> "POWER"
+vyges-opendb get --input d.odb --class dbInst --field get_orient --key _19_    # -> "R0"
+vyges-opendb set --input d.odb --output o.odb --class dbInst --field set_orient --key _19_ --value MX
+```
+
+Addressing follows the tables above: `--key` is repeatable and positional (`str:` keys and
+`idx:` keys in declared order), `--value` likewise for setters. `set` (and `fields
+--writable`) require a `--features gen-write` build — the same L2/write gate — and error
+clearly otherwise. Unknown fields, bad indices, bad values, and missing objects all surface
+as typed errors, never panics.
+
 Regenerating after an OpenROAD SHA bump re-derives the schema and re-emits the bindings, so
 new upstream accessors are picked up automatically (subject to the guards above).
 

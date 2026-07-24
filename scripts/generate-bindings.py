@@ -136,6 +136,15 @@ def _rty(kind: str) -> str:
     return "usize" if kind == "idx" else "&str"
 
 
+def key_exprs(argspecs):
+    """(dispatch call fragment, discovery descriptors) for a class's addressing keys."""
+    calls = ", ".join(
+        (f"k_idx(keys, {i})?" if k == "idx" else f"k_str(keys, {i})?")
+        for i, (n, k) in enumerate(argspecs))
+    desc = [("idx:" + n) if k == "idx" else ("str:" + n) for n, k in argspecs]
+    return calls, desc
+
+
 def nameable_classes(db_h: str) -> dict[str, str]:
     """class name -> a C++ expression template '{}->...' yielding its name (const char*/std::string).
 
@@ -191,6 +200,10 @@ class Emit:
         self.wreexport: list[str] = []
         self.wapi: list[str] = []
         self.wper_class: dict[str, int] = {}
+        # runtime registry: (class, field, value_kind, keys_desc, dispatch_arm) for reads,
+        # and (class, field, value_types_desc, keys_desc, dispatch_arm) for writes.
+        self.reg: list[tuple] = []
+        self.wreg: list[tuple] = []
 
     def add_setter(self, cls, spec, m, reserved_fn, reserved_db, seen):
         """Emit a `set*`/`clear*` setter with fully-marshallable params -> Result<()> (throws on
@@ -243,6 +256,23 @@ class Emit:
             f"{{ Ok(sys::{fn}(self.r(){fwd})?) }}")
         seen.add(fn)
         self.wper_class[cls] = self.wper_class.get(cls, 0) + 1
+
+        # runtime write registry: convert each value from the CLI's `values` slice
+        rust_types = [v.split(":", 1)[1].strip() for v in rust_vals]
+
+        def conv(j, rt):
+            if rt == "&str":
+                return f"val(values, {j})?"
+            return (f'val(values, {j})?.parse().map_err(|_| '
+                    f'crate::Error::Odb(format!("value #{j} must be a {rt}")))?')
+
+        field = snake(name)
+        key_call, keys_desc = key_exprs(argspecs)
+        value_types = ["str" if rt == "&str" else rt for rt in rust_types]
+        # Db setter signature is (keys..., values...) — join both, skipping an empty key list.
+        parts = ([key_call] if key_call else []) + [conv(j, rt) for j, rt in enumerate(rust_types)]
+        arm = f'        ("{cls}", "{field}") => {{ db.{fn}({", ".join(parts)})?; Ok(()) }},'
+        self.wreg.append((cls, field, value_types, keys_desc, arm))
         return True
 
     def add(self, cls, spec, m, nameable, reserved_fn, reserved_db, seen):
@@ -263,10 +293,16 @@ class Emit:
         target = ret.rstrip("*").strip() if kind == "relation" else None
         elem = ret[len("dbSet<"):].rstrip(">").strip().rstrip("*").strip() if kind == "iterator" else None
 
+        field = snake(name)
+        key_call, keys_desc = key_exprs(argspecs)
+        arm = f'        ("{cls}", "{field}") => Ok(serde_json::json!(db.{fn}({key_call}))),'
+        reg_kind = None
+
         # ---- decide marshalling ------------------------------------------------
         if kind in ("getter", "predicate"):
             if nret in SCALAR:
                 rty, cty, default = SCALAR[nret]
+                reg_kind = rty
                 self.h.append(f"{cty} {fn}(const OdbDb& db{c_params});")
                 self.cc.append(
                     f"{cty} {fn}(const OdbDb& h{c_params}) {{ auto* p = {resolve}; "
@@ -276,9 +312,11 @@ class Emit:
                     f"    pub fn {fn}(&self{rust_args_sig}) -> {rty} "
                     f"{{ sys::{fn}(self.r(){rust_fwd}) }}")
             elif nret in ("std::string",):
+                reg_kind = "string"
                 self._string(fn, name, resolve, c_params, r_params, rust_args_sig, rust_fwd,
                              f"rust::String(p->{name}())")
             elif nret in ("constchar*", "char*"):
+                reg_kind = "string"
                 self.h.append(f"rust::String {fn}(const OdbDb& db{c_params});")
                 self.cc.append(
                     f"rust::String {fn}(const OdbDb& h{c_params}) {{ auto* p = {resolve}; "
@@ -289,6 +327,7 @@ class Emit:
                     f"    pub fn {fn}(&self{rust_args_sig}) -> String "
                     f"{{ sys::{fn}(self.r(){rust_fwd}) }}")
             elif ret in ENUMS:
+                reg_kind = "string"
                 self._string(fn, name, resolve, c_params, r_params, rust_args_sig, rust_fwd,
                              f"rust::String(p->{name}().getString())")
             else:
@@ -298,6 +337,7 @@ class Emit:
             if target not in nameable:
                 self.skipped += 1
                 return False
+            reg_kind = "string"
             nexpr = nameable[target].format("t")
             self.h.append(f"rust::String {fn}(const OdbDb& db{c_params});")
             self.cc.append(
@@ -337,6 +377,7 @@ class Emit:
             seen.add(nth)
             seen.add(fn)
             self.per_class[cls] = self.per_class.get(cls, 0) + 1
+            self.reg.append((cls, field, "list", keys_desc, arm))
             return True
         else:
             self.skipped += 1
@@ -345,6 +386,7 @@ class Emit:
         self.reexport.append(fn)
         seen.add(fn)
         self.per_class[cls] = self.per_class.get(cls, 0) + 1
+        self.reg.append((cls, field, reg_kind, keys_desc, arm))
         return True
 
     def _string(self, fn, name, resolve, c_params, r_params, rust_args_sig, rust_fwd, expr):
@@ -509,6 +551,66 @@ def main() -> int:
         "// &mut self + Result<()>; throws (-> Err) when the addressed object does not exist.\n\n"
         "impl Db {\n" + "\n".join(e.wapi) + "\n}\n")
 
+    # ---- generated_registry.rs (runtime discovery + get/set dispatch) ----------
+    def keys_lit(desc):
+        return "&[" + ", ".join(f'"{d}"' for d in desc) + "]"
+
+    reg = sorted(e.reg)
+    wreg = sorted(e.wreg)
+    read_fields = "\n".join(
+        f'    Field {{ class: "{c}", field: "{f}", value: "{k}", keys: {keys_lit(kd)} }},'
+        for c, f, k, kd, _ in reg)
+    read_arms = "\n".join(t[4] for t in reg)
+    write_fields = "\n".join(
+        f'    WriteField {{ class: "{c}", field: "{f}", values: &[{", ".join(chr(34)+v+chr(34) for v in vt)}], keys: {keys_lit(kd)} }},'
+        for c, f, vt, kd, _ in wreg)
+    write_arms = "\n".join(t[4] for t in wreg)
+
+    (API / "src/generated_registry.rs").write_text(
+        "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +
+        "// Runtime registry over the generated accessors: field discovery + string-keyed\n"
+        "// get/set dispatch, so the whole surface is reachable from the CLI / `vyges mcp`\n"
+        "// without a bespoke subcommand per accessor. include!()'d into `mod registry`.\n\n"
+        "use crate::Db;\n\n"
+        "/// A readable field: its class, name, JSON value kind, and addressing keys\n"
+        "/// (`\"str:inst\"` / `\"idx:idx\"` — order matters).\n"
+        "pub struct Field {\n"
+        "    pub class: &'static str,\n    pub field: &'static str,\n"
+        "    pub value: &'static str,\n    pub keys: &'static [&'static str],\n}\n\n"
+        "/// Every readable field the generated surface exposes.\n"
+        "pub const FIELDS: &[Field] = &[\n" + read_fields + "\n];\n\n"
+        "fn k_str(keys: &[String], i: usize) -> crate::Result<&str> {\n"
+        "    keys.get(i).map(String::as_str)\n"
+        "        .ok_or_else(|| crate::Error::Odb(format!(\"missing key #{i}\")))\n}\n"
+        "fn k_idx(keys: &[String], i: usize) -> crate::Result<usize> {\n"
+        "    k_str(keys, i)?.parse()\n"
+        "        .map_err(|_| crate::Error::Odb(format!(\"key #{i} must be an integer index\")))\n}\n\n"
+        "/// Read a field by (class, field) with string-encoded addressing keys -> JSON value.\n"
+        "pub fn get(db: &Db, class: &str, field: &str, keys: &[String]) "
+        "-> crate::Result<serde_json::Value> {\n"
+        "    match (class, field) {\n" + read_arms + "\n"
+        "        _ => Err(crate::Error::Odb(format!(\"unknown read field: {class}.{field}\"))),\n"
+        "    }\n}\n\n"
+        "/// A writable field: its class, name, value types to supply, and addressing keys.\n"
+        "#[cfg(feature = \"gen-write\")]\n"
+        "pub struct WriteField {\n"
+        "    pub class: &'static str,\n    pub field: &'static str,\n"
+        "    pub values: &'static [&'static str],\n    pub keys: &'static [&'static str],\n}\n\n"
+        "/// Every writable field (gated behind `gen-write`).\n"
+        "#[cfg(feature = \"gen-write\")]\n"
+        "pub const WRITE_FIELDS: &[WriteField] = &[\n" + write_fields + "\n];\n\n"
+        "#[cfg(feature = \"gen-write\")]\n"
+        "fn val(values: &[String], j: usize) -> crate::Result<&str> {\n"
+        "    values.get(j).map(String::as_str)\n"
+        "        .ok_or_else(|| crate::Error::Odb(format!(\"missing value #{j}\")))\n}\n\n"
+        "/// Apply a setter by (class, field) with string keys + string-encoded values.\n"
+        "#[cfg(feature = \"gen-write\")]\n"
+        "pub fn set(db: &mut Db, class: &str, field: &str, keys: &[String], values: &[String]) "
+        "-> crate::Result<()> {\n"
+        "    match (class, field) {\n" + write_arms + "\n"
+        "        _ => Err(crate::Error::Odb(format!(\"unknown write field: {class}.{field}\"))),\n"
+        "    }\n}\n")
+
     total = sum(e.per_class.values())
     wtotal = sum(e.wper_class.values())
     print(f"generated {total} read accessors across {len(e.per_class)} classes "
@@ -517,8 +619,10 @@ def main() -> int:
         w = e.wper_class.get(c, 0)
         print(f"  {c:<10} {e.per_class[c]:>3} read  {w:>3} write")
     print(f"generated {wtotal} setters (gated behind `gen-write`) across {len(e.wper_class)} classes")
+    print(f"registry: {len(e.reg)} read fields + {len(e.wreg)} write fields (get/set dispatch)")
     print("wrote: src/generated{,_write}.{h,cc}, src/generated{,_write}_bridge.rs, "
-          "src/generated_resolvers.h, ../vyges-tools-opendb/src/generated{,_write}_api.rs")
+          "src/generated_resolvers.h, ../vyges-tools-opendb/src/generated{,_write}_api.rs, "
+          "../vyges-tools-opendb/src/generated_registry.rs")
     return 0
 
 
