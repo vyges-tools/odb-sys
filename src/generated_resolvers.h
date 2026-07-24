@@ -51,3 +51,15 @@ inline odb::dbFill* gen_fill(const OdbDb& h, std::size_t i) {
   std::size_t k = 0; for (odb::dbFill* f : b->getFills()) { if (k++ == i) return f; } return nullptr; }
 inline odb::dbBox* gen_box(const OdbDb& h, std::size_t i) {
   odb::dbObstruction* o = gen_obstruction(h, i); return o ? o->getBBox() : nullptr; }
+inline odb::dbModule* gen_module(const OdbDb& h, rust::Str n) {
+  odb::dbBlock* b = gen_block(h); return b ? b->findModule(gs(n).c_str()) : nullptr; }
+inline odb::dbGroup* gen_group(const OdbDb& h, rust::Str n) {
+  odb::dbBlock* b = gen_block(h); return b ? b->findGroup(gs(n).c_str()) : nullptr; }
+inline odb::dbRegion* gen_region(const OdbDb& h, rust::Str n) {
+  odb::dbBlock* b = gen_block(h); return b ? b->findRegion(gs(n).c_str()) : nullptr; }
+inline odb::dbBlockage* gen_blockage(const OdbDb& h, std::size_t i) {
+  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;
+  std::size_t k = 0; for (odb::dbBlockage* x : b->getBlockages()) { if (k++ == i) return x; } return nullptr; }
+inline odb::dbTrackGrid* gen_trackgrid(const OdbDb& h, std::size_t i) {
+  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;
+  std::size_t k = 0; for (odb::dbTrackGrid* x : b->getTrackGrids()) { if (k++ == i) return x; } return nullptr; }

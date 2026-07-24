@@ -5,7 +5,7 @@
   "scope": "hand-written core only",
   "class_count": 44,
   "method_count": 1137,
-  "bridged_count": 509,
+  "bridged_count": 533,
   "classes": [
     {
       "name": "dbBPin",
@@ -663,7 +663,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbModule"
         },
         {
@@ -811,7 +811,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbModule"
         },
         {
@@ -820,7 +820,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbModInst"
         },
         {
@@ -838,7 +838,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbModBTerm"
         },
         {
@@ -847,7 +847,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbModITerm"
         },
         {
@@ -856,7 +856,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbPowerDomain"
         },
         {
@@ -865,7 +865,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbLogicPort"
         },
         {
@@ -874,7 +874,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbPowerSwitch"
         },
         {
@@ -883,7 +883,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbIsolation"
         },
         {
@@ -892,7 +892,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbLevelShifter"
         },
         {
@@ -901,7 +901,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbGroup"
         },
         {
@@ -2148,7 +2148,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbMarkerCategory"
         },
         {
@@ -2333,7 +2333,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getMaxDensity",
@@ -2341,7 +2341,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getBlock",
@@ -4512,7 +4512,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbGroup"
         },
         {
@@ -4557,7 +4557,7 @@
           "params": [],
           "const": false,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbModule"
         },
         {
@@ -7409,7 +7409,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbModInst"
         },
         {
@@ -7418,7 +7418,7 @@
           "params": [],
           "const": true,
           "kind": "relation",
-          "bridged": false,
+          "bridged": true,
           "target": "dbModule"
         },
         {
@@ -8365,7 +8365,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbInst"
         },
         {
@@ -8379,7 +8379,7 @@
           ],
           "const": false,
           "kind": "setter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "isInvalid",
@@ -8387,7 +8387,7 @@
           "params": [],
           "const": false,
           "kind": "predicate",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getBoundaries",
@@ -8456,7 +8456,7 @@
           "params": [],
           "const": false,
           "kind": "iterator",
-          "bridged": false,
+          "bridged": true,
           "element": "dbGroup"
         },
         {
@@ -11640,7 +11640,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getNumGridPatternsY",
@@ -11648,7 +11648,7 @@
           "params": [],
           "const": false,
           "kind": "getter",
-          "bridged": false
+          "bridged": true
         },
         {
           "name": "getGridPatternX",

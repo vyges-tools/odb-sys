@@ -147,3 +147,8 @@ void swire_set_wire_type(const OdbDb& db, rust::Str net, std::size_t idx, rust::
 void wire_set_property(const OdbDb& db, rust::Str net, int32_t jid, int32_t property);
 void box_set_soft(const OdbDb& db, std::size_t idx, bool value);
 void box_set_layer_mask(const OdbDb& db, std::size_t idx, uint32_t mask);
+void region_set_invalid(const OdbDb& db, rust::Str region, bool v);
+void blockage_set_pushed_down(const OdbDb& db, std::size_t idx);
+void blockage_set_soft(const OdbDb& db, std::size_t idx);
+void blockage_set_is_system_reserved(const OdbDb& db, std::size_t idx, bool is_system_reserved);
+void blockage_set_max_density(const OdbDb& db, std::size_t idx, float max_density);

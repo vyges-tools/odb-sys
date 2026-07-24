@@ -10,9 +10,11 @@ mod ffi_gen {
         type OdbDb = crate::ffi::OdbDb;
         fn block_get_name(db: &OdbDb) -> String;
         fn block_get_const_name(db: &OdbDb) -> String;
+        fn block_get_chip(db: &OdbDb) -> String;
         fn block_get_tech(db: &OdbDb) -> String;
         fn block_get_parent(db: &OdbDb) -> String;
         fn block_get_parent_inst(db: &OdbDb) -> String;
+        fn block_get_top_module(db: &OdbDb) -> String;
         fn num_block_get_children(db: &OdbDb) -> usize;
         fn nth_block_get_children(db: &OdbDb, i: usize) -> String;
         fn num_block_get_b_terms(db: &OdbDb) -> usize;
@@ -21,8 +23,28 @@ mod ffi_gen {
         fn nth_block_get_i_terms(db: &OdbDb, i: usize) -> String;
         fn num_block_get_insts(db: &OdbDb) -> usize;
         fn nth_block_get_insts(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_modules(db: &OdbDb) -> usize;
+        fn nth_block_get_modules(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_mod_insts(db: &OdbDb) -> usize;
+        fn nth_block_get_mod_insts(db: &OdbDb, i: usize) -> String;
         fn num_block_get_mod_nets(db: &OdbDb) -> usize;
         fn nth_block_get_mod_nets(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_mod_b_terms(db: &OdbDb) -> usize;
+        fn nth_block_get_mod_b_terms(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_mod_i_terms(db: &OdbDb) -> usize;
+        fn nth_block_get_mod_i_terms(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_power_domains(db: &OdbDb) -> usize;
+        fn nth_block_get_power_domains(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_logic_ports(db: &OdbDb) -> usize;
+        fn nth_block_get_logic_ports(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_power_switches(db: &OdbDb) -> usize;
+        fn nth_block_get_power_switches(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_isolations(db: &OdbDb) -> usize;
+        fn nth_block_get_isolations(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_level_shifters(db: &OdbDb) -> usize;
+        fn nth_block_get_level_shifters(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_groups(db: &OdbDb) -> usize;
+        fn nth_block_get_groups(db: &OdbDb, i: usize) -> String;
         fn num_block_get_nets(db: &OdbDb) -> usize;
         fn nth_block_get_nets(db: &OdbDb, i: usize) -> String;
         fn num_block_get_vias(db: &OdbDb) -> usize;
@@ -56,6 +78,8 @@ mod ffi_gen {
         fn nth_block_get_regions(db: &OdbDb, i: usize) -> String;
         fn num_block_get_non_default_rules(db: &OdbDb) -> usize;
         fn nth_block_get_non_default_rules(db: &OdbDb, i: usize) -> String;
+        fn num_block_get_marker_categories(db: &OdbDb) -> usize;
+        fn nth_block_get_marker_categories(db: &OdbDb, i: usize) -> String;
         fn inst_get_name(db: &OdbDb, inst: &str) -> String;
         fn inst_get_const_name(db: &OdbDb, inst: &str) -> String;
         fn inst_get_origin_x(db: &OdbDb, inst: &str) -> i32;
@@ -75,11 +99,13 @@ mod ffi_gen {
         fn inst_is_do_not_touch(db: &OdbDb, inst: &str) -> bool;
         fn inst_get_block(db: &OdbDb, inst: &str) -> String;
         fn inst_get_master(db: &OdbDb, inst: &str) -> String;
+        fn inst_get_group(db: &OdbDb, inst: &str) -> String;
         fn num_inst_get_i_terms(db: &OdbDb, inst: &str) -> usize;
         fn nth_inst_get_i_terms(db: &OdbDb, inst: &str, i: usize) -> String;
         fn inst_get_first_input(db: &OdbDb, inst: &str) -> String;
         fn inst_get_first_output(db: &OdbDb, inst: &str) -> String;
         fn inst_get_region(db: &OdbDb, inst: &str) -> String;
+        fn inst_get_module(db: &OdbDb, inst: &str) -> String;
         fn inst_get_child(db: &OdbDb, inst: &str) -> String;
         fn inst_get_parent(db: &OdbDb, inst: &str) -> String;
         fn num_inst_get_children(db: &OdbDb, inst: &str) -> usize;
@@ -154,6 +180,8 @@ mod ffi_gen {
         fn net_get_term_b_box_y_max(db: &OdbDb, net: &str) -> i32;
         fn net_get_term_b_box_dx(db: &OdbDb, net: &str) -> i32;
         fn net_get_term_b_box_dy(db: &OdbDb, net: &str) -> i32;
+        fn net_find_main_parent_mod_inst(db: &OdbDb, net: &str) -> String;
+        fn net_find_main_parent_module(db: &OdbDb, net: &str) -> String;
         fn net_has_jumpers(db: &OdbDb, net: &str) -> bool;
         fn net_find_mod_net_in_highest_hier(db: &OdbDb, net: &str) -> String;
         fn bterm_get_name(db: &OdbDb, bterm: &str) -> String;
@@ -249,6 +277,8 @@ mod ffi_gen {
         fn layer_get_wrong_way_width(db: &OdbDb, layer: &str) -> u32;
         fn layer_get_wrong_way_min_width(db: &OdbDb, layer: &str) -> u32;
         fn layer_get_layer_adjustment(db: &OdbDb, layer: &str) -> f32;
+        fn num_layer_get_tech_layer_cut_class_rules(db: &OdbDb, layer: &str) -> usize;
+        fn nth_layer_get_tech_layer_cut_class_rules(db: &OdbDb, layer: &str, i: usize) -> String;
         fn layer_is_rect_only(db: &OdbDb, layer: &str) -> bool;
         fn layer_is_right_way_on_grid_only(db: &OdbDb, layer: &str) -> bool;
         fn layer_is_right_way_on_grid_only_check_mask(db: &OdbDb, layer: &str) -> bool;
@@ -398,10 +428,61 @@ mod ffi_gen {
         fn box_is_soft(db: &OdbDb, idx: usize) -> bool;
         fn box_get_tech_layer(db: &OdbDb, idx: usize) -> String;
         fn box_get_layer_mask(db: &OdbDb, idx: usize) -> u32;
+        fn module_get_name(db: &OdbDb, module: &str) -> String;
+        fn module_get_mod_inst(db: &OdbDb, module: &str) -> String;
+        fn module_get_parent_module(db: &OdbDb, module: &str) -> String;
+        fn module_get_hierarchical_name(db: &OdbDb, module: &str) -> String;
+        fn module_get_owner(db: &OdbDb, module: &str) -> String;
+        fn num_module_get_children(db: &OdbDb, module: &str) -> usize;
+        fn nth_module_get_children(db: &OdbDb, module: &str, i: usize) -> String;
+        fn num_module_get_mod_insts(db: &OdbDb, module: &str) -> usize;
+        fn nth_module_get_mod_insts(db: &OdbDb, module: &str, i: usize) -> String;
+        fn num_module_get_mod_nets(db: &OdbDb, module: &str) -> usize;
+        fn nth_module_get_mod_nets(db: &OdbDb, module: &str, i: usize) -> String;
+        fn num_module_get_ports(db: &OdbDb, module: &str) -> usize;
+        fn nth_module_get_ports(db: &OdbDb, module: &str, i: usize) -> String;
+        fn num_module_get_mod_b_terms(db: &OdbDb, module: &str) -> usize;
+        fn nth_module_get_mod_b_terms(db: &OdbDb, module: &str, i: usize) -> String;
+        fn num_module_get_insts(db: &OdbDb, module: &str) -> usize;
+        fn nth_module_get_insts(db: &OdbDb, module: &str, i: usize) -> String;
+        fn module_get_mod_inst_count(db: &OdbDb, module: &str) -> i32;
+        fn module_get_db_inst_count(db: &OdbDb, module: &str) -> i32;
+        fn module_is_top(db: &OdbDb, module: &str) -> bool;
+        fn group_get_name(db: &OdbDb, group: &str) -> String;
+        fn group_get_parent_group(db: &OdbDb, group: &str) -> String;
+        fn group_get_region(db: &OdbDb, group: &str) -> String;
+        fn num_group_get_mod_insts(db: &OdbDb, group: &str) -> usize;
+        fn nth_group_get_mod_insts(db: &OdbDb, group: &str, i: usize) -> String;
+        fn num_group_get_insts(db: &OdbDb, group: &str) -> usize;
+        fn nth_group_get_insts(db: &OdbDb, group: &str, i: usize) -> String;
+        fn num_group_get_groups(db: &OdbDb, group: &str) -> usize;
+        fn nth_group_get_groups(db: &OdbDb, group: &str, i: usize) -> String;
+        fn num_group_get_power_nets(db: &OdbDb, group: &str) -> usize;
+        fn nth_group_get_power_nets(db: &OdbDb, group: &str, i: usize) -> String;
+        fn num_group_get_ground_nets(db: &OdbDb, group: &str) -> usize;
+        fn nth_group_get_ground_nets(db: &OdbDb, group: &str, i: usize) -> String;
+        fn region_get_name(db: &OdbDb, region: &str) -> String;
+        fn num_region_get_region_insts(db: &OdbDb, region: &str) -> usize;
+        fn nth_region_get_region_insts(db: &OdbDb, region: &str, i: usize) -> String;
+        fn region_is_invalid(db: &OdbDb, region: &str) -> bool;
+        fn num_region_get_groups(db: &OdbDb, region: &str) -> usize;
+        fn nth_region_get_groups(db: &OdbDb, region: &str, i: usize) -> String;
+        fn region_get_block(db: &OdbDb, region: &str) -> String;
+        fn blockage_get_instance(db: &OdbDb, idx: usize) -> String;
+        fn blockage_is_pushed_down(db: &OdbDb, idx: usize) -> bool;
+        fn blockage_is_soft(db: &OdbDb, idx: usize) -> bool;
+        fn blockage_is_system_reserved(db: &OdbDb, idx: usize) -> bool;
+        fn blockage_get_max_density(db: &OdbDb, idx: usize) -> f32;
+        fn blockage_get_block(db: &OdbDb, idx: usize) -> String;
+        fn trackgrid_get_tech_layer(db: &OdbDb, idx: usize) -> String;
+        fn trackgrid_get_block(db: &OdbDb, idx: usize) -> String;
+        fn trackgrid_get_num_grid_patterns_x(db: &OdbDb, idx: usize) -> i32;
+        fn trackgrid_get_num_grid_patterns_y(db: &OdbDb, idx: usize) -> i32;
     }
 }
 
 pub use ffi_gen::{
+    block_get_chip,
     block_get_const_name,
     block_get_core_area_dx,
     block_get_core_area_dy,
@@ -430,6 +511,13 @@ pub use ffi_gen::{
     block_get_parent,
     block_get_parent_inst,
     block_get_tech,
+    block_get_top_module,
+    blockage_get_block,
+    blockage_get_instance,
+    blockage_get_max_density,
+    blockage_is_pushed_down,
+    blockage_is_soft,
+    blockage_is_system_reserved,
     box_get_block_via,
     box_get_box_dx,
     box_get_box_dy,
@@ -479,6 +567,9 @@ pub use ffi_gen::{
     fill_get_tech_layer,
     fill_mask_number,
     fill_needs_o_p_c,
+    group_get_name,
+    group_get_parent_group,
+    group_get_region,
     inst_get_block,
     inst_get_child,
     inst_get_const_name,
@@ -487,9 +578,11 @@ pub use ffi_gen::{
     inst_get_eco_modify,
     inst_get_first_input,
     inst_get_first_output,
+    inst_get_group,
     inst_get_location_x,
     inst_get_location_y,
     inst_get_master,
+    inst_get_module,
     inst_get_name,
     inst_get_orient,
     inst_get_origin_x,
@@ -620,6 +713,14 @@ pub use ffi_gen::{
     master_is_pad,
     master_is_sequential,
     master_is_special_power,
+    module_get_db_inst_count,
+    module_get_hierarchical_name,
+    module_get_mod_inst,
+    module_get_mod_inst_count,
+    module_get_name,
+    module_get_owner,
+    module_get_parent_module,
+    module_is_top,
     mterm_get_b_box_dx,
     mterm_get_b_box_dy,
     mterm_get_b_box_x_max,
@@ -639,6 +740,8 @@ pub use ffi_gen::{
     ndr_get_hard_spacing,
     ndr_get_name,
     ndr_is_block_rule,
+    net_find_main_parent_mod_inst,
+    net_find_main_parent_module,
     net_find_mod_net_in_highest_hier,
     net_get1st_b_term,
     net_get1st_cap_node_id,
@@ -694,34 +797,84 @@ pub use ffi_gen::{
     net_max_internal_cap_num,
     nth_block_get_b_terms,
     nth_block_get_children,
+    nth_block_get_groups,
     nth_block_get_i_terms,
     nth_block_get_insts,
+    nth_block_get_isolations,
+    nth_block_get_level_shifters,
+    nth_block_get_logic_ports,
+    nth_block_get_marker_categories,
+    nth_block_get_mod_b_terms,
+    nth_block_get_mod_i_terms,
+    nth_block_get_mod_insts,
     nth_block_get_mod_nets,
+    nth_block_get_modules,
     nth_block_get_nets,
     nth_block_get_non_default_rules,
+    nth_block_get_power_domains,
+    nth_block_get_power_switches,
     nth_block_get_regions,
     nth_block_get_rows,
     nth_block_get_vias,
+    nth_group_get_ground_nets,
+    nth_group_get_groups,
+    nth_group_get_insts,
+    nth_group_get_mod_insts,
+    nth_group_get_power_nets,
     nth_inst_get_children,
     nth_inst_get_i_terms,
+    nth_layer_get_tech_layer_cut_class_rules,
     nth_master_get_m_terms,
+    nth_module_get_children,
+    nth_module_get_insts,
+    nth_module_get_mod_b_terms,
+    nth_module_get_mod_insts,
+    nth_module_get_mod_nets,
+    nth_module_get_ports,
     nth_net_get_b_terms,
     nth_net_get_i_terms,
+    nth_region_get_groups,
+    nth_region_get_region_insts,
     num_block_get_b_terms,
     num_block_get_children,
+    num_block_get_groups,
     num_block_get_i_terms,
     num_block_get_insts,
+    num_block_get_isolations,
+    num_block_get_level_shifters,
+    num_block_get_logic_ports,
+    num_block_get_marker_categories,
+    num_block_get_mod_b_terms,
+    num_block_get_mod_i_terms,
+    num_block_get_mod_insts,
     num_block_get_mod_nets,
+    num_block_get_modules,
     num_block_get_nets,
     num_block_get_non_default_rules,
+    num_block_get_power_domains,
+    num_block_get_power_switches,
     num_block_get_regions,
     num_block_get_rows,
     num_block_get_vias,
+    num_group_get_ground_nets,
+    num_group_get_groups,
+    num_group_get_insts,
+    num_group_get_mod_insts,
+    num_group_get_power_nets,
     num_inst_get_children,
     num_inst_get_i_terms,
+    num_layer_get_tech_layer_cut_class_rules,
     num_master_get_m_terms,
+    num_module_get_children,
+    num_module_get_insts,
+    num_module_get_mod_b_terms,
+    num_module_get_mod_insts,
+    num_module_get_mod_nets,
+    num_module_get_ports,
     num_net_get_b_terms,
     num_net_get_i_terms,
+    num_region_get_groups,
+    num_region_get_region_insts,
     obs_get_block,
     obs_get_effective_width,
     obs_get_instance,
@@ -733,6 +886,9 @@ pub use ffi_gen::{
     obs_is_pushed_down,
     obs_is_slot_obstruction,
     obs_is_system_reserved,
+    region_get_block,
+    region_get_name,
+    region_is_invalid,
     row_get_b_box_dx,
     row_get_b_box_dy,
     row_get_b_box_x_max,
@@ -774,6 +930,10 @@ pub use ffi_gen::{
     techvia_has_params,
     techvia_is_default,
     techvia_is_top_of_stack,
+    trackgrid_get_block,
+    trackgrid_get_num_grid_patterns_x,
+    trackgrid_get_num_grid_patterns_y,
+    trackgrid_get_tech_layer,
     via_get_block,
     via_get_block_via,
     via_get_bottom_layer,

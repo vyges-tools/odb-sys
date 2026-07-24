@@ -7,9 +7,11 @@ using namespace odb;
 
 rust::String block_get_name(const OdbDb& h) { auto* p = gen_block(h); return p ? rust::String(p->getName()) : rust::String(); }
 rust::String block_get_const_name(const OdbDb& h) { auto* p = gen_block(h); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
+rust::String block_get_chip(const OdbDb& h) { auto* p = gen_block(h); if (!p) return rust::String(); auto* t = p->getChip(); return t ? rust::String(t->getName()) : rust::String(); }
 rust::String block_get_tech(const OdbDb& h) { auto* p = gen_block(h); if (!p) return rust::String(); auto* t = p->getTech(); return t ? rust::String(t->getName()) : rust::String(); }
 rust::String block_get_parent(const OdbDb& h) { auto* p = gen_block(h); if (!p) return rust::String(); auto* t = p->getParent(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String block_get_parent_inst(const OdbDb& h) { auto* p = gen_block(h); if (!p) return rust::String(); auto* t = p->getParentInst(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String block_get_top_module(const OdbDb& h) { auto* p = gen_block(h); if (!p) return rust::String(); auto* t = p->getTopModule(); return t ? rust::String(t->getName()) : rust::String(); }
 std::size_t num_block_get_children(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getChildren().size() : 0; }
 rust::String nth_block_get_children(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getChildren()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
 std::size_t num_block_get_b_terms(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getBTerms().size() : 0; }
@@ -18,8 +20,28 @@ std::size_t num_block_get_i_terms(const OdbDb& h) { auto* p = gen_block(h); retu
 rust::String nth_block_get_i_terms(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getITerms()) { if (k++ == i) return rust::String((e->getInst()->getName() + "/" + e->getMTerm()->getName())); } return rust::String(); }
 std::size_t num_block_get_insts(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getInsts().size() : 0; }
 rust::String nth_block_get_insts(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getInsts()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+std::size_t num_block_get_modules(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getModules().size() : 0; }
+rust::String nth_block_get_modules(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModules()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_block_get_mod_insts(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getModInsts().size() : 0; }
+rust::String nth_block_get_mod_insts(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModInsts()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
 std::size_t num_block_get_mod_nets(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getModNets().size() : 0; }
 rust::String nth_block_get_mod_nets(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModNets()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+std::size_t num_block_get_mod_b_terms(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getModBTerms().size() : 0; }
+rust::String nth_block_get_mod_b_terms(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModBTerms()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_block_get_mod_i_terms(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getModITerms().size() : 0; }
+rust::String nth_block_get_mod_i_terms(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModITerms()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_block_get_power_domains(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getPowerDomains().size() : 0; }
+rust::String nth_block_get_power_domains(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getPowerDomains()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_block_get_logic_ports(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getLogicPorts().size() : 0; }
+rust::String nth_block_get_logic_ports(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getLogicPorts()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_block_get_power_switches(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getPowerSwitches().size() : 0; }
+rust::String nth_block_get_power_switches(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getPowerSwitches()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_block_get_isolations(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getIsolations().size() : 0; }
+rust::String nth_block_get_isolations(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getIsolations()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_block_get_level_shifters(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getLevelShifters().size() : 0; }
+rust::String nth_block_get_level_shifters(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getLevelShifters()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_block_get_groups(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getGroups().size() : 0; }
+rust::String nth_block_get_groups(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getGroups()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
 std::size_t num_block_get_nets(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getNets().size() : 0; }
 rust::String nth_block_get_nets(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getNets()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
 std::size_t num_block_get_vias(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getVias().size() : 0; }
@@ -53,6 +75,8 @@ std::size_t num_block_get_regions(const OdbDb& h) { auto* p = gen_block(h); retu
 rust::String nth_block_get_regions(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getRegions()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
 std::size_t num_block_get_non_default_rules(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getNonDefaultRules().size() : 0; }
 rust::String nth_block_get_non_default_rules(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getNonDefaultRules()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+std::size_t num_block_get_marker_categories(const OdbDb& h) { auto* p = gen_block(h); return p ? p->getMarkerCategories().size() : 0; }
+rust::String nth_block_get_marker_categories(const OdbDb& h, std::size_t i) { auto* p = gen_block(h); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getMarkerCategories()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
 rust::String inst_get_name(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? rust::String(p->getName()) : rust::String(); }
 rust::String inst_get_const_name(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); const char* v = p->getConstName(); return rust::String(v ? v : ""); }
 int32_t inst_get_origin_x(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getOrigin().getX() : 0; }
@@ -72,11 +96,13 @@ bool inst_get_user_flag3(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h,
 bool inst_is_do_not_touch(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->isDoNotTouch() : false; }
 rust::String inst_get_block(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String inst_get_master(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getMaster(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String inst_get_group(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getGroup(); return t ? rust::String(t->getName()) : rust::String(); }
 std::size_t num_inst_get_i_terms(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getITerms().size() : 0; }
 rust::String nth_inst_get_i_terms(const OdbDb& h, rust::Str inst, std::size_t i) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getITerms()) { if (k++ == i) return rust::String((e->getInst()->getName() + "/" + e->getMTerm()->getName())); } return rust::String(); }
 rust::String inst_get_first_input(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getFirstInput(); return t ? rust::String((t->getInst()->getName() + "/" + t->getMTerm()->getName())) : rust::String(); }
 rust::String inst_get_first_output(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getFirstOutput(); return t ? rust::String((t->getInst()->getName() + "/" + t->getMTerm()->getName())) : rust::String(); }
 rust::String inst_get_region(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getRegion(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String inst_get_module(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getModule(); return t ? rust::String(t->getName()) : rust::String(); }
 rust::String inst_get_child(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getChild(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String inst_get_parent(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); if (!p) return rust::String(); auto* t = p->getParent(); return t ? rust::String(t->getConstName()) : rust::String(); }
 std::size_t num_inst_get_children(const OdbDb& h, rust::Str inst) { auto* p = gen_inst(h, inst); return p ? p->getChildren().size() : 0; }
@@ -151,6 +177,8 @@ int32_t net_get_term_b_box_x_max(const OdbDb& h, rust::Str net) { auto* p = gen_
 int32_t net_get_term_b_box_y_max(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().yMax() : 0; }
 int32_t net_get_term_b_box_dx(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().dx() : 0; }
 int32_t net_get_term_b_box_dy(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->getTermBBox().dy() : 0; }
+rust::String net_find_main_parent_mod_inst(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); if (!p) return rust::String(); auto* t = p->findMainParentModInst(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String net_find_main_parent_module(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); if (!p) return rust::String(); auto* t = p->findMainParentModule(); return t ? rust::String(t->getName()) : rust::String(); }
 bool net_has_jumpers(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); return p ? p->hasJumpers() : false; }
 rust::String net_find_mod_net_in_highest_hier(const OdbDb& h, rust::Str net) { auto* p = gen_net(h, net); if (!p) return rust::String(); auto* t = p->findModNetInHighestHier(); return t ? rust::String(t->getConstName()) : rust::String(); }
 rust::String bterm_get_name(const OdbDb& h, rust::Str bterm) { auto* p = gen_bterm(h, bterm); return p ? rust::String(p->getName()) : rust::String(); }
@@ -246,6 +274,8 @@ int32_t mterm_get_index(const OdbDb& h, rust::Str master, rust::Str term) { auto
 uint32_t layer_get_wrong_way_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getWrongWayWidth() : 0; }
 uint32_t layer_get_wrong_way_min_width(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getWrongWayMinWidth() : 0; }
 float layer_get_layer_adjustment(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getLayerAdjustment() : 0.0f; }
+std::size_t num_layer_get_tech_layer_cut_class_rules(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->getTechLayerCutClassRules().size() : 0; }
+rust::String nth_layer_get_tech_layer_cut_class_rules(const OdbDb& h, rust::Str layer, std::size_t i) { auto* p = gen_techlayer(h, layer); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getTechLayerCutClassRules()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
 bool layer_is_rect_only(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->isRectOnly() : false; }
 bool layer_is_right_way_on_grid_only(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->isRightWayOnGridOnly() : false; }
 bool layer_is_right_way_on_grid_only_check_mask(const OdbDb& h, rust::Str layer) { auto* p = gen_techlayer(h, layer); return p ? p->isRightWayOnGridOnlyCheckMask() : false; }
@@ -395,3 +425,53 @@ uint32_t box_get_d_y(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx
 bool box_is_soft(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->isSoft() : false; }
 rust::String box_get_tech_layer(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); if (!p) return rust::String(); auto* t = p->getTechLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
 uint32_t box_get_layer_mask(const OdbDb& h, std::size_t idx) { auto* p = gen_box(h, idx); return p ? p->getLayerMask() : 0; }
+rust::String module_get_name(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); if (!p) return rust::String(); const char* v = p->getName(); return rust::String(v ? v : ""); }
+rust::String module_get_mod_inst(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); if (!p) return rust::String(); auto* t = p->getModInst(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String module_get_parent_module(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); if (!p) return rust::String(); auto* t = p->getParentModule(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String module_get_hierarchical_name(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? rust::String(p->getHierarchicalName()) : rust::String(); }
+rust::String module_get_owner(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); if (!p) return rust::String(); auto* t = p->getOwner(); return t ? rust::String(t->getConstName()) : rust::String(); }
+std::size_t num_module_get_children(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->getChildren().size() : 0; }
+rust::String nth_module_get_children(const OdbDb& h, rust::Str module, std::size_t i) { auto* p = gen_module(h, module); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getChildren()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_module_get_mod_insts(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->getModInsts().size() : 0; }
+rust::String nth_module_get_mod_insts(const OdbDb& h, rust::Str module, std::size_t i) { auto* p = gen_module(h, module); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModInsts()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_module_get_mod_nets(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->getModNets().size() : 0; }
+rust::String nth_module_get_mod_nets(const OdbDb& h, rust::Str module, std::size_t i) { auto* p = gen_module(h, module); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModNets()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+std::size_t num_module_get_ports(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->getPorts().size() : 0; }
+rust::String nth_module_get_ports(const OdbDb& h, rust::Str module, std::size_t i) { auto* p = gen_module(h, module); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getPorts()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_module_get_mod_b_terms(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->getModBTerms().size() : 0; }
+rust::String nth_module_get_mod_b_terms(const OdbDb& h, rust::Str module, std::size_t i) { auto* p = gen_module(h, module); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModBTerms()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_module_get_insts(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->getInsts().size() : 0; }
+rust::String nth_module_get_insts(const OdbDb& h, rust::Str module, std::size_t i) { auto* p = gen_module(h, module); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getInsts()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+int32_t module_get_mod_inst_count(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->getModInstCount() : 0; }
+int32_t module_get_db_inst_count(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->getDbInstCount() : 0; }
+bool module_is_top(const OdbDb& h, rust::Str module) { auto* p = gen_module(h, module); return p ? p->isTop() : false; }
+rust::String group_get_name(const OdbDb& h, rust::Str group) { auto* p = gen_group(h, group); if (!p) return rust::String(); const char* v = p->getName(); return rust::String(v ? v : ""); }
+rust::String group_get_parent_group(const OdbDb& h, rust::Str group) { auto* p = gen_group(h, group); if (!p) return rust::String(); auto* t = p->getParentGroup(); return t ? rust::String(t->getName()) : rust::String(); }
+rust::String group_get_region(const OdbDb& h, rust::Str group) { auto* p = gen_group(h, group); if (!p) return rust::String(); auto* t = p->getRegion(); return t ? rust::String(t->getName()) : rust::String(); }
+std::size_t num_group_get_mod_insts(const OdbDb& h, rust::Str group) { auto* p = gen_group(h, group); return p ? p->getModInsts().size() : 0; }
+rust::String nth_group_get_mod_insts(const OdbDb& h, rust::Str group, std::size_t i) { auto* p = gen_group(h, group); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getModInsts()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_group_get_insts(const OdbDb& h, rust::Str group) { auto* p = gen_group(h, group); return p ? p->getInsts().size() : 0; }
+rust::String nth_group_get_insts(const OdbDb& h, rust::Str group, std::size_t i) { auto* p = gen_group(h, group); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getInsts()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+std::size_t num_group_get_groups(const OdbDb& h, rust::Str group) { auto* p = gen_group(h, group); return p ? p->getGroups().size() : 0; }
+rust::String nth_group_get_groups(const OdbDb& h, rust::Str group, std::size_t i) { auto* p = gen_group(h, group); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getGroups()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+std::size_t num_group_get_power_nets(const OdbDb& h, rust::Str group) { auto* p = gen_group(h, group); return p ? p->getPowerNets().size() : 0; }
+rust::String nth_group_get_power_nets(const OdbDb& h, rust::Str group, std::size_t i) { auto* p = gen_group(h, group); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getPowerNets()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+std::size_t num_group_get_ground_nets(const OdbDb& h, rust::Str group) { auto* p = gen_group(h, group); return p ? p->getGroundNets().size() : 0; }
+rust::String nth_group_get_ground_nets(const OdbDb& h, rust::Str group, std::size_t i) { auto* p = gen_group(h, group); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getGroundNets()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+rust::String region_get_name(const OdbDb& h, rust::Str region) { auto* p = gen_region(h, region); return p ? rust::String(p->getName()) : rust::String(); }
+std::size_t num_region_get_region_insts(const OdbDb& h, rust::Str region) { auto* p = gen_region(h, region); return p ? p->getRegionInsts().size() : 0; }
+rust::String nth_region_get_region_insts(const OdbDb& h, rust::Str region, std::size_t i) { auto* p = gen_region(h, region); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getRegionInsts()) { if (k++ == i) return rust::String(e->getConstName()); } return rust::String(); }
+bool region_is_invalid(const OdbDb& h, rust::Str region) { auto* p = gen_region(h, region); return p ? p->isInvalid() : false; }
+std::size_t num_region_get_groups(const OdbDb& h, rust::Str region) { auto* p = gen_region(h, region); return p ? p->getGroups().size() : 0; }
+rust::String nth_region_get_groups(const OdbDb& h, rust::Str region, std::size_t i) { auto* p = gen_region(h, region); if (!p) return rust::String(); std::size_t k = 0; for (auto* e : p->getGroups()) { if (k++ == i) return rust::String(e->getName()); } return rust::String(); }
+rust::String region_get_block(const OdbDb& h, rust::Str region) { auto* p = gen_region(h, region); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String blockage_get_instance(const OdbDb& h, std::size_t idx) { auto* p = gen_blockage(h, idx); if (!p) return rust::String(); auto* t = p->getInstance(); return t ? rust::String(t->getConstName()) : rust::String(); }
+bool blockage_is_pushed_down(const OdbDb& h, std::size_t idx) { auto* p = gen_blockage(h, idx); return p ? p->isPushedDown() : false; }
+bool blockage_is_soft(const OdbDb& h, std::size_t idx) { auto* p = gen_blockage(h, idx); return p ? p->isSoft() : false; }
+bool blockage_is_system_reserved(const OdbDb& h, std::size_t idx) { auto* p = gen_blockage(h, idx); return p ? p->isSystemReserved() : false; }
+float blockage_get_max_density(const OdbDb& h, std::size_t idx) { auto* p = gen_blockage(h, idx); return p ? p->getMaxDensity() : 0.0f; }
+rust::String blockage_get_block(const OdbDb& h, std::size_t idx) { auto* p = gen_blockage(h, idx); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String trackgrid_get_tech_layer(const OdbDb& h, std::size_t idx) { auto* p = gen_trackgrid(h, idx); if (!p) return rust::String(); auto* t = p->getTechLayer(); return t ? rust::String(t->getConstName()) : rust::String(); }
+rust::String trackgrid_get_block(const OdbDb& h, std::size_t idx) { auto* p = gen_trackgrid(h, idx); if (!p) return rust::String(); auto* t = p->getBlock(); return t ? rust::String(t->getConstName()) : rust::String(); }
+int32_t trackgrid_get_num_grid_patterns_x(const OdbDb& h, std::size_t idx) { auto* p = gen_trackgrid(h, idx); return p ? p->getNumGridPatternsX() : 0; }
+int32_t trackgrid_get_num_grid_patterns_y(const OdbDb& h, std::size_t idx) { auto* p = gen_trackgrid(h, idx); return p ? p->getNumGridPatternsY() : 0; }

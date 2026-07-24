@@ -36,6 +36,7 @@ long tail of accessors is bound *mechanically* instead of by hand:
 | `dbVia` | name | `block->findVia` |
 | `dbTechNonDefaultRule` | name | `block`/`tech` `->findNonDefaultRule` |
 | `dbRow` | name (scan rows) | `block->getRows()` match |
+| `dbModule` · `dbGroup` · `dbRegion` | name | `block->find{Module,Group,Region}` |
 
 Classes with **no name** are addressed by **position** instead (the index-addressing mode —
 an arg typed `idx` → `usize`/`std::size_t`):
@@ -46,6 +47,7 @@ an arg typed `idx` → `usize`/`std::size_t`):
 | `dbSWire` | `net` + `idx` | i-th of `net->getSWires()` |
 | `dbWire` | `net` | `net->getWire()` (1:1 with the net) |
 | `dbBox` | `idx` | i-th obstruction's `getBBox()` — surfaces box geometry (`xMin`/`getDX`/…) |
+| `dbBlockage` · `dbTrackGrid` | `idx` | i-th of `block->get{Blockages,TrackGrids}()` |
 
 **Still uncovered:** `dbRSeg`/`dbCapNode` (parasitics — addressable by id, low instrumentation
 value) and the polymorphic ownership of `dbBox` beyond obstructions (inst/master/pin bboxes)

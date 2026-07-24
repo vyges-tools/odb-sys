@@ -152,6 +152,11 @@ mod ffi_gen_write {
         fn wire_set_property(db: &OdbDb, net: &str, jid: i32, property: i32) -> Result<()>;
         fn box_set_soft(db: &OdbDb, idx: usize, value: bool) -> Result<()>;
         fn box_set_layer_mask(db: &OdbDb, idx: usize, mask: u32) -> Result<()>;
+        fn region_set_invalid(db: &OdbDb, region: &str, v: bool) -> Result<()>;
+        fn blockage_set_pushed_down(db: &OdbDb, idx: usize) -> Result<()>;
+        fn blockage_set_soft(db: &OdbDb, idx: usize) -> Result<()>;
+        fn blockage_set_is_system_reserved(db: &OdbDb, idx: usize, is_system_reserved: bool) -> Result<()>;
+        fn blockage_set_max_density(db: &OdbDb, idx: usize, max_density: f32) -> Result<()>;
     }
 }
 
@@ -167,6 +172,10 @@ pub use ffi_gen_write::{
     block_set_max_routing_layer,
     block_set_min_layer_for_clock,
     block_set_min_routing_layer,
+    blockage_set_is_system_reserved,
+    blockage_set_max_density,
+    blockage_set_pushed_down,
+    blockage_set_soft,
     box_set_layer_mask,
     box_set_soft,
     bterm_set_ext_id,
@@ -288,6 +297,7 @@ pub use ffi_gen_write::{
     obs_set_min_spacing,
     obs_set_pushed_down,
     obs_set_slot_obstruction,
+    region_set_invalid,
     site_set_height,
     site_set_symmetry_r90,
     site_set_symmetry_x,

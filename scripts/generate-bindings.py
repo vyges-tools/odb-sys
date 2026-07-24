@@ -55,6 +55,12 @@ TARGETS = {
     "dbWire":      {"key": "wire",   "args": ["net"],             "resolve": "gen_wire(h, net)"},
     "dbFill":      {"key": "fill",   "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_fill(h, idx)"},
     "dbBox":       {"key": "box",    "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_box(h, idx)"},
+    # hierarchy / grouping / region (name-addressable) + blockage / track-grid (index-addressed)
+    "dbModule":    {"key": "module", "args": ["module"], "resolve": "gen_module(h, module)"},
+    "dbGroup":     {"key": "group",  "args": ["group"],  "resolve": "gen_group(h, group)"},
+    "dbRegion":    {"key": "region", "args": ["region"], "resolve": "gen_region(h, region)"},
+    "dbBlockage":  {"key": "blockage",  "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_blockage(h, idx)"},
+    "dbTrackGrid": {"key": "trackgrid", "args": [{"name": "idx", "type": "idx"}], "resolve": "gen_trackgrid(h, idx)"},
 }
 
 
@@ -168,7 +174,9 @@ def nameable_classes(db_h: str) -> dict[str, str]:
         body = db_h[m.end():i - 1]
         if re.search(r"\bgetConstName\s*\(\s*\)", body):
             out[name] = "{}->getConstName()"
-        elif re.search(r"\bstd::string\s+getName\s*\(\s*\)", body):
+        elif re.search(r"\bgetName\s*\(\s*\)", body):
+            # any no-arg getName() (std::string OR const char*) -> rust::String accepts both.
+            # (dbITerm's getName(char='/') has a param, so it won't match here — overridden below.)
             out[name] = "{}->getName()"
     out["dbITerm"] = '({0}->getInst()->getName() + "/" + {0}->getMTerm()->getName())'
     return out
@@ -524,6 +532,18 @@ def main() -> int:
         "  std::size_t k = 0; for (odb::dbFill* f : b->getFills()) { if (k++ == i) return f; } return nullptr; }\n"
         "static odb::dbBox* gen_box(const OdbDb& h, std::size_t i) {\n"
         "  odb::dbObstruction* o = gen_obstruction(h, i); return o ? o->getBBox() : nullptr; }\n"
+        "static odb::dbModule* gen_module(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findModule(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbGroup* gen_group(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findGroup(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbRegion* gen_region(const OdbDb& h, rust::Str n) {\n"
+        "  odb::dbBlock* b = gen_block(h); return b ? b->findRegion(gs(n).c_str()) : nullptr; }\n"
+        "static odb::dbBlockage* gen_blockage(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbBlockage* x : b->getBlockages()) { if (k++ == i) return x; } return nullptr; }\n"
+        "static odb::dbTrackGrid* gen_trackgrid(const OdbDb& h, std::size_t i) {\n"
+        "  odb::dbBlock* b = gen_block(h); if (!b) return nullptr;\n"
+        "  std::size_t k = 0; for (odb::dbTrackGrid* x : b->getTrackGrids()) { if (k++ == i) return x; } return nullptr; }\n"
         "}  // namespace\n")
 
     # ---- generated_resolvers.h (shared by the read + write .cc) -----------------

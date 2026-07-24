@@ -151,3 +151,8 @@ void swire_set_wire_type(const OdbDb& h, rust::Str net, std::size_t idx, rust::S
 void wire_set_property(const OdbDb& h, rust::Str net, int32_t jid, int32_t property) { auto* p = gen_wire(h, net); if (!p) throw std::runtime_error("vyges-opendb: dbWire not found"); p->setProperty(jid, property); }
 void box_set_soft(const OdbDb& h, std::size_t idx, bool value) { auto* p = gen_box(h, idx); if (!p) throw std::runtime_error("vyges-opendb: dbBox not found"); p->setSoft(value); }
 void box_set_layer_mask(const OdbDb& h, std::size_t idx, uint32_t mask) { auto* p = gen_box(h, idx); if (!p) throw std::runtime_error("vyges-opendb: dbBox not found"); p->setLayerMask(mask); }
+void region_set_invalid(const OdbDb& h, rust::Str region, bool v) { auto* p = gen_region(h, region); if (!p) throw std::runtime_error("vyges-opendb: dbRegion not found"); p->setInvalid(v); }
+void blockage_set_pushed_down(const OdbDb& h, std::size_t idx) { auto* p = gen_blockage(h, idx); if (!p) throw std::runtime_error("vyges-opendb: dbBlockage not found"); p->setPushedDown(); }
+void blockage_set_soft(const OdbDb& h, std::size_t idx) { auto* p = gen_blockage(h, idx); if (!p) throw std::runtime_error("vyges-opendb: dbBlockage not found"); p->setSoft(); }
+void blockage_set_is_system_reserved(const OdbDb& h, std::size_t idx, bool is_system_reserved) { auto* p = gen_blockage(h, idx); if (!p) throw std::runtime_error("vyges-opendb: dbBlockage not found"); p->setIsSystemReserved(is_system_reserved); }
+void blockage_set_max_density(const OdbDb& h, std::size_t idx, float max_density) { auto* p = gen_blockage(h, idx); if (!p) throw std::runtime_error("vyges-opendb: dbBlockage not found"); p->setMaxDensity(max_density); }
