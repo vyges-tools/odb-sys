@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0
+# Freshness gate for the machine-generated binding surface.
+#
+# The cxx bindings, the third (write) bridge, the runtime registry, and the coverage map are all
+# DERIVED from OpenROAD's db.h by scripts/generate-bindings.py + derive-schema.py — nothing here is
+# hand-written per API. This job re-runs the generators against the pinned db.h and fails if the
+# committed output drifted, so an OpenROAD SHA bump (or a generator edit) can never land with stale
+# generated code. See docs/derived-core-schema.md and the architecture note in vyges-tools-internal.
+name: generated-freshness
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # Sibling layout: the generator writes the safe Db API + registry into the opendb crate, so
+      # both repos must be present as siblings (same layout as release-opendb.yml).
+      - uses: actions/checkout@v4
+        with:
+          path: vyges-tools-opendb-lib
+      - uses: actions/checkout@v4
+        with:
+          repository: vyges-tools/opendb
+          path: vyges-tools-opendb
+
+      - name: Regenerate from db.h and fail on drift
+        working-directory: vyges-tools-opendb-lib
+        # fetch-odb-src.sh pulls the pinned OpenROAD odb subtree (for db.h); check-generated.sh
+        # re-emits every artifact and git-diffs both repos.
+        run: scripts/check-generated.sh
