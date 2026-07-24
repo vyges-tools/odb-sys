@@ -28,7 +28,7 @@ jobs:
         include:
           - { os: ubuntu-latest,    label: linux-x86_64 }
           - { os: ubuntu-24.04-arm, label: linux-arm64  }
-          - { os: macos-14,         label: macos-arm64  }
+          - { os: macos-latest,     label: macos-arm64  }   # newest hosted macOS (Apple Silicon); modern Xcode
     steps:
       - uses: actions/checkout@v4
       - name: Toolchain (Linux)
@@ -41,14 +41,6 @@ jobs:
       - name: Toolchain (macOS)
         if: runner.os == 'macOS'
         run: brew install cmake boost   # NOT fmt/spdlog/abseil — built from source
-      - name: Select newest Xcode (macOS)
-        if: runner.os == 'macOS'
-        # The image default (Xcode 15.4) ships a libc++ that rejects cxx's rust::Slice iterator
-        # (undefined std::__pointer_traits_element_type<...>); Xcode >= 16's libc++ compiles it.
-        run: |
-          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
-          [ -n "$LATEST" ] && sudo xcode-select -s "$LATEST"
-          echo "using: $(xcodebuild -version | head -1)"
       - uses: dtolnay/rust-toolchain@stable
       - name: cargo test (build-from-source, end-to-end bridge)
         run: cargo test --release --verbose
@@ -63,7 +55,7 @@ jobs:
         include:
           - { os: ubuntu-latest,    label: linux-x86_64, base: "ubuntu-24.04" }
           - { os: ubuntu-24.04-arm, label: linux-arm64,  base: "ubuntu-24.04" }
-          - { os: macos-14,         label: macos-arm64,  base: "macos>=11.0"  }
+          - { os: macos-latest,     label: macos-arm64,  base: "macos>=11.0"  }   # newest hosted macOS (Apple Silicon)
     steps:
       - uses: actions/checkout@v4
 
@@ -77,14 +69,6 @@ jobs:
       - name: Toolchain (macOS)
         if: runner.os == 'macOS'
         run: brew install cmake boost
-
-      - name: Select newest Xcode (macOS)
-        if: runner.os == 'macOS'
-        # Image default Xcode 15.4's libc++ rejects cxx's rust::Slice iterator; Xcode >= 16 is fine.
-        run: |
-          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
-          [ -n "$LATEST" ] && sudo xcode-select -s "$LATEST"
-          echo "using: $(xcodebuild -version | head -1)"
 
       - name: Fetch pinned odb subtree (sparse)
         run: scripts/fetch-odb-src.sh
