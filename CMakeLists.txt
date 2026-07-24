@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
-# vyges-odb-sys — standalone libodb (OpenDB core) built from a pinned, sparse
-# OpenROAD subtree. No SWIG, no Tcl, no OpenROAD engines. C++20.
+# vyges-opendb-lib — standalone libodb (OpenDB core + LEF/DEF I/O) built from a pinned, sparse
+# OpenROAD subtree. No SWIG, no Tcl, no OpenROAD engines. C++20. BISON at build time (LEF/DEF).
 #
 # The source layout is pinned (see openroad-pin.yaml); scripts/fetch-odb-src.sh
 # sparse-checks-out src/odb + src/utl + cmake into vendor/OpenROAD.
@@ -46,29 +46,52 @@ FetchContent_MakeAvailable(fmt absl)   # fmt before spdlog (SPDLOG_FMT_EXTERNAL)
 FetchContent_MakeAvailable(spdlog)
 
 # ---- sources (pinned layout) -------------------------------------------------
-# v0 scope: the db core (in-memory model + .odb read/write) + utl (logger).
-# The db core carries dbDatabase read/write, the ECO journal, wire codec, RC, etc.
-# LEF/DEF/GDS I/O sub-libs (defin/lefin/gdsin/...) are a follow-up (ODB_IO below).
-file(GLOB DB_SRC  CONFIGURE_DEPENDS "${OPENROAD_SRC}/src/odb/src/db/*.cpp")
+# v1 scope: the db core + utl (logger) + LEF/DEF I/O (lefin/lefout/defin/defout and the si2
+# LEF/DEF parser libs). We do NOT use OpenROAD's per-sub-lib CMakeLists via add_subdirectory —
+# they call OpenROAD-only macros (swig_lib, messages) and assume the OpenROAD project layout — so
+# we glob the sources into one static lib ourselves, as we already do for db+utl.
+# Still deliberately excluded: Tcl, SWIG, or-tools, engines, GDS/CDL/3dblox (add later if needed).
+set(ODB "${OPENROAD_SRC}/src/odb/src")
+
+# The si2 LEF/DEF parsers are BISON-generated (their lexers are hand-written — no flex).
+find_package(BISON REQUIRED)
+bison_target(lef_parser "${ODB}/lef/lef/lef.y" "${CMAKE_CURRENT_BINARY_DIR}/lef_parser.cpp"
+             COMPILE_FLAGS "--name-prefix=lefyy")
+bison_target(def_parser "${ODB}/def/def/def.y" "${CMAKE_CURRENT_BINARY_DIR}/def_parser.cpp"
+             COMPILE_FLAGS "--name-prefix=defyy")
+
+file(GLOB DB_SRC  CONFIGURE_DEPENDS "${ODB}/db/*.cpp")
 file(GLOB UTL_SRC CONFIGURE_DEPENDS
      "${OPENROAD_SRC}/src/utl/src/*.cpp"
      "${OPENROAD_SRC}/src/utl/src/prometheus/*.cpp")  # Logger.cpp references it unconditionally
-# Drop the Tcl-glue files (need tcl.h; unused in a tcl-free libodb). They only compiled on
-# macOS by accident (system tcl.h present) and were dropped as dead code at link time.
+# Drop the Tcl-glue files (need tcl.h; unused in a tcl-free libodb).
 list(FILTER UTL_SRC EXCLUDE REGEX "/(MakeLogger|decode)\\.cpp$")
+# LEF/DEF readers/writers + the parser libs. For lef/def, ONLY the lef/ + lefzlib/ (resp. def/ +
+# defzlib/) subdirs are part of the library; the sibling subdirs (clef, lefrw, TEST, doc, …) are
+# standalone tools we don't build.
+file(GLOB IO_SRC CONFIGURE_DEPENDS
+     "${ODB}/defin/*.cpp" "${ODB}/defout/*.cpp"
+     "${ODB}/lefin/*.cpp" "${ODB}/lefout/*.cpp"
+     "${ODB}/lef/lef/*.cpp" "${ODB}/lef/lefzlib/*.cpp"
+     "${ODB}/def/def/*.cpp" "${ODB}/def/defzlib/*.cpp")
 
-add_library(odb STATIC ${DB_SRC} ${UTL_SRC})
+add_library(odb STATIC ${DB_SRC} ${UTL_SRC} ${IO_SRC}
+            ${BISON_lef_parser_OUTPUT_SOURCE} ${BISON_def_parser_OUTPUT_SOURCE})
 target_include_directories(odb PUBLIC
   "${OPENROAD_SRC}/src/odb/include"
-  "${OPENROAD_SRC}/src/utl/include")
-# Link fmt/spdlog/abseil (our pinned, source-built) BEFORE Boost so their headers win: a
-# system Boost dir (e.g. Homebrew's /opt/homebrew/include) also bundles a *different* fmt/abseil,
-# and if it came first the odb objects would reference those symbols and fail to link our pins.
+  "${OPENROAD_SRC}/src/utl/include"
+  "${ODB}/lef/lef" "${ODB}/lef/lefzlib"
+  "${ODB}/def/def" "${ODB}/def/defzlib"
+  "${CMAKE_CURRENT_BINARY_DIR}")            # generated lef_parser.hpp / def_parser.hpp
+# Link fmt/spdlog/abseil (our pinned, source-built) BEFORE Boost so their headers win: a system
+# Boost dir (e.g. Homebrew's /opt/homebrew/include) also bundles a *different* fmt/abseil, and if
+# it came first the odb objects would reference those symbols and fail to link our pins.
 target_link_libraries(odb PUBLIC
   fmt::fmt spdlog::spdlog
   absl::synchronization absl::strings absl::hash absl::flat_hash_map absl::base
   Boost::headers ZLIB::ZLIB)
-# Deliberately NOT linked: Tcl (proven droppable), SWIG bindings, or-tools, engines.
+# The si2 parser C code trips -Wclass-memaccess on GCC (not an error — no -Werror); silence it.
+target_compile_options(odb PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-class-memaccess>)
 
 # ---- smoke test: round-trip a real .odb --------------------------------------
 option(VYGES_ODB_SMOKE "Build the .odb round-trip smoke test" OFF)

@@ -45,11 +45,11 @@ jobs:
         # abseil are built from source by CMake — installing the system copies would shadow the pins.
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ git binutils libboost-dev zlib1g-dev
+          sudo apt-get install -y cmake g++ git binutils bison libboost-dev zlib1g-dev
 
       - name: Toolchain (macOS)
         if: runner.os == 'macOS'
-        run: brew install cmake boost   # NOT fmt/spdlog/abseil — built from source
+        run: brew install cmake boost bison   # bison for the LEF/DEF parsers; NOT fmt/spdlog/abseil
 
       - uses: dtolnay/rust-toolchain@stable
 
@@ -59,7 +59,10 @@ jobs:
       - name: Configure + build libodb + odb_smoke (from source, static)
         run: |
           OSX=""
-          [ "${{ runner.os }}" = "macOS" ] && OSX="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_PREFIX_PATH=$(brew --prefix)"
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            OSX="-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_PREFIX_PATH=$(brew --prefix)"
+            export PATH="$(brew --prefix bison)/bin:$PATH"  # brew bison is keg-only + newer than macOS's 2.x
+          fi
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVYGES_ODB_SMOKE=ON $OSX
           # Build ONLY odb_smoke (pulls in libodb + the abseil subset odb actually uses). The
           # default `all` target also compiles abseil libs odb never links (flags/status/...).

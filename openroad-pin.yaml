@@ -18,6 +18,8 @@ deps:
 license:
   spdx: BSD-3-Clause                                  # OpenROAD source
 notes: >
-  Standalone libodb links WITHOUT tcl, swig, or-tools, or any OpenROAD engine. fmt/spdlog/abseil
-  are built from source (static); only glibc + zlib are dynamic, so the binary is portable across
-  Linux distros with glibc >= the build base. Requires C++20.
+  Standalone libodb links WITHOUT tcl, swig, or-tools, or any OpenROAD engine. v1 adds LEF/DEF I/O
+  (lefin/lefout/defin/defout + the si2 LEF/DEF parser libs; the parsers are BISON-generated, so
+  BISON is a build-time dep — no flex). fmt/spdlog/abseil are built from source (static); only
+  glibc + zlib are dynamic, so the binary is portable across Linux distros with glibc >= the build
+  base. Requires C++20.
