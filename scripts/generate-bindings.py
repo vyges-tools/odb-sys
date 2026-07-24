@@ -575,7 +575,9 @@ def main() -> int:
     ds = load_derive()
     db_h = DB_H.read_text()
     by_name = {}
+    all_classes = []
     for cname, base, body in ds.iter_class_bodies(db_h):
+        all_classes.append(cname)
         if cname in TARGETS:
             by_name[cname] = ds.parse_class(cname, base, body, set())
     missing = [c for c in TARGETS if c not in by_name]
@@ -811,6 +813,25 @@ def main() -> int:
         for c, f, vt, kd, _ in wreg)
     write_arms = "\n".join(t[4] for t in wreg)
 
+    # Unimplemented map: every method on a targeted class that the generator did NOT bind (its
+    # snake-field is neither a field nor the base of an expanded sub-field). Lets the get/set
+    # fallback answer assertively ("<odb method> not implemented") and log exactly what was called.
+    impl_fields: dict = {}
+    for t in list(reg) + list(wreg):
+        impl_fields.setdefault(t[0], set()).add(t[1])
+
+    def is_impl(cls, method):
+        b = snake(method)
+        return any(x == b or x.startswith(b + "_") for x in impl_fields.get(cls, ()))
+
+    unimpl = sorted(
+        (cls, snake(m["name"]), m["name"], m["kind"], m["return"].strip())
+        for cls in TARGETS for m in by_name[cls]["methods"] if not is_impl(cls, m["name"]))
+    unimpl_lit = "\n".join(
+        f'    Unimpl {{ class: "{c}", field: "{f}", method: "{meth}", kind: "{k}", ret: {chr(34)+rt.replace(chr(34), chr(39))+chr(34)} }},'
+        for c, f, meth, k, rt in unimpl)
+    known_classes_lit = ",\n    ".join(f'"{c}"' for c in sorted(set(all_classes)))
+
     (API / "src/generated_registry.rs").write_text(
         "// SPDX-License-Identifier: Apache-2.0\n" + BANNER +
         "// Runtime registry over the generated accessors: field discovery + string-keyed\n"
@@ -830,11 +851,51 @@ def main() -> int:
         "fn k_idx(keys: &[String], i: usize) -> crate::Result<usize> {\n"
         "    k_str(keys, i)?.parse()\n"
         "        .map_err(|_| crate::Error::Odb(format!(\"key #{i} must be an integer index\")))\n}\n\n"
+        "/// A real odb method the generator did NOT bind (for assertive 'not implemented' answers).\n"
+        "pub struct Unimpl {\n"
+        "    pub class: &'static str,\n    pub field: &'static str,\n    pub method: &'static str,\n"
+        "    pub kind: &'static str,\n    pub ret: &'static str,\n}\n\n"
+        "/// Every real odb method on a targeted class that is not yet bound.\n"
+        "pub const UNIMPLEMENTED: &[Unimpl] = &[\n" + unimpl_lit + "\n];\n\n"
+        "/// Every odb class name (to tell a real-but-unbound class from a typo).\n"
+        "pub const KNOWN_CLASSES: &[&str] = &[\n    " + known_classes_lit + ",\n];\n\n"
+        "/// Emit an odb API-surface miss as a structured `vyges-events` event — the same\n"
+        "/// stderr->JSONL->orchestrator causal-trail path every engine uses, so downstream misses\n"
+        "/// are centralized, clustered by `code`, with class:/field:/method: as co-reference objects.\n"
+        "fn record_miss(code: &str, class: &str, field: &str, method: &str, raw: &str) {\n"
+        "    let mut objects = vec![format!(\"class:{class}\"), format!(\"field:{field}\")];\n"
+        "    if !method.is_empty() {\n"
+        "        objects.push(format!(\"method:{method}\"));\n"
+        "    }\n"
+        "    vyges_events::emit(\n"
+        "        &vyges_events::Event::new(\"vyges-opendb\", vyges_events::Severity::Warn, raw)\n"
+        "            .with_code(code)\n"
+        "            .with_objects(objects),\n"
+        "    );\n}\n\n"
+        "/// Fallback for an unmatched (class, field): emit a structured miss event, and answer\n"
+        "/// assertively — distinguishing a real-but-unbound odb API from an unknown field / non-odb\n"
+        "/// class. Codes: ODB-0900 unimplemented API · ODB-0901 unknown field · ODB-0902 unknown class.\n"
+        "fn miss<T>(op: &str, class: &str, field: &str) -> crate::Result<T> {\n"
+        "    if let Some(u) = UNIMPLEMENTED.iter().find(|u| u.class == class && u.field == field) {\n"
+        "        let raw = format!(\n"
+        "            \"{class}::{} not implemented — real odb API ({} returning {}), no binding yet\",\n"
+        "            u.method, u.kind, u.ret);\n"
+        "        record_miss(\"ODB-0900\", class, field, u.method, &raw);\n"
+        "        return Err(crate::Error::Odb(raw));\n"
+        "    }\n"
+        "    if KNOWN_CLASSES.contains(&class) {\n"
+        "        let raw = format!(\"{op}: unknown field '{field}' on odb class '{class}'\");\n"
+        "        record_miss(\"ODB-0901\", class, field, \"\", &raw);\n"
+        "        return Err(crate::Error::Odb(raw));\n"
+        "    }\n"
+        "    let raw = format!(\"{op}: '{class}' is not an odb class\");\n"
+        "    record_miss(\"ODB-0902\", class, field, \"\", &raw);\n"
+        "    Err(crate::Error::Odb(raw))\n}\n\n"
         "/// Read a field by (class, field) with string-encoded addressing keys -> JSON value.\n"
         "pub fn get(db: &Db, class: &str, field: &str, keys: &[String]) "
         "-> crate::Result<serde_json::Value> {\n"
         "    match (class, field) {\n" + read_arms + "\n"
-        "        _ => Err(crate::Error::Odb(format!(\"unknown read field: {class}.{field}\"))),\n"
+        "        _ => miss(\"read\", class, field),\n"
         "    }\n}\n\n"
         "/// A writable field: its class, name, value types to supply, and addressing keys.\n"
         "#[cfg(feature = \"gen-write\")]\n"
@@ -853,7 +914,7 @@ def main() -> int:
         "pub fn set(db: &mut Db, class: &str, field: &str, keys: &[String], values: &[String]) "
         "-> crate::Result<()> {\n"
         "    match (class, field) {\n" + write_arms + "\n"
-        "        _ => Err(crate::Error::Odb(format!(\"unknown write field: {class}.{field}\"))),\n"
+        "        _ => miss(\"write\", class, field),\n"
         "    }\n}\n")
 
     total = sum(e.per_class.values())
